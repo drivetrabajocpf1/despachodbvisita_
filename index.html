@@ -224,9 +224,11 @@
         padding:5px 12px; border-radius:20px; border:1px solid var(--border);
         background:var(--surface); color:var(--muted); cursor:pointer;
         transition:background .12s,color .12s,border-color .12s;
+        display:inline-flex; align-items:center; gap:4px;
       }
       .sort-btn:hover { background:var(--bg); color:var(--text); }
       .sort-btn.active { background:var(--text); color:var(--accent-fg); border-color:var(--text); }
+      .sort-arrow { font-size:10px; opacity:.7; }
 
       /* ── Pagination ── */
       .pagination {
@@ -556,10 +558,11 @@
             </div>
             <div class="field" style="max-width:140px">
               <label>Turno</label>
+              <!-- FIX: valores coinciden exactamente con los guardados en BD -->
               <select id="pf_turno" onchange="buscarPersonal()">
                 <option value="">Todos</option>
-                <option value="Mañana">A</option>
-                <option value="Tarde">B</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
                 <option value="Rotativo">Rotativo</option>
               </select>
             </div>
@@ -572,11 +575,14 @@
                 <div class="results-count" id="pResultsCount"></div>
                 <div class="sort-tabs">
                   <span style="font-size:11px;color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;">Ordenar:</span>
-                  <button class="sort-btn active" onclick="setSortPersonal('apellido',this)">Apellido</button>
-                  <button class="sort-btn" onclick="setSortPersonal('grado',this)">Grado</button>
-                  <button class="sort-btn" onclick="setSortPersonal('credencial',this)">Credencial</button>
-                  <button class="sort-btn" onclick="setSortPersonal('sector',this)">Sector</button>
-                  <button class="sort-btn" onclick="setSortPersonal('curso_titulo',this)">Curso</button>
+                  <button class="sort-btn active" id="sortBtn_apellido" onclick="setSortPersonal('apellido',this)">Apellido</button>
+                  <button class="sort-btn" id="sortBtn_grado" onclick="setSortPersonal('grado',this)">Grado</button>
+                  <!-- FIX: credencial con toggle asc/desc -->
+                  <button class="sort-btn" id="sortBtn_credencial" onclick="setSortPersonal('credencial',this)">
+                    Credencial <span class="sort-arrow" id="sortArrow_credencial"></span>
+                  </button>
+                  <button class="sort-btn" id="sortBtn_sector" onclick="setSortPersonal('sector',this)">Sector</button>
+                  <button class="sort-btn" id="sortBtn_curso_titulo" onclick="setSortPersonal('curso_titulo',this)">Curso</button>
                 </div>
               </div>
               <button class="btn btn-excel btn-sm" onclick="exportarPersonalExcel()">
@@ -794,6 +800,10 @@
       let allPersonal = [];
       let currentPageP = 1;
       let sortFieldP = "apellido";
+      let sortAscP = true;   // FIX: dirección de orden
+
+      // FIX: mapa de objetos personal indexado por id (evita problemas con JSON en onclick)
+      const personalMap = {};
 
       /* ══════════════════════════════
          AUTH
@@ -1045,10 +1055,15 @@
         if (fc) q = q.ilike("credencial", `%${fc}%`);
         if (fs) q = q.ilike("sector", `%${fs}%`);
         if (fcu) q = q.ilike("curso_titulo", `%${fcu}%`);
-        if (ft) q = q.eq("turno", ft);
+        // FIX: filtro por turno con ilike para evitar problemas de mayúsculas/capitalización
+        if (ft) q = q.ilike("turno", ft);
         const { data, error } = await q;
         if (error) return;
         allPersonal = data || [];
+
+        // FIX: indexar en mapa para acceso seguro desde botones
+        allPersonal.forEach(p => { personalMap[p.id] = p; });
+
         currentPageP = 1;
         actualizarStatsPersonal(allPersonal);
         renderPaginaPersonal();
@@ -1065,30 +1080,47 @@
           : `${data.length} persona${data.length!==1?"s":""}`;
       }
 
+      // FIX: toggle asc/desc cuando se vuelve a clickear el mismo campo
       function setSortPersonal(field, btn) {
-        sortFieldP = field;
+        if (sortFieldP === field) {
+          // mismo campo: invertir dirección
+          sortAscP = !sortAscP;
+        } else {
+          // campo nuevo: asc por defecto
+          sortFieldP = field;
+          sortAscP = true;
+        }
+
+        // actualizar UI de botones
         document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
+
+        // mostrar flechita solo en credencial (o en cualquier campo activo)
+        const arrowEl = document.getElementById("sortArrow_" + field);
+        // limpiar todas las flechas primero
+        document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
+        if (arrowEl) arrowEl.textContent = sortAscP ? "↑" : "↓";
+
         renderPaginaPersonal();
       }
 
       function renderPaginaPersonal() {
-        // Ordenar
         const sorted = [...allPersonal].sort((a,b) => {
           const va = (a[sortFieldP] || "").toLowerCase();
           const vb = (b[sortFieldP] || "").toLowerCase();
-          return va.localeCompare(vb, "es");
+          const cmp = va.localeCompare(vb, "es");
+          return sortAscP ? cmp : -cmp;
         });
 
         const total = sorted.length;
         const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
         if (currentPageP > totalPages) currentPageP = totalPages;
         const start = (currentPageP - 1) * PAGE_SIZE;
-        renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start, sorted);
+        renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start);
         renderPaginacion(total, totalPages, "pPaginacion", p => { currentPageP = p; renderPaginaPersonal(); });
       }
 
-      function renderResultadosPersonal(data, offset=0, sorted=[]) {
+      function renderResultadosPersonal(data, offset=0) {
         const el = document.getElementById("pResultados");
         if (!data.length) {
           el.innerHTML = `<div class="empty-state">
@@ -1100,7 +1132,8 @@
           </div>`;
           return;
         }
-        el.innerHTML = data.map((p,i) => {
+        // FIX: botón editar usa el id para buscar en personalMap, evitando JSON inline
+        el.innerHTML = data.map((p) => {
           const initials = ((p.nombre||"").charAt(0) + (p.apellido||"").charAt(0)).toUpperCase();
           return `
           <div class="personal-card">
@@ -1127,7 +1160,7 @@
                 ${p.detalle ? `<div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5">${esc(p.detalle)}</div>` : ""}
               </div>
               <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick='abrirEdicionPersonal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Editar</button>
+                <button class="btn btn-edit-soft" onclick="abrirEdicionPersonal('${p.id}')">Editar</button>
                 <button class="btn btn-danger-soft" onclick="eliminarPersonal('${p.id}')">Eliminar</button>
               </div>
             </div>
@@ -1142,8 +1175,13 @@
         buscarPersonal();
       }
 
-      function abrirEdicionPersonal(p) {
-        const fields = ["id","grado","nombre","apellido","credencial","dni","cuil","telefono","mail","usuario_gde","direccion","expediente_oi","numero_oi","curso_titulo","sector","turno","detalle"];
+      // FIX: recibe id (string), busca objeto en personalMap
+      function abrirEdicionPersonal(id) {
+        const p = personalMap[id];
+        if (!p) return alert("No se encontró el registro.");
+        const fields = ["id","grado","nombre","apellido","credencial","dni","cuil","telefono",
+                        "mail","usuario_gde","direccion","expediente_oi","numero_oi",
+                        "curso_titulo","sector","turno","detalle"];
         fields.forEach(f => {
           const el = document.getElementById("ep_" + f);
           if (el) el.value = p[f] || "";
