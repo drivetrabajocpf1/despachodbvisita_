@@ -24,6 +24,8 @@
         --accent-fg: #f5f4f1;
         --tag-bg: #eef3ff;
         --tag-text: #2d4baa;
+        --tag-bg2: #f0fdf4;
+        --tag-text2: #166534;
         --danger: #c0392b;
         --danger-bg: #fff5f5;
         --success: #1a7a4a;
@@ -111,6 +113,8 @@
       .form-grid-3 { grid-template-columns:1fr 1fr 1fr; }
       .form-grid-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
       .col-2 { grid-column:span 2; }
+      .col-3 { grid-column:span 3; }
+      .col-4 { grid-column:span 4; }
       .field { display:flex; flex-direction:column; gap:5px; }
       label { font-size:12px; font-weight:500; color:var(--muted); letter-spacing:.01em; }
       input,textarea,select {
@@ -119,7 +123,7 @@
         background:var(--surface); color:var(--text); width:100%;
         outline:none; transition:border-color .15s,box-shadow .15s; -webkit-appearance:none;
       }
-      input:hover,textarea:hover { border-color:var(--border-md); }
+      input:hover,textarea:hover,select:hover { border-color:var(--border-md); }
       input:focus,textarea:focus,select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
       input::placeholder,textarea::placeholder { color:var(--faint); }
       textarea { resize:vertical; min-height:80px; line-height:1.55; }
@@ -146,7 +150,6 @@
       .btn-edit-soft:hover { background:var(--bg); color:var(--text); border-color:transparent; }
       .btn-sm { padding:6px 12px; font-size:12px; }
 
-      /* Excel button */
       .btn-excel {
         background:#1a7a4a; color:#fff; border-color:#1a7a4a;
         font-size:12.5px; padding:8px 14px;
@@ -160,10 +163,10 @@
         background:var(--bg); display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;
       }
       .filter-bar .field { flex:1; min-width:120px; }
-      .filter-bar input { background:var(--surface); font-size:13px; padding:8px 11px; }
+      .filter-bar input,.filter-bar select { background:var(--surface); font-size:13px; padding:8px 11px; }
 
       /* ── Stats bar ── */
-      .stats-bar { padding:16px 32px; display:flex; gap:24px; background:var(--bg); border-bottom:1px solid var(--border); }
+      .stats-bar { padding:16px 32px; display:flex; gap:24px; background:var(--bg); border-bottom:1px solid var(--border); flex-wrap:wrap; }
       .stat-item { display:flex; flex-direction:column; gap:2px; }
       .stat-num { font-size:20px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; }
       .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; }
@@ -174,7 +177,7 @@
       .results-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
       .results-count { font-size:12px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.06em; }
 
-      /* ── Cards ── */
+      /* ── Cards expedientes ── */
       .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:8px; transition:border-color .15s,box-shadow .15s; position:relative; }
       .card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
       .card-inner { display:flex; gap:16px; align-items:flex-start; }
@@ -186,9 +189,44 @@
       .card-chips { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
       .chip { font-size:11.5px; padding:3px 9px; border-radius:20px; font-weight:500; border:1px solid var(--border); color:var(--muted); background:var(--bg); font-family:"DM Mono",monospace; letter-spacing:-.01em; }
       .chip-tag { background:var(--tag-bg); color:var(--tag-text); border-color:transparent; }
+      .chip-green { background:var(--tag-bg2); color:var(--tag-text2); border-color:transparent; }
       .chip-fecha { color:var(--faint); border-color:transparent; background:transparent; font-size:11px; }
       .card-actions { display:flex; gap:2px; flex-shrink:0; opacity:0; transition:opacity .15s; align-items:flex-start; }
       .card:hover .card-actions { opacity:1; }
+
+      /* ── Cards personal ── */
+      .personal-card {
+        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+        padding:18px 20px; margin-bottom:8px; transition:border-color .15s,box-shadow .15s;
+      }
+      .personal-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+      .personal-card-inner { display:flex; gap:16px; align-items:flex-start; }
+      .personal-avatar {
+        width:38px; height:38px; border-radius:50%; background:var(--bg); border:1px solid var(--border);
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        font-family:"DM Mono",monospace; font-size:13px; font-weight:500; color:var(--muted);
+      }
+      .personal-body { flex:1; min-width:0; }
+      .personal-name { font-size:14.5px; font-weight:500; letter-spacing:-.01em; margin-bottom:3px; }
+      .personal-sub { font-size:12.5px; color:var(--muted); margin-bottom:10px; }
+      .personal-grid {
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+        gap:6px 16px; margin-bottom:10px;
+      }
+      .personal-field { display:flex; flex-direction:column; gap:1px; }
+      .personal-field-label { font-size:10.5px; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; font-weight:500; }
+      .personal-field-value { font-size:12.5px; color:var(--text); font-family:"DM Mono",monospace; }
+
+      /* ── Ordenar tabs ── */
+      .sort-tabs { display:flex; gap:4px; align-items:center; flex-wrap:wrap; }
+      .sort-btn {
+        font-family:"DM Sans",sans-serif; font-size:12px; font-weight:500;
+        padding:5px 12px; border-radius:20px; border:1px solid var(--border);
+        background:var(--surface); color:var(--muted); cursor:pointer;
+        transition:background .12s,color .12s,border-color .12s;
+      }
+      .sort-btn:hover { background:var(--bg); color:var(--text); }
+      .sort-btn.active { background:var(--text); color:var(--accent-fg); border-color:var(--text); }
 
       /* ── Pagination ── */
       .pagination {
@@ -215,7 +253,7 @@
       /* ── Modal ── */
       .overlay { position:fixed; inset:0; background:rgba(10,10,8,.45); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(2px); }
       .overlay.open { display:flex; }
-      .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; width:100%; max-width:520px; box-shadow:var(--shadow-md); animation:slideUp .18s ease; }
+      .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-md); animation:slideUp .18s ease; }
       @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
       .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
       .modal-title { font-size:16px; font-weight:500; letter-spacing:-.01em; }
@@ -232,7 +270,7 @@
         .layout { grid-template-columns:1fr; }
         .sidebar { position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); }
         .form-grid-2,.form-grid-3,.form-grid-4 { grid-template-columns:1fr; }
-        .col-2 { grid-column:span 1; }
+        .col-2,.col-3,.col-4 { grid-column:span 1; }
         .form-section,.results-wrap,.filter-bar,.stats-bar,.topbar { padding-left:16px; padding-right:16px; }
         .login-wrap { padding:20px; }
       }
@@ -291,9 +329,10 @@
             Despacho Db
           </div>
         </div>
+
         <div class="sidebar-section">
-          <div class="sidebar-label">Menú</div>
-          <button class="nav-item active" onclick="setPanel('lista',this)">
+          <div class="sidebar-label">Expedientes</div>
+          <button class="nav-item active" id="navLista" onclick="setPanel('lista',this)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
               <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
@@ -301,7 +340,7 @@
             </svg>
             Todos los expedientes
           </button>
-          <button class="nav-item" onclick="setPanel('nuevo',this)">
+          <button class="nav-item" id="navNuevo" onclick="setPanel('nuevo',this)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
               <line x1="8" y1="12" x2="16" y2="12"/>
@@ -309,6 +348,28 @@
             Cargar expediente
           </button>
         </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">Personal</div>
+          <button class="nav-item" id="navPersonal" onclick="setPanel('personal',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Ver personal
+          </button>
+          <button class="nav-item" id="navNuevoPersonal" onclick="setPanel('nuevoPersonal',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+            Cargar personal
+          </button>
+        </div>
+
         <div class="sidebar-footer">
           <div class="user-pill">
             <div class="avatar" id="avatar">--</div>
@@ -328,7 +389,8 @@
       </aside>
 
       <main class="main">
-        <!-- Panel Lista -->
+
+        <!-- ══ Panel Lista Expedientes ══ -->
         <div class="panel active" id="panelLista">
           <div class="topbar">
             <div>
@@ -354,7 +416,6 @@
             </div>
           </div>
 
-          <!-- Filters -->
           <div class="filter-bar">
             <div class="field">
               <label>Expediente</label>
@@ -396,7 +457,7 @@
           </div>
         </div>
 
-        <!-- Panel Nuevo -->
+        <!-- ══ Panel Nuevo Expediente ══ -->
         <div class="panel" id="panelNuevo">
           <div class="topbar">
             <div>
@@ -418,7 +479,7 @@
                 <label for="tag">Tag</label>
                 <input id="tag" maxlength="20" placeholder="pedido,ur6, fiesta..."/>
               </div>
-              <div class="field col-2" style="grid-column:span 4">
+              <div class="field col-4">
                 <label for="detalle">Detalle *</label>
                 <textarea id="detalle" placeholder="masomenos de que es"></textarea>
               </div>
@@ -445,15 +506,212 @@
             </div>
           </div>
         </div>
+
+        <!-- ══ Panel Personal ══ -->
+        <div class="panel" id="panelPersonal">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Personal</div>
+              <div class="page-sub">Directorio del personal</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="pStatTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pStatSectores">—</div>
+              <div class="stat-label">Sectores</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pStatFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Nombre / Apellido</label>
+              <input id="pf_nombre" placeholder="Buscar…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Grado</label>
+              <input id="pf_grado" placeholder="Filtrar por grado…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Credencial</label>
+              <input id="pf_credencial" placeholder="Filtrar por credencial…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Sector</label>
+              <input id="pf_sector" placeholder="Filtrar por sector…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Curso / Título</label>
+              <input id="pf_curso" placeholder="Filtrar por curso…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field" style="max-width:140px">
+              <label>Turno</label>
+              <select id="pf_turno" onchange="buscarPersonal()">
+                <option value="">Todos</option>
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noche">Noche</option>
+                <option value="Rotativo">Rotativo</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPersonal()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div class="results-count" id="pResultsCount"></div>
+                <div class="sort-tabs">
+                  <span style="font-size:11px;color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;">Ordenar:</span>
+                  <button class="sort-btn active" onclick="setSortPersonal('apellido',this)">Apellido</button>
+                  <button class="sort-btn" onclick="setSortPersonal('grado',this)">Grado</button>
+                  <button class="sort-btn" onclick="setSortPersonal('credencial',this)">Credencial</button>
+                  <button class="sort-btn" onclick="setSortPersonal('sector',this)">Sector</button>
+                  <button class="sort-btn" onclick="setSortPersonal('curso_titulo',this)">Curso</button>
+                </div>
+              </div>
+              <button class="btn btn-excel btn-sm" onclick="exportarPersonalExcel()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="pResultados"></div>
+            <div class="pagination" id="pPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Personal ══ -->
+        <div class="panel" id="panelNuevoPersonal">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo personal</div>
+              <div class="page-sub">Completá y guardá el registro</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:860px">
+
+              <!-- Fila 1 -->
+              <div class="field">
+                <label for="p_grado">Grado</label>
+                <input id="p_grado" placeholder="Ej: Inspector"/>
+              </div>
+              <div class="field">
+                <label for="p_nombre">Nombre *</label>
+                <input id="p_nombre" placeholder="Nombre"/>
+              </div>
+              <div class="field">
+                <label for="p_apellido">Apellido *</label>
+                <input id="p_apellido" placeholder="Apellido"/>
+              </div>
+              <div class="field">
+                <label for="p_credencial">Credencial</label>
+                <input id="p_credencial" placeholder="Nro. credencial"/>
+              </div>
+
+              <!-- Fila 2 -->
+              <div class="field">
+                <label for="p_dni">DNI</label>
+                <input id="p_dni" placeholder="00.000.000"/>
+              </div>
+              <div class="field">
+                <label for="p_cuil">CUIL</label>
+                <input id="p_cuil" placeholder="20-00000000-0"/>
+              </div>
+              <div class="field">
+                <label for="p_telefono">Teléfono</label>
+                <input id="p_telefono" placeholder="+54 11 ..."/>
+              </div>
+              <div class="field">
+                <label for="p_mail">Mail</label>
+                <input id="p_mail" type="email" placeholder="correo@..."/>
+              </div>
+
+              <!-- Fila 3 -->
+              <div class="field">
+                <label for="p_usuario_gde">Usuario GDE</label>
+                <input id="p_usuario_gde" placeholder="Usuario GDE"/>
+              </div>
+              <div class="field col-2">
+                <label for="p_direccion">Dirección</label>
+                <input id="p_direccion" placeholder="Calle, nro, ciudad"/>
+              </div>
+              <div class="field">
+                <label for="p_sector">Sector</label>
+                <input id="p_sector" placeholder="Sector / área"/>
+              </div>
+              <div class="field">
+                <label for="p_turno">Turno</label>
+                <select id="p_turno">
+                  <option value="">Sin especificar</option>
+                  <option value="Mañana">Mañana</option>
+                  <option value="Tarde">Tarde</option>
+                  <option value="Noche">Noche</option>
+                  <option value="Rotativo">Rotativo</option>
+                </select>
+              </div>
+
+              <!-- Fila 4 -->
+              <div class="field col-2">
+                <label for="p_expediente_oi">Expediente OI</label>
+                <input id="p_expediente_oi" placeholder="EX-OI-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="p_numero_oi">Número OI</label>
+                <input id="p_numero_oi" placeholder="Nro. OI"/>
+              </div>
+
+              <!-- Fila 5 -->
+              <div class="field col-4">
+                <label for="p_curso_titulo">Curso / Título</label>
+                <input id="p_curso_titulo" placeholder="Ej: Tecnicatura en Seguridad, Curso de..."/>
+              </div>
+
+              <!-- Fila 6 -->
+              <div class="field col-4">
+                <label for="p_detalle">Detalle / Observaciones</label>
+                <textarea id="p_detalle" placeholder="Cualquier información adicional..."></textarea>
+              </div>
+            </div>
+
+            <div class="error-msg" id="pFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarPersonal()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioPersonal()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
 
-    <!-- ── Modal edición ── -->
+    <!-- ── Modal edición expediente ── -->
     <div class="overlay" id="editOverlay" onclick="overlayClick(event)">
       <div class="modal">
         <div class="modal-header">
           <div class="modal-title">Editar expediente</div>
-          <button class="modal-close" onclick="cerrarModal()">
+          <button class="modal-close" onclick="cerrarModal('editOverlay')">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -469,8 +727,53 @@
           <div class="field col-2"><label>Tag</label><input id="editTag" maxlength="20"/></div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+          <button class="btn btn-ghost" onclick="cerrarModal('editOverlay')">Cancelar</button>
           <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modal edición personal ── -->
+    <div class="overlay" id="editPersonalOverlay" onclick="overlayClickPersonal(event)">
+      <div class="modal" style="max-width:640px">
+        <div class="modal-header">
+          <div class="modal-title">Editar personal</div>
+          <button class="modal-close" onclick="cerrarModal('editPersonalOverlay')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="ep_id"/>
+        <div class="form-grid form-grid-2" style="gap:12px">
+          <div class="field"><label>Grado</label><input id="ep_grado"/></div>
+          <div class="field"><label>Nombre *</label><input id="ep_nombre"/></div>
+          <div class="field"><label>Apellido *</label><input id="ep_apellido"/></div>
+          <div class="field"><label>Credencial</label><input id="ep_credencial"/></div>
+          <div class="field"><label>DNI</label><input id="ep_dni"/></div>
+          <div class="field"><label>CUIL</label><input id="ep_cuil"/></div>
+          <div class="field"><label>Teléfono</label><input id="ep_telefono"/></div>
+          <div class="field"><label>Mail</label><input id="ep_mail" type="email"/></div>
+          <div class="field"><label>Usuario GDE</label><input id="ep_usuario_gde"/></div>
+          <div class="field"><label>Sector</label><input id="ep_sector"/></div>
+          <div class="field"><label>Turno</label>
+            <select id="ep_turno">
+              <option value="">Sin especificar</option>
+              <option value="Mañana">Mañana</option>
+              <option value="Tarde">Tarde</option>
+              <option value="Noche">Noche</option>
+              <option value="Rotativo">Rotativo</option>
+            </select>
+          </div>
+          <div class="field col-2"><label>Dirección</label><input id="ep_direccion"/></div>
+          <div class="field"><label>Expediente OI</label><input id="ep_expediente_oi"/></div>
+          <div class="field"><label>Número OI</label><input id="ep_numero_oi"/></div>
+          <div class="field col-2"><label>Curso / Título</label><input id="ep_curso_titulo"/></div>
+          <div class="field col-2"><label>Detalle</label><textarea id="ep_detalle"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="cerrarModal('editPersonalOverlay')">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarEdicionPersonal()">Guardar cambios</button>
         </div>
       </div>
     </div>
@@ -485,10 +788,19 @@
 
       const PAGE_SIZE = 10;
       let user = null;
-      let allData = [];   // todos los resultados del filtro actual
+
+      // Expedientes
+      let allData = [];
       let currentPage = 1;
 
-      /* ── Auth ── */
+      // Personal
+      let allPersonal = [];
+      let currentPageP = 1;
+      let sortFieldP = "apellido";
+
+      /* ══════════════════════════════
+         AUTH
+      ══════════════════════════════ */
       async function init() {
         const { data } = await sb.auth.getUser();
         if (data.user) { user = data.user; showApp(); buscar(); }
@@ -523,15 +835,21 @@
         document.getElementById("resultados").innerHTML = "";
       }
 
-      /* ── Panels ── */
+      /* ══════════════════════════════
+         PANELS
+      ══════════════════════════════ */
       function setPanel(name, btn) {
         document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-        document.getElementById("panel" + name.charAt(0).toUpperCase() + name.slice(1)).classList.add("active");
+        const key = name.charAt(0).toUpperCase() + name.slice(1);
+        document.getElementById("panel" + key).classList.add("active");
         btn.classList.add("active");
+        if (name === "personal") buscarPersonal();
       }
 
-      /* ── CRUD ── */
+      /* ══════════════════════════════
+         EXPEDIENTES — CRUD
+      ══════════════════════════════ */
       async function guardar() {
         if (!user) return;
         const errEl = document.getElementById("formError");
@@ -551,7 +869,7 @@
         const { error } = await sb.from("expedientes").insert([payload]);
         if (error) { showErr(errEl, error.message); return; }
         limpiarFormulario();
-        setPanel("lista", document.querySelector(".nav-item"));
+        setPanel("lista", document.getElementById("navLista"));
         buscar();
       }
 
@@ -593,17 +911,14 @@
         const total = allData.length;
         const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
         if (currentPage > totalPages) currentPage = totalPages;
-
         const start = (currentPage - 1) * PAGE_SIZE;
-        const slice = allData.slice(start, start + PAGE_SIZE);
-
-        renderResultados(slice, start);
-        renderPaginacion(total, totalPages);
+        renderResultados(allData.slice(start, start + PAGE_SIZE), start);
+        renderPaginacion(total, totalPages, "paginacion", p => { currentPage = p; renderPagina(); });
       }
 
       function renderResultados(data, offset=0) {
         const el = document.getElementById("resultados");
-        if (!data.length && allData.length === 0) {
+        if (!data.length) {
           el.innerHTML = `<div class="empty-state">
             <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -638,82 +953,6 @@
         `).join("");
       }
 
-      function renderPaginacion(total, totalPages) {
-        const pag = document.getElementById("paginacion");
-        if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
-        pag.style.display = "flex";
-
-        // Build page number buttons (max 7 visible)
-        let pages = [];
-        if (totalPages <= 7) {
-          for (let i=1;i<=totalPages;i++) pages.push(i);
-        } else {
-          pages = [1];
-          const left  = Math.max(2, currentPage-1);
-          const right = Math.min(totalPages-1, currentPage+1);
-          if (left > 2) pages.push("…");
-          for (let i=left;i<=right;i++) pages.push(i);
-          if (right < totalPages-1) pages.push("…");
-          pages.push(totalPages);
-        }
-
-        const startItem = (currentPage-1)*PAGE_SIZE+1;
-        const endItem   = Math.min(currentPage*PAGE_SIZE, total);
-
-        pag.innerHTML = `
-          <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
-          <div class="pagination-controls">
-            <button class="page-btn" onclick="irPagina(${currentPage-1})" ${currentPage===1?"disabled":""}>
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            ${pages.map(p => p==="…"
-              ? `<span class="page-btn" style="cursor:default;opacity:.4">…</span>`
-              : `<button class="page-btn ${p===currentPage?"active":""}" onclick="irPagina(${p})">${p}</button>`
-            ).join("")}
-            <button class="page-btn" onclick="irPagina(${currentPage+1})" ${currentPage===totalPages?"disabled":""}>
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-        `;
-      }
-
-      function irPagina(p) {
-        const totalPages = Math.ceil(allData.length / PAGE_SIZE);
-        if (p < 1 || p > totalPages) return;
-        currentPage = p;
-        renderPagina();
-        document.getElementById("panelLista").querySelector(".results-wrap").scrollTo({ top:0, behavior:"smooth" });
-      }
-
-      /* ── Excel export ── */
-      function exportarExcel() {
-        if (!allData.length) { alert("No hay expedientes para exportar."); return; }
-
-        const rows = allData.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-          "Tag":           e.tag || "",
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(rows);
-
-        // Auto column widths
-        const colWidths = Object.keys(rows[0]).map(k => ({
-          wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12)
-        }));
-        ws["!cols"] = colWidths;
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
-
-        const fecha = new Date().toISOString().slice(0,10);
-        XLSX.writeFile(wb, `expedientes_${fecha}.xlsx`);
-      }
-
-      /* ── Delete / Edit ── */
       async function eliminar(id) {
         if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
         const { error } = await sb.from("expedientes").delete().eq("id", id);
@@ -732,9 +971,6 @@
         document.getElementById("editOverlay").classList.add("open");
       }
 
-      function cerrarModal() { document.getElementById("editOverlay").classList.remove("open"); }
-      function overlayClick(e) { if (e.target===e.currentTarget) cerrarModal(); }
-
       async function guardarEdicion() {
         const payload = {
           numero_expediente: document.getElementById("editNumero").value,
@@ -746,18 +982,298 @@
         };
         const { error } = await sb.from("expedientes").update(payload).eq("id", document.getElementById("editId").value);
         if (error) return alert(error.message);
-        cerrarModal();
+        cerrarModal("editOverlay");
         buscar();
       }
 
-      /* ── Helpers ── */
+      function exportarExcel() {
+        if (!allData.length) { alert("No hay expedientes para exportar."); return; }
+        const rows = allData.map(e => ({
+          "N° Expediente": e.numero_expediente || "",
+          "Fecha":         e.fecha || "",
+          "Detalle":       e.detalle || "",
+          "Interno":       e.interno || "",
+          "LPU":           e.lpu || "",
+          "Tag":           e.tag || "",
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
+        XLSX.writeFile(wb, `expedientes_${new Date().toISOString().slice(0,10)}.xlsx`);
+      }
+
+      /* ══════════════════════════════
+         PERSONAL — CRUD
+      ══════════════════════════════ */
+      async function guardarPersonal() {
+        if (!user) return;
+        const errEl = document.getElementById("pFormError");
+        errEl.classList.remove("show");
+        const payload = {
+          user_id:        user.id,
+          grado:          v("p_grado"),
+          nombre:         v("p_nombre"),
+          apellido:       v("p_apellido"),
+          credencial:     v("p_credencial"),
+          dni:            v("p_dni"),
+          cuil:           v("p_cuil"),
+          telefono:       v("p_telefono"),
+          mail:           v("p_mail"),
+          usuario_gde:    v("p_usuario_gde"),
+          direccion:      v("p_direccion"),
+          expediente_oi:  v("p_expediente_oi"),
+          numero_oi:      v("p_numero_oi"),
+          curso_titulo:   v("p_curso_titulo"),
+          sector:         v("p_sector"),
+          turno:          v("p_turno"),
+          detalle:        v("p_detalle"),
+        };
+        if (!payload.nombre || !payload.apellido) {
+          showErr(errEl,"Nombre y apellido son obligatorios."); return;
+        }
+        const { error } = await sb.from("personal").insert([payload]);
+        if (error) { showErr(errEl, error.message); return; }
+        limpiarFormularioPersonal();
+        setPanel("personal", document.getElementById("navPersonal"));
+      }
+
+      async function buscarPersonal() {
+        if (!user) return;
+        let q = sb.from("personal").select("*");
+        const fn = v("pf_nombre"), fg = v("pf_grado"),
+              fc = v("pf_credencial"), fs = v("pf_sector"), fcu = v("pf_curso"), ft = v("pf_turno");
+        if (fn) q = q.or(`nombre.ilike.%${fn}%,apellido.ilike.%${fn}%`);
+        if (fg) q = q.ilike("grado", `%${fg}%`);
+        if (fc) q = q.ilike("credencial", `%${fc}%`);
+        if (fs) q = q.ilike("sector", `%${fs}%`);
+        if (fcu) q = q.ilike("curso_titulo", `%${fcu}%`);
+        if (ft) q = q.eq("turno", ft);
+        const { data, error } = await q;
+        if (error) return;
+        allPersonal = data || [];
+        currentPageP = 1;
+        actualizarStatsPersonal(allPersonal);
+        renderPaginaPersonal();
+      }
+
+      function actualizarStatsPersonal(data) {
+        const sectores = new Set(data.map(p => p.sector).filter(Boolean)).size;
+        document.getElementById("pStatTotal").textContent    = data.length;
+        document.getElementById("pStatSectores").textContent = sectores;
+        document.getElementById("pStatFiltrados").textContent = data.length;
+        const filtrado = v("pf_nombre")||v("pf_grado")||v("pf_credencial")||v("pf_sector")||v("pf_curso");
+        document.getElementById("pResultsCount").textContent = filtrado
+          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
+          : `${data.length} persona${data.length!==1?"s":""}`;
+      }
+
+      function setSortPersonal(field, btn) {
+        sortFieldP = field;
+        document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderPaginaPersonal();
+      }
+
+      function renderPaginaPersonal() {
+        // Ordenar
+        const sorted = [...allPersonal].sort((a,b) => {
+          const va = (a[sortFieldP] || "").toLowerCase();
+          const vb = (b[sortFieldP] || "").toLowerCase();
+          return va.localeCompare(vb, "es");
+        });
+
+        const total = sorted.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        if (currentPageP > totalPages) currentPageP = totalPages;
+        const start = (currentPageP - 1) * PAGE_SIZE;
+        renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start, sorted);
+        renderPaginacion(total, totalPages, "pPaginacion", p => { currentPageP = p; renderPaginaPersonal(); });
+      }
+
+      function renderResultadosPersonal(data, offset=0, sorted=[]) {
+        const el = document.getElementById("pResultados");
+        if (!data.length) {
+          el.innerHTML = `<div class="empty-state">
+            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+            <p>No hay personal registrado</p>
+          </div>`;
+          return;
+        }
+        el.innerHTML = data.map((p,i) => {
+          const initials = ((p.nombre||"").charAt(0) + (p.apellido||"").charAt(0)).toUpperCase();
+          return `
+          <div class="personal-card">
+            <div class="personal-card-inner">
+              <div class="personal-avatar">${initials}</div>
+              <div class="personal-body">
+                <div class="personal-name">${esc(p.apellido)}, ${esc(p.nombre)}</div>
+                <div class="personal-sub">${p.grado ? esc(p.grado) + " · " : ""}${p.sector ? esc(p.sector) : "Sin sector"}</div>
+                <div class="personal-grid">
+                  ${p.credencial ? `<div class="personal-field"><span class="personal-field-label">Credencial</span><span class="personal-field-value">${esc(p.credencial)}</span></div>` : ""}
+                  ${p.dni        ? `<div class="personal-field"><span class="personal-field-label">DNI</span><span class="personal-field-value">${esc(p.dni)}</span></div>` : ""}
+                  ${p.cuil       ? `<div class="personal-field"><span class="personal-field-label">CUIL</span><span class="personal-field-value">${esc(p.cuil)}</span></div>` : ""}
+                  ${p.telefono   ? `<div class="personal-field"><span class="personal-field-label">Tel.</span><span class="personal-field-value">${esc(p.telefono)}</span></div>` : ""}
+                  ${p.mail       ? `<div class="personal-field"><span class="personal-field-label">Mail</span><span class="personal-field-value">${esc(p.mail)}</span></div>` : ""}
+                  ${p.usuario_gde? `<div class="personal-field"><span class="personal-field-label">GDE</span><span class="personal-field-value">${esc(p.usuario_gde)}</span></div>` : ""}
+                  ${p.numero_oi  ? `<div class="personal-field"><span class="personal-field-label">Nro. OI</span><span class="personal-field-value">${esc(p.numero_oi)}</span></div>` : ""}
+                </div>
+                <div class="card-chips">
+                  ${p.curso_titulo    ? `<span class="chip chip-tag">${esc(p.curso_titulo)}</span>` : ""}
+                  ${p.turno          ? `<span class="chip chip-green">${esc(p.turno)}</span>` : ""}
+                  ${p.expediente_oi  ? `<span class="chip">OI: ${esc(p.expediente_oi)}</span>` : ""}
+                  ${p.direccion      ? `<span class="chip chip-fecha">${esc(p.direccion)}</span>` : ""}
+                </div>
+                ${p.detalle ? `<div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5">${esc(p.detalle)}</div>` : ""}
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-edit-soft" onclick='abrirEdicionPersonal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Editar</button>
+                <button class="btn btn-danger-soft" onclick="eliminarPersonal('${p.id}')">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        `}).join("");
+      }
+
+      async function eliminarPersonal(id) {
+        if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
+        const { error } = await sb.from("personal").delete().eq("id", id);
+        if (error) return alert(error.message);
+        buscarPersonal();
+      }
+
+      function abrirEdicionPersonal(p) {
+        const fields = ["id","grado","nombre","apellido","credencial","dni","cuil","telefono","mail","usuario_gde","direccion","expediente_oi","numero_oi","curso_titulo","sector","turno","detalle"];
+        fields.forEach(f => {
+          const el = document.getElementById("ep_" + f);
+          if (el) el.value = p[f] || "";
+        });
+        document.getElementById("editPersonalOverlay").classList.add("open");
+      }
+
+      async function guardarEdicionPersonal() {
+        const id = document.getElementById("ep_id").value;
+        const payload = {
+          grado:         document.getElementById("ep_grado").value,
+          nombre:        document.getElementById("ep_nombre").value,
+          apellido:      document.getElementById("ep_apellido").value,
+          credencial:    document.getElementById("ep_credencial").value,
+          dni:           document.getElementById("ep_dni").value,
+          cuil:          document.getElementById("ep_cuil").value,
+          telefono:      document.getElementById("ep_telefono").value,
+          mail:          document.getElementById("ep_mail").value,
+          usuario_gde:   document.getElementById("ep_usuario_gde").value,
+          direccion:     document.getElementById("ep_direccion").value,
+          expediente_oi: document.getElementById("ep_expediente_oi").value,
+          numero_oi:     document.getElementById("ep_numero_oi").value,
+          curso_titulo:  document.getElementById("ep_curso_titulo").value,
+          sector:        document.getElementById("ep_sector").value,
+          turno:         document.getElementById("ep_turno").value,
+          detalle:       document.getElementById("ep_detalle").value,
+        };
+        const { error } = await sb.from("personal").update(payload).eq("id", id);
+        if (error) return alert(error.message);
+        cerrarModal("editPersonalOverlay");
+        buscarPersonal();
+      }
+
+      function exportarPersonalExcel() {
+        if (!allPersonal.length) { alert("No hay personal para exportar."); return; }
+        const rows = allPersonal.map(p => ({
+          "Grado":          p.grado || "",
+          "Apellido":       p.apellido || "",
+          "Nombre":         p.nombre || "",
+          "Credencial":     p.credencial || "",
+          "DNI":            p.dni || "",
+          "CUIL":           p.cuil || "",
+          "Teléfono":       p.telefono || "",
+          "Mail":           p.mail || "",
+          "Usuario GDE":    p.usuario_gde || "",
+          "Dirección":      p.direccion || "",
+          "Expediente OI":  p.expediente_oi || "",
+          "Número OI":      p.numero_oi || "",
+          "Curso / Título": p.curso_titulo || "",
+          "Sector":         p.sector || "",
+          "Turno":          p.turno || "",
+          "Detalle":        p.detalle || "",
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Personal");
+        XLSX.writeFile(wb, `personal_${new Date().toISOString().slice(0,10)}.xlsx`);
+      }
+
+      /* ══════════════════════════════
+         PAGINACIÓN GENÉRICA
+      ══════════════════════════════ */
+      function renderPaginacion(total, totalPages, containerId, onPage) {
+        const pag = document.getElementById(containerId);
+        const cp  = containerId === "paginacion" ? currentPage : currentPageP;
+        if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
+        pag.style.display = "flex";
+
+        let pages = [];
+        if (totalPages <= 7) {
+          for (let i=1;i<=totalPages;i++) pages.push(i);
+        } else {
+          pages = [1];
+          const left  = Math.max(2, cp-1);
+          const right = Math.min(totalPages-1, cp+1);
+          if (left > 2) pages.push("…");
+          for (let i=left;i<=right;i++) pages.push(i);
+          if (right < totalPages-1) pages.push("…");
+          pages.push(totalPages);
+        }
+
+        const startItem = (cp-1)*PAGE_SIZE+1;
+        const endItem   = Math.min(cp*PAGE_SIZE, total);
+
+        pag.innerHTML = `
+          <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
+          <div class="pagination-controls">
+            <button class="page-btn" onclick="(${onPage.toString()})(${cp-1})" ${cp===1?"disabled":""}>
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            ${pages.map(p => p==="…"
+              ? `<span class="page-btn" style="cursor:default;opacity:.4">…</span>`
+              : `<button class="page-btn ${p===cp?"active":""}" onclick="(${onPage.toString()})(${p})">${p}</button>`
+            ).join("")}
+            <button class="page-btn" onclick="(${onPage.toString()})(${cp+1})" ${cp===totalPages?"disabled":""}>
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        `;
+      }
+
+      /* ══════════════════════════════
+         MODALES
+      ══════════════════════════════ */
+      function cerrarModal(id) { document.getElementById(id).classList.remove("open"); }
+      function overlayClick(e) { if (e.target===e.currentTarget) cerrarModal("editOverlay"); }
+      function overlayClickPersonal(e) { if (e.target===e.currentTarget) cerrarModal("editPersonalOverlay"); }
+
+      /* ══════════════════════════════
+         HELPERS
+      ══════════════════════════════ */
       function limpiarFiltros() {
         ["f_numero","f_tag","f_fecha","f_interno","f_lpu"].forEach(id => document.getElementById(id).value="");
         buscar();
       }
-
       function limpiarFormulario() {
         ["numero","detalle","interno","lpu","tag","fecha"].forEach(id => document.getElementById(id).value="");
+      }
+      function limpiarFiltrosPersonal() {
+        ["pf_nombre","pf_grado","pf_credencial","pf_sector","pf_curso","pf_turno"].forEach(id => document.getElementById(id).value="");
+        buscarPersonal();
+      }
+      function limpiarFormularioPersonal() {
+        ["p_grado","p_nombre","p_apellido","p_credencial","p_dni","p_cuil","p_telefono",
+         "p_mail","p_usuario_gde","p_direccion","p_expediente_oi","p_numero_oi",
+         "p_curso_titulo","p_sector","p_turno","p_detalle"].forEach(id => document.getElementById(id).value="");
       }
 
       function v(id) { return document.getElementById(id)?.value?.trim()||""; }
