@@ -191,8 +191,19 @@
       .chip-tag { background:var(--tag-bg); color:var(--tag-text); border-color:transparent; }
       .chip-green { background:var(--tag-bg2); color:var(--tag-text2); border-color:transparent; }
       .chip-fecha { color:var(--faint); border-color:transparent; background:transparent; font-size:11px; }
-      .card-actions { display:flex; gap:2px; flex-shrink:0; opacity:0; transition:opacity .15s; align-items:flex-start; }
-      .card:hover .card-actions { opacity:1; }
+      .card-actions { 
+  display:flex; 
+  gap:2px; 
+  flex-shrink:0; 
+  opacity:0; 
+  transition:opacity .15s; 
+  align-items:flex-start; 
+}
+
+.card:hover .card-actions,
+.personal-card:hover .card-actions { 
+  opacity:1; 
+}
 
       /* ── Cards personal ── */
       .personal-card {
