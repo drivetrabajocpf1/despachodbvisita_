@@ -796,7 +796,15 @@
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
-      const sb = supabase.createClient(
+  window.addEventListener('load', () => {
+    if (typeof supabase === 'undefined') {
+      document.body.innerHTML = '<p style="padding:40px;font-size:16px;color:red">Error: no se pudo cargar Supabase. Verificá tu conexión o red corporativa.</p>';
+    }
+  });
+</script>
+    
+    <script>
+        const sb = supabase.createClient(
         "https://efwfieepcaiftkgqsciq.supabase.co",
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmd2ZpZWVwY2FpZnRrZ3FzY2lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTI1MjUsImV4cCI6MjA5Mjk2ODUyNX0.Xv6_NbBSlMv4aNJ6-XVR_5MYuuyZNHhcYNdGYn3F7_Y"
       );
