@@ -569,7 +569,6 @@
             </div>
             <div class="field" style="max-width:140px">
               <label>Turno</label>
-              <!-- FIX: valores coinciden exactamente con los guardados en BD -->
               <select id="pf_turno" onchange="buscarPersonal()">
                 <option value="">Todos</option>
                 <option value="A">A</option>
@@ -588,7 +587,6 @@
                   <span style="font-size:11px;color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;">Ordenar:</span>
                   <button class="sort-btn active" id="sortBtn_apellido" onclick="setSortPersonal('apellido',this)">Apellido</button>
                   <button class="sort-btn" id="sortBtn_grado" onclick="setSortPersonal('grado',this)">Grado</button>
-                  <!-- FIX: credencial con toggle asc/desc -->
                   <button class="sort-btn" id="sortBtn_credencial" onclick="setSortPersonal('credencial',this)">
                     Credencial <span class="sort-arrow" id="sortArrow_credencial"></span>
                   </button>
@@ -792,22 +790,29 @@
       </div>
     </div>
 
-<script src="https://raw.githubusercontent.com/supabase/supabase-js/master/dist/umd/supabase.min.js"></script>
-<script src="https://raw.githubusercontent.com/SheetJS/sheetjs/master/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <script>
-  window.addEventListener('load', () => {
-    if (typeof supabase === 'undefined') {
-      document.body.innerHTML = '<p style="padding:40px;font-size:16px;color:red">Error: no se pudo cargar Supabase. Verificá tu conexión o red corporativa.</p>';
-    }
-  });
-</script>
-    
-    <script>
-        const sb = supabase.createClient(
-        "https://efwfieepcaiftkgqsciq.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmd2ZpZWVwY2FpZnRrZ3FzY2lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTI1MjUsImV4cCI6MjA5Mjk2ODUyNX0.Xv6_NbBSlMv4aNJ6-XVR_5MYuuyZNHhcYNdGYn3F7_Y"
-      );
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB1o6zNVuTGVbSW9Srp6ihKm600okjO1lo",
+        authDomain: "despachovisitacpf1.firebaseapp.com",
+        projectId: "despachovisitacpf1",
+        storageBucket: "despachovisitacpf1.firebasestorage.app",
+        messagingSenderId: "237378635866",
+        appId: "1:237378635866:web:704780e83e187bd3e67063"
+      };
+
+      const app  = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db   = getFirestore(app);
 
       const PAGE_SIZE = 10;
       let user = null;
@@ -820,18 +825,24 @@
       let allPersonal = [];
       let currentPageP = 1;
       let sortFieldP = "apellido";
-      let sortAscP = true;   // FIX: dirección de orden
+      let sortAscP = true;
 
-      // FIX: mapa de objetos personal indexado por id (evita problemas con JSON en onclick)
       const personalMap = {};
 
       /* ══════════════════════════════
          AUTH
       ══════════════════════════════ */
-      async function init() {
-        const { data } = await sb.auth.getUser();
-        if (data.user) { user = data.user; showApp(); buscar(); }
-      }
+      onAuthStateChanged(auth, (u) => {
+        if (u) {
+          user = u;
+          showApp();
+          buscar();
+        } else {
+          user = null;
+          document.getElementById("loginWrap").style.display = "flex";
+          document.getElementById("appWrap").style.display = "none";
+        }
+      });
 
       function showApp() {
         document.getElementById("loginWrap").style.display = "none";
@@ -841,82 +852,99 @@
         document.getElementById("avatar").textContent = email.slice(0,2).toUpperCase();
       }
 
-      async function login() {
+      window.login = async function () {
         const emailVal = document.getElementById("email").value.trim();
         const passVal  = document.getElementById("password").value;
         const errEl    = document.getElementById("loginError");
         errEl.classList.remove("show");
         if (!emailVal || !passVal) { showErr(errEl,"Completá email y contraseña."); return; }
-        const { data, error } = await sb.auth.signInWithPassword({ email:emailVal, password:passVal });
-        if (error) { showErr(errEl, error.message); return; }
-        user = data.user;
-        showApp();
-        buscar();
-      }
+        try {
+          await signInWithEmailAndPassword(auth, emailVal, passVal);
+        } catch (error) {
+          showErr(errEl, traducirErrorAuth(error.code));
+        }
+      };
 
-      async function logout() {
-        await sb.auth.signOut();
-        user = null;
-        document.getElementById("loginWrap").style.display = "flex";
-        document.getElementById("appWrap").style.display = "none";
+      window.logout = async function () {
+        await signOut(auth);
         document.getElementById("resultados").innerHTML = "";
+      };
+
+      function traducirErrorAuth(code) {
+        const map = {
+          "auth/invalid-email": "Email inválido.",
+          "auth/user-not-found": "Usuario no encontrado.",
+          "auth/wrong-password": "Contraseña incorrecta.",
+          "auth/invalid-credential": "Email o contraseña incorrectos.",
+          "auth/too-many-requests": "Demasiados intentos. Probá más tarde.",
+        };
+        return map[code] || "Error al iniciar sesión.";
       }
 
       /* ══════════════════════════════
          PANELS
       ══════════════════════════════ */
-      function setPanel(name, btn) {
+      window.setPanel = function (name, btn) {
         document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
         const key = name.charAt(0).toUpperCase() + name.slice(1);
         document.getElementById("panel" + key).classList.add("active");
         btn.classList.add("active");
         if (name === "personal") buscarPersonal();
-      }
+      };
 
       /* ══════════════════════════════
          EXPEDIENTES — CRUD
       ══════════════════════════════ */
-      async function guardar() {
+      window.guardar = async function () {
         if (!user) return;
         const errEl = document.getElementById("formError");
         errEl.classList.remove("show");
         const payload = {
-          user_id: user.id,
+          user_id: user.uid,
           numero_expediente: v("numero"),
           detalle: v("detalle"),
           interno: v("interno"),
           lpu: v("lpu"),
           tag: v("tag"),
           fecha: v("fecha") || null,
+          created_at: new Date().toISOString(),
         };
         if (!payload.numero_expediente || !payload.detalle) {
           showErr(errEl,"N° expediente y detalle son obligatorios."); return;
         }
-        const { error } = await sb.from("expedientes").insert([payload]);
-        if (error) { showErr(errEl, error.message); return; }
-        limpiarFormulario();
-        setPanel("lista", document.getElementById("navLista"));
-        buscar();
-      }
+        try {
+          await addDoc(collection(db, "expedientes"), payload);
+          limpiarFormulario();
+          setPanel("lista", document.getElementById("navLista"));
+          buscar();
+        } catch (error) {
+          showErr(errEl, error.message);
+        }
+      };
 
-      async function buscar() {
+      window.buscar = async function () {
         if (!user) return;
-        let q = sb.from("expedientes").select("*");
+        const snap = await getDocs(collection(db, "expedientes"));
+        let data = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
         const fn = v("f_numero"), ft = v("f_tag"), ff = v("f_fecha"),
               fi = v("f_interno"), fl = v("f_lpu");
-        if (fn) q = q.ilike("numero_expediente", `%${fn}%`);
-        if (ft) q = q.ilike("tag", `%${ft}%`);
-        if (ff) q = q.eq("fecha", ff);
-        if (fi) q = q.ilike("interno", `%${fi}%`);
-        if (fl) q = q.ilike("lpu", `%${fl}%`);
-        const { data, error } = await q.order("fecha", { ascending:false });
-        if (error) return;
-        allData = data || [];
+
+        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
+        if (ft) data = data.filter(e => (e.tag||"").toLowerCase().includes(ft.toLowerCase()));
+        if (ff) data = data.filter(e => e.fecha === ff);
+        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
+        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
+
+        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
+
+        allData = data;
         currentPage = 1;
         actualizarStats(allData);
         renderPagina();
-      }
+      };
 
       function actualizarStats(data) {
         const now = new Date();
@@ -940,7 +968,7 @@
         if (currentPage > totalPages) currentPage = totalPages;
         const start = (currentPage - 1) * PAGE_SIZE;
         renderResultados(allData.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "paginacion", p => { currentPage = p; renderPagina(); });
+        renderPaginacion(total, totalPages, "paginacion", "expedientes");
       }
 
       function renderResultados(data, offset=0) {
@@ -972,7 +1000,7 @@
                 </div>
               </div>
               <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick='abrirEdicion(${JSON.stringify(e).replace(/'/g,"&#39;")})'>Editar</button>
+                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
                 <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
               </div>
             </div>
@@ -980,14 +1008,19 @@
         `).join("");
       }
 
-      async function eliminar(id) {
+      window.eliminar = async function (id) {
         if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
-        const { error } = await sb.from("expedientes").delete().eq("id", id);
-        if (error) return alert(error.message);
-        buscar();
-      }
+        try {
+          await deleteDoc(doc(db, "expedientes", id));
+          buscar();
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
-      function abrirEdicion(e) {
+      window.abrirEdicion = function (id) {
+        const e = allData.find(x => x.id === id);
+        if (!e) return alert("No se encontró el registro.");
         document.getElementById("editId").value      = e.id;
         document.getElementById("editNumero").value  = e.numero_expediente || "";
         document.getElementById("editDetalle").value = e.detalle || "";
@@ -996,9 +1029,9 @@
         document.getElementById("editTag").value     = e.tag || "";
         document.getElementById("editFecha").value   = e.fecha || "";
         document.getElementById("editOverlay").classList.add("open");
-      }
+      };
 
-      async function guardarEdicion() {
+      window.guardarEdicion = async function () {
         const payload = {
           numero_expediente: document.getElementById("editNumero").value,
           detalle:  document.getElementById("editDetalle").value,
@@ -1007,13 +1040,17 @@
           tag:      document.getElementById("editTag").value,
           fecha:    document.getElementById("editFecha").value || null,
         };
-        const { error } = await sb.from("expedientes").update(payload).eq("id", document.getElementById("editId").value);
-        if (error) return alert(error.message);
-        cerrarModal("editOverlay");
-        buscar();
-      }
+        const id = document.getElementById("editId").value;
+        try {
+          await updateDoc(doc(db, "expedientes", id), payload);
+          cerrarModal("editOverlay");
+          buscar();
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
-      function exportarExcel() {
+      window.exportarExcel = function () {
         if (!allData.length) { alert("No hay expedientes para exportar."); return; }
         const rows = allData.map(e => ({
           "N° Expediente": e.numero_expediente || "",
@@ -1028,17 +1065,17 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
         XLSX.writeFile(wb, `expedientes_${new Date().toISOString().slice(0,10)}.xlsx`);
-      }
+      };
 
       /* ══════════════════════════════
          PERSONAL — CRUD
       ══════════════════════════════ */
-      async function guardarPersonal() {
+      window.guardarPersonal = async function () {
         if (!user) return;
         const errEl = document.getElementById("pFormError");
         errEl.classList.remove("show");
         const payload = {
-          user_id:        user.id,
+          user_id:        user.uid,
           grado:          v("p_grado"),
           nombre:         v("p_nombre"),
           apellido:       v("p_apellido"),
@@ -1055,39 +1092,46 @@
           sector:         v("p_sector"),
           turno:          v("p_turno"),
           detalle:        v("p_detalle"),
+          created_at:     new Date().toISOString(),
         };
         if (!payload.nombre || !payload.apellido) {
           showErr(errEl,"Nombre y apellido son obligatorios."); return;
         }
-        const { error } = await sb.from("personal").insert([payload]);
-        if (error) { showErr(errEl, error.message); return; }
-        limpiarFormularioPersonal();
-        setPanel("personal", document.getElementById("navPersonal"));
-      }
+        try {
+          await addDoc(collection(db, "personal"), payload);
+          limpiarFormularioPersonal();
+          setPanel("personal", document.getElementById("navPersonal"));
+        } catch (error) {
+          showErr(errEl, error.message);
+        }
+      };
 
-      async function buscarPersonal() {
+      window.buscarPersonal = async function () {
         if (!user) return;
-        let q = sb.from("personal").select("*");
+        const snap = await getDocs(collection(db, "personal"));
+        let data = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
         const fn = v("pf_nombre"), fg = v("pf_grado"),
               fc = v("pf_credencial"), fs = v("pf_sector"), fcu = v("pf_curso"), ft = v("pf_turno");
-        if (fn) q = q.or(`nombre.ilike.%${fn}%,apellido.ilike.%${fn}%`);
-        if (fg) q = q.ilike("grado", `%${fg}%`);
-        if (fc) q = q.ilike("credencial", `%${fc}%`);
-        if (fs) q = q.ilike("sector", `%${fs}%`);
-        if (fcu) q = q.ilike("curso_titulo", `%${fcu}%`);
-        // FIX: filtro por turno con ilike para evitar problemas de mayúsculas/capitalización
-        if (ft) q = q.ilike("turno", ft);
-        const { data, error } = await q;
-        if (error) return;
-        allPersonal = data || [];
 
-        // FIX: indexar en mapa para acceso seguro desde botones
+        if (fn) data = data.filter(p =>
+          (p.nombre||"").toLowerCase().includes(fn.toLowerCase()) ||
+          (p.apellido||"").toLowerCase().includes(fn.toLowerCase())
+        );
+        if (fg) data = data.filter(p => (p.grado||"").toLowerCase().includes(fg.toLowerCase()));
+        if (fc) data = data.filter(p => (p.credencial||"").toLowerCase().includes(fc.toLowerCase()));
+        if (fs) data = data.filter(p => (p.sector||"").toLowerCase().includes(fs.toLowerCase()));
+        if (fcu) data = data.filter(p => (p.curso_titulo||"").toLowerCase().includes(fcu.toLowerCase()));
+        if (ft) data = data.filter(p => (p.turno||"").toLowerCase() === ft.toLowerCase());
+
+        allPersonal = data;
         allPersonal.forEach(p => { personalMap[p.id] = p; });
 
         currentPageP = 1;
         actualizarStatsPersonal(allPersonal);
         renderPaginaPersonal();
-      }
+      };
 
       function actualizarStatsPersonal(data) {
         const sectores = new Set(data.map(p => p.sector).filter(Boolean)).size;
@@ -1100,29 +1144,23 @@
           : `${data.length} persona${data.length!==1?"s":""}`;
       }
 
-      // FIX: toggle asc/desc cuando se vuelve a clickear el mismo campo
-      function setSortPersonal(field, btn) {
+      window.setSortPersonal = function (field, btn) {
         if (sortFieldP === field) {
-          // mismo campo: invertir dirección
           sortAscP = !sortAscP;
         } else {
-          // campo nuevo: asc por defecto
           sortFieldP = field;
           sortAscP = true;
         }
 
-        // actualizar UI de botones
         document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        // mostrar flechita solo en credencial (o en cualquier campo activo)
         const arrowEl = document.getElementById("sortArrow_" + field);
-        // limpiar todas las flechas primero
         document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
         if (arrowEl) arrowEl.textContent = sortAscP ? "↑" : "↓";
 
         renderPaginaPersonal();
-      }
+      };
 
       function renderPaginaPersonal() {
         const sorted = [...allPersonal].sort((a,b) => {
@@ -1137,7 +1175,7 @@
         if (currentPageP > totalPages) currentPageP = totalPages;
         const start = (currentPageP - 1) * PAGE_SIZE;
         renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "pPaginacion", p => { currentPageP = p; renderPaginaPersonal(); });
+        renderPaginacion(total, totalPages, "pPaginacion", "personal");
       }
 
       function renderResultadosPersonal(data, offset=0) {
@@ -1152,7 +1190,6 @@
           </div>`;
           return;
         }
-        // FIX: botón editar usa el id para buscar en personalMap, evitando JSON inline
         el.innerHTML = data.map((p) => {
           const initials = ((p.nombre||"").charAt(0) + (p.apellido||"").charAt(0)).toUpperCase();
           return `
@@ -1188,15 +1225,17 @@
         `}).join("");
       }
 
-      async function eliminarPersonal(id) {
+      window.eliminarPersonal = async function (id) {
         if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
-        const { error } = await sb.from("personal").delete().eq("id", id);
-        if (error) return alert(error.message);
-        buscarPersonal();
-      }
+        try {
+          await deleteDoc(doc(db, "personal", id));
+          buscarPersonal();
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
-      // FIX: recibe id (string), busca objeto en personalMap
-      function abrirEdicionPersonal(id) {
+      window.abrirEdicionPersonal = function (id) {
         const p = personalMap[id];
         if (!p) return alert("No se encontró el registro.");
         const fields = ["id","grado","nombre","apellido","credencial","dni","cuil","telefono",
@@ -1207,9 +1246,9 @@
           if (el) el.value = p[f] || "";
         });
         document.getElementById("editPersonalOverlay").classList.add("open");
-      }
+      };
 
-      async function guardarEdicionPersonal() {
+      window.guardarEdicionPersonal = async function () {
         const id = document.getElementById("ep_id").value;
         const payload = {
           grado:         document.getElementById("ep_grado").value,
@@ -1229,13 +1268,16 @@
           turno:         document.getElementById("ep_turno").value,
           detalle:       document.getElementById("ep_detalle").value,
         };
-        const { error } = await sb.from("personal").update(payload).eq("id", id);
-        if (error) return alert(error.message);
-        cerrarModal("editPersonalOverlay");
-        buscarPersonal();
-      }
+        try {
+          await updateDoc(doc(db, "personal", id), payload);
+          cerrarModal("editPersonalOverlay");
+          buscarPersonal();
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
-      function exportarPersonalExcel() {
+      window.exportarPersonalExcel = function () {
         if (!allPersonal.length) { alert("No hay personal para exportar."); return; }
         const rows = allPersonal.map(p => ({
           "Grado":          p.grado || "",
@@ -1260,14 +1302,19 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Personal");
         XLSX.writeFile(wb, `personal_${new Date().toISOString().slice(0,10)}.xlsx`);
-      }
+      };
 
       /* ══════════════════════════════
          PAGINACIÓN GENÉRICA
       ══════════════════════════════ */
-      function renderPaginacion(total, totalPages, containerId, onPage) {
+      window.cambiarPagina = function (containerType, p) {
+        if (containerType === "expedientes") { currentPage = p; renderPagina(); }
+        else { currentPageP = p; renderPaginaPersonal(); }
+      };
+
+      function renderPaginacion(total, totalPages, containerId, containerType) {
         const pag = document.getElementById(containerId);
-        const cp  = containerId === "paginacion" ? currentPage : currentPageP;
+        const cp  = containerType === "expedientes" ? currentPage : currentPageP;
         if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
         pag.style.display = "flex";
 
@@ -1290,14 +1337,14 @@
         pag.innerHTML = `
           <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
           <div class="pagination-controls">
-            <button class="page-btn" onclick="(${onPage.toString()})(${cp-1})" ${cp===1?"disabled":""}>
+            <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp-1})" ${cp===1?"disabled":""}>
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             ${pages.map(p => p==="…"
               ? `<span class="page-btn" style="cursor:default;opacity:.4">…</span>`
-              : `<button class="page-btn ${p===cp?"active":""}" onclick="(${onPage.toString()})(${p})">${p}</button>`
+              : `<button class="page-btn ${p===cp?"active":""}" onclick="cambiarPagina('${containerType}', ${p})">${p}</button>`
             ).join("")}
-            <button class="page-btn" onclick="(${onPage.toString()})(${cp+1})" ${cp===totalPages?"disabled":""}>
+            <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp+1})" ${cp===totalPages?"disabled":""}>
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
@@ -1307,42 +1354,40 @@
       /* ══════════════════════════════
          MODALES
       ══════════════════════════════ */
-      function cerrarModal(id) { document.getElementById(id).classList.remove("open"); }
-      function overlayClick(e) { if (e.target===e.currentTarget) cerrarModal("editOverlay"); }
-      function overlayClickPersonal(e) { if (e.target===e.currentTarget) cerrarModal("editPersonalOverlay"); }
+      window.cerrarModal = function (id) { document.getElementById(id).classList.remove("open"); };
+      window.overlayClick = function (e) { if (e.target===e.currentTarget) cerrarModal("editOverlay"); };
+      window.overlayClickPersonal = function (e) { if (e.target===e.currentTarget) cerrarModal("editPersonalOverlay"); };
 
       /* ══════════════════════════════
          HELPERS
       ══════════════════════════════ */
-      function limpiarFiltros() {
+      window.limpiarFiltros = function () {
         ["f_numero","f_tag","f_fecha","f_interno","f_lpu"].forEach(id => document.getElementById(id).value="");
         buscar();
-      }
-      function limpiarFormulario() {
+      };
+      window.limpiarFormulario = function () {
         ["numero","detalle","interno","lpu","tag","fecha"].forEach(id => document.getElementById(id).value="");
-      }
-      function limpiarFiltrosPersonal() {
+      };
+      window.limpiarFiltrosPersonal = function () {
         ["pf_nombre","pf_grado","pf_credencial","pf_sector","pf_curso","pf_turno"].forEach(id => document.getElementById(id).value="");
         buscarPersonal();
-      }
-      function limpiarFormularioPersonal() {
+      };
+      window.limpiarFormularioPersonal = function () {
         ["p_grado","p_nombre","p_apellido","p_credencial","p_dni","p_cuil","p_telefono",
          "p_mail","p_usuario_gde","p_direccion","p_expediente_oi","p_numero_oi",
          "p_curso_titulo","p_sector","p_turno","p_detalle"].forEach(id => document.getElementById(id).value="");
-      }
+      };
 
       function v(id) { return document.getElementById(id)?.value?.trim()||""; }
 
       function esc(str) {
         if (!str) return "";
-        return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
       }
 
       function showErr(el, msg) { el.textContent=msg; el.classList.add("show"); }
 
       document.getElementById("password").addEventListener("keydown", e => { if (e.key==="Enter") login(); });
-
-      init();
     </script>
   </body>
 </html>
