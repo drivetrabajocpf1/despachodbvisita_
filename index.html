@@ -381,6 +381,25 @@
         </div>
 
         <div class="sidebar-section">
+          <div class="sidebar-label">Pedidos</div>
+          <button class="nav-item" id="navPedidos" onclick="setPanel('pedidos',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            Ver pedidos
+          </button>
+          <button class="nav-item" id="navNuevoPedido" onclick="setPanel('nuevoPedido',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            Cargar pedido
+          </button>
+        </div>
+
+        <div class="sidebar-section">
           <div class="sidebar-label">Personal</div>
           <button class="nav-item" id="navPersonal" onclick="setPanel('personal',this)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
@@ -643,6 +662,115 @@
                 Guardar
               </button>
               <button class="btn btn-ghost" onclick="limpiarFormularioNovedad()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Pedidos ══ -->
+        <div class="panel" id="panelPedidos">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Pedidos</div>
+              <div class="page-sub">Expedientes con tag "pedido"</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatMes">—</div>
+              <div class="stat-label">Este mes</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Expediente</label>
+              <input id="pdf_numero" placeholder="Buscar por número…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field">
+              <label>Interno</label>
+              <input id="pdf_interno" placeholder="Filtrar por interno…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field">
+              <label>LPU</label>
+              <input id="pdf_lpu" placeholder="Filtrar por LPU…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field" style="max-width:150px">
+              <label>Fecha</label>
+              <input id="pdf_fecha" type="date" onchange="buscarPedidos()"/>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPedidos()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div class="results-count" id="pdResultsCount"></div>
+              <button class="btn btn-excel btn-sm" onclick="exportarPedidosExcel()" title="Descargar pedidos filtrados como Excel">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="pdResultados"></div>
+            <div class="pagination" id="pdPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Pedido ══ -->
+        <div class="panel" id="panelNuevoPedido">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo pedido</div>
+              <div class="page-sub">Se guarda como expediente con tag "pedido"</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:720px">
+              <div class="field col-2">
+                <label for="pd_numero">N° expediente *</label>
+                <input id="pd_numero" placeholder="EX-2026-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_fecha">Fecha</label>
+                <input id="pd_fecha" type="date"/>
+              </div>
+              <div class="field col-4">
+                <label for="pd_detalle">Detalle *</label>
+                <textarea id="pd_detalle" placeholder="masomenos de que es"></textarea>
+              </div>
+              <div class="field col-2">
+                <label for="pd_interno">Interno</label>
+                <input id="pd_interno" placeholder="Nombre del interno"/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_lpu">LPU</label>
+                <input id="pd_lpu" placeholder="LPU"/>
+              </div>
+            </div>
+            <div class="error-msg" id="pdFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarPedido()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioPedido()">Limpiar</button>
             </div>
           </div>
         </div>
@@ -943,6 +1071,7 @@
 
       const PAGE_SIZE = 10;
       const NOVEDADES_TAG = "novedades";
+      const PEDIDOS_TAG = "pedido";
       let user = null;
 
       // Expedientes
@@ -952,6 +1081,10 @@
       // Novedades
       let allNovedades = [];
       let currentPageN = 1;
+
+      // Pedidos
+      let allPedidos = [];
+      let currentPagePd = 1;
 
       // Personal
       let allPersonal = [];
@@ -1024,6 +1157,7 @@
         btn.classList.add("active");
         if (name === "personal") buscarPersonal();
         if (name === "novedades") buscarNovedades();
+        if (name === "pedidos") buscarPedidos();
       };
 
       /* ══════════════════════════════
@@ -1152,7 +1286,7 @@
       };
 
       window.abrirEdicion = function (id) {
-        const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id);
+        const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id) || allPedidos.find(x => x.id === id);
         if (!e) return alert("No se encontró el registro.");
         document.getElementById("editId").value      = e.id;
         document.getElementById("editNumero").value  = e.numero_expediente || "";
@@ -1179,6 +1313,7 @@
           cerrarModal("editOverlay");
           buscar();
           buscarNovedades();
+          buscarPedidos();
         } catch (error) {
           alert(error.message);
         }
@@ -1340,6 +1475,148 @@
       };
       window.limpiarFormularioNovedad = function () {
         ["n_numero","n_detalle","n_interno","n_lpu","n_fecha"].forEach(id => document.getElementById(id).value="");
+      };
+
+      /* ══════════════════════════════
+         PEDIDOS — reutiliza "expedientes", tag fijo
+      ══════════════════════════════ */
+      window.guardarPedido = async function () {
+        if (!user) return;
+        const errEl = document.getElementById("pdFormError");
+        errEl.classList.remove("show");
+        const payload = {
+          user_id: user.uid,
+          numero_expediente: v("pd_numero"),
+          detalle: v("pd_detalle"),
+          interno: v("pd_interno"),
+          lpu: v("pd_lpu"),
+          tag: PEDIDOS_TAG,
+          fecha: v("pd_fecha") || null,
+          created_at: new Date().toISOString(),
+        };
+        if (!payload.numero_expediente || !payload.detalle) {
+          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
+        }
+        try {
+          await addDoc(collection(db, "expedientes"), payload);
+          limpiarFormularioPedido();
+          setPanel("pedidos", document.getElementById("navPedidos"));
+          buscarPedidos();
+        } catch (error) {
+          showErr(errEl, error.message);
+        }
+      };
+
+      window.buscarPedidos = async function () {
+        if (!user) return;
+        const snap = await getDocs(collection(db, "expedientes"));
+        let data = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+        // Siempre filtrado por tag "pedido"
+        data = data.filter(e => (e.tag||"").toLowerCase() === PEDIDOS_TAG);
+
+        const fn = v("pdf_numero"), ff = v("pdf_fecha"),
+              fi = v("pdf_interno"), fl = v("pdf_lpu");
+
+        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
+        if (ff) data = data.filter(e => e.fecha === ff);
+        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
+        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
+
+        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
+
+        allPedidos = data;
+        currentPagePd = 1;
+        actualizarStatsPedidos(allPedidos);
+        renderPaginaPedidos();
+      };
+
+      function actualizarStatsPedidos(data) {
+        const now = new Date();
+        const esteMes = data.filter(e => {
+          if (!e.fecha) return false;
+          const d = new Date(e.fecha + "T00:00:00");
+          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+        }).length;
+        document.getElementById("pdStatTotal").textContent = data.length;
+        document.getElementById("pdStatMes").textContent   = esteMes;
+        document.getElementById("pdStatFiltrados").textContent = data.length;
+        const filtrado = v("pdf_numero")||v("pdf_fecha")||v("pdf_interno")||v("pdf_lpu");
+        document.getElementById("pdResultsCount").textContent = filtrado
+          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
+          : `${data.length} pedido${data.length!==1?"s":""}`;
+      }
+
+      function renderPaginaPedidos() {
+        const total = allPedidos.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        if (currentPagePd > totalPages) currentPagePd = totalPages;
+        const start = (currentPagePd - 1) * PAGE_SIZE;
+        renderResultadosPedidos(allPedidos.slice(start, start + PAGE_SIZE), start);
+        renderPaginacion(total, totalPages, "pdPaginacion", "pedidos");
+      }
+
+      function renderResultadosPedidos(data, offset=0) {
+        const el = document.getElementById("pdResultados");
+        if (!data.length) {
+          el.innerHTML = `<div class="empty-state">
+            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <p>No hay pedidos</p>
+          </div>`;
+          return;
+        }
+        el.innerHTML = data.map((e,i) => `
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
+              <div class="card-body">
+                <div class="card-head">
+                  <span class="card-num">${esc(e.numero_expediente)}</span>
+                </div>
+                <div class="card-detalle">${esc(e.detalle)}</div>
+                <div class="card-chips">
+                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                  <span class="chip chip-tag">pedido</span>
+                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                </div>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.exportarPedidosExcel = function () {
+        if (!allPedidos.length) { alert("No hay pedidos para exportar."); return; }
+        const rows = allPedidos.map(e => ({
+          "N° Expediente": e.numero_expediente || "",
+          "Fecha":         e.fecha || "",
+          "Detalle":       e.detalle || "",
+          "Interno":       e.interno || "",
+          "LPU":           e.lpu || "",
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+        XLSX.writeFile(wb, `pedidos_${new Date().toISOString().slice(0,10)}.xlsx`);
+      };
+
+      window.limpiarFiltrosPedidos = function () {
+        ["pdf_numero","pdf_fecha","pdf_interno","pdf_lpu"].forEach(id => document.getElementById(id).value="");
+        buscarPedidos();
+      };
+      window.limpiarFormularioPedido = function () {
+        ["pd_numero","pd_detalle","pd_interno","pd_lpu","pd_fecha"].forEach(id => document.getElementById(id).value="");
       };
 
       /* ══════════════════════════════
@@ -1585,6 +1862,7 @@
       window.cambiarPagina = function (containerType, p) {
         if (containerType === "expedientes") { currentPage = p; renderPagina(); }
         else if (containerType === "novedades") { currentPageN = p; renderPaginaNovedades(); }
+        else if (containerType === "pedidos") { currentPagePd = p; renderPaginaPedidos(); }
         else { currentPageP = p; renderPaginaPersonal(); }
       };
 
@@ -1592,6 +1870,7 @@
         const pag = document.getElementById(containerId);
         const cp  = containerType === "expedientes" ? currentPage
                   : containerType === "novedades" ? currentPageN
+                  : containerType === "pedidos" ? currentPagePd
                   : currentPageP;
         if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
         pag.style.display = "flex";
