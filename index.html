@@ -10,7 +10,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Chart.js desde CDN alternativo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
     <style>
       :root {
@@ -1932,9 +1933,11 @@
           
           renderDashboard(period);
         } catch (error) {
+          console.error("Error al cargar dashboard:", error);
           content.innerHTML = `
             <div class="dashboard-error">
               Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
+              <br><small style="font-size:12px; margin-top:8px; display:block;">${error.message || "Error desconocido"}</small>
             </div>
           `;
         }
