@@ -10,8 +10,6 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <!-- Chart.js desde CDN alternativo -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
     <style>
       :root {
@@ -334,9 +332,9 @@
       
       .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:16px; color:var(--text); }
       
-      .chart-card-body { position:relative; height:300px; display:flex; align-items:center; justify-content:center; }
+      .chart-card-body { position:relative; min-height:250px; display:flex; align-items:center; justify-content:center; }
       
-      .chart-card-body canvas { width:100% !important; height:100% !important; }
+      .chart-card-body canvas { width:100% !important; height:auto !important; max-height:300px; }
       
       .dashboard-summary {
         background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
@@ -1259,7 +1257,6 @@
           user = null;
           document.getElementById("loginWrap").style.display = "flex";
           document.getElementById("appWrap").style.display = "none";
-          destroyDashboardCharts();
         }
       });
 
@@ -1287,7 +1284,6 @@
       window.logout = async function () {
         await signOut(auth);
         document.getElementById("resultados").innerHTML = "";
-        destroyDashboardCharts();
       };
 
       function traducirErrorAuth(code) {
@@ -1318,7 +1314,7 @@
       };
 
       /* ══════════════════════════════
-         DASHBOARD
+         DASHBOARD - Funciones de utilidad
       ══════════════════════════════ */
       function normalizeTag(tag) {
         if (!tag) return "";
@@ -1393,11 +1389,9 @@
         return !isNaN(date.getTime());
       }
 
-      function countByTag(data, tagName) {
-        const normalizedTag = normalizeTag(tagName);
-        return data.filter(e => normalizeTag(e.tag) === normalizedTag).length;
-      }
-
+      /* ══════════════════════════════
+         DASHBOARD - Preparación de datos
+      ══════════════════════════════ */
       function prepareDataExpedientesPorMes(data) {
         const last12Months = [];
         const now = new Date();
@@ -1510,34 +1504,235 @@
         return last12Months;
       }
 
-      function createChart(id, config) {
-        const ctx = document.getElementById(id);
-        if (!ctx) return null;
+      /* ══════════════════════════════
+         DASHBOARD - Dibujo de gráficos con Canvas API
+      ══════════════════════════════ */
+      function drawBarChart(canvasId, labels, values, color = "#1a1916") {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
         
-        if (window[id + "Chart"]) {
-          window[id + "Chart"].destroy();
+        const ctx = canvas.getContext("2d");
+        const width = canvas.parentElement.clientWidth - 40;
+        const height = 250;
+        canvas.width = width;
+        canvas.height = height;
+        
+        const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        
+        const maxValue = Math.max(...values, 1);
+        const barWidth = chartWidth / labels.length * 0.7;
+        const barGap = chartWidth / labels.length * 0.3;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw grid lines
+        ctx.strokeStyle = "#e2e0da";
+        ctx.lineWidth = 1;
+        ctx.font = "10px 'DM Mono', monospace";
+        ctx.fillStyle = "#7a7870";
+        
+        for (let i = 0; i <= 5; i++) {
+          const y = padding.top + chartHeight - (chartHeight * i / 5);
+          ctx.beginPath();
+          ctx.moveTo(padding.left, y);
+          ctx.lineTo(width - padding.right, y);
+          ctx.stroke();
+          
+          const value = Math.round(maxValue * i / 5);
+          ctx.textAlign = "right";
+          ctx.fillText(value.toString(), padding.left - 10, y + 3);
         }
         
-        window[id + "Chart"] = new Chart(ctx, config);
-        dashboardCharts.push(window[id + "Chart"]);
-        return window[id + "Chart"];
-      }
-
-      function destroyDashboardCharts() {
-        dashboardCharts.forEach(chart => {
-          if (chart && typeof chart.destroy === "function") {
-            chart.destroy();
+        // Draw bars
+        labels.forEach((label, i) => {
+          const x = padding.left + i * (chartWidth / labels.length) + barGap / 2;
+          const barHeight = (values[i] / maxValue) * chartHeight;
+          const y = padding.top + chartHeight - barHeight;
+          
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.roundRect(x, y, barWidth, barHeight, 3);
+          ctx.fill();
+          
+          // Draw label
+          ctx.fillStyle = "#7a7870";
+          ctx.textAlign = "center";
+          ctx.font = "10px 'DM Mono', monospace";
+          if (labels.length <= 12) {
+            ctx.fillText(label, x + barWidth / 2, height - 15);
+          } else {
+            // Rotate labels if too many
+            ctx.save();
+            ctx.translate(x + barWidth / 2, height - 15);
+            ctx.rotate(-Math.PI / 4);
+            ctx.fillText(label, 0, 0);
+            ctx.restore();
           }
         });
-        dashboardCharts = [];
-        
-        // Clean up window references
-        if (window.expPorMesChart) { window.expPorMesChart.destroy(); delete window.expPorMesChart; }
-        if (window.expPorTipoChart) { window.expPorTipoChart.destroy(); delete window.expPorTipoChart; }
-        if (window.expPorURChart) { window.expPorURChart.destroy(); delete window.expPorURChart; }
-        if (window.pecPafChart) { window.pecPafChart.destroy(); delete window.pecPafChart; }
       }
 
+      function drawDoughnutChart(canvasId, labels, values) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext("2d");
+        const width = canvas.parentElement.clientWidth - 40;
+        const height = 250;
+        canvas.width = width;
+        canvas.height = height;
+        
+        const centerX = width / 3;
+        const centerY = height / 2;
+        const radius = Math.min(centerX, centerY) - 40;
+        const innerRadius = radius * 0.55;
+        
+        const colors = ["#1a1916", "#2d4baa", "#166534", "#7a7870", "#b0ada4", "#8b6f47"];
+        const total = values.reduce((sum, v) => sum + v, 0);
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        let startAngle = -Math.PI / 2;
+        
+        values.forEach((value, i) => {
+          const sliceAngle = (value / total) * 2 * Math.PI;
+          const endAngle = startAngle + sliceAngle;
+          
+          ctx.fillStyle = colors[i % colors.length];
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+          ctx.closePath();
+          ctx.fill();
+          
+          startAngle = endAngle;
+        });
+        
+        // Draw legend
+        const legendX = width * 0.65;
+        const legendY = height / 2 - (labels.length * 20) / 2;
+        
+        labels.forEach((label, i) => {
+          const y = legendY + i * 20;
+          
+          ctx.fillStyle = colors[i % colors.length];
+          ctx.beginPath();
+          ctx.arc(legendX, y + 5, 5, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          ctx.fillStyle = "#7a7870";
+          ctx.font = "11px 'DM Sans', sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText(`${label} (${values[i]})`, legendX + 15, y + 9);
+        });
+      }
+
+      function drawLineChart(canvasId, labels, dataset1, dataset2, label1, label2) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext("2d");
+        const width = canvas.parentElement.clientWidth - 40;
+        const height = 250;
+        canvas.width = width;
+        canvas.height = height;
+        
+        const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        
+        const maxValue = Math.max(...dataset1, ...dataset2, 1);
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw grid lines
+        ctx.strokeStyle = "#e2e0da";
+        ctx.lineWidth = 1;
+        ctx.font = "10px 'DM Mono', monospace";
+        ctx.fillStyle = "#7a7870";
+        
+        for (let i = 0; i <= 5; i++) {
+          const y = padding.top + chartHeight - (chartHeight * i / 5);
+          ctx.beginPath();
+          ctx.moveTo(padding.left, y);
+          ctx.lineTo(width - padding.right, y);
+          ctx.stroke();
+          
+          const value = Math.round(maxValue * i / 5);
+          ctx.textAlign = "right";
+          ctx.fillText(value.toString(), padding.left - 10, y + 3);
+        }
+        
+        // Draw lines
+        const drawLine = (data, color) => {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          
+          data.forEach((value, i) => {
+            const x = padding.left + (i / (data.length - 1)) * chartWidth;
+            const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
+            
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          ctx.stroke();
+          
+          // Draw points
+          data.forEach((value, i) => {
+            const x = padding.left + (i / (data.length - 1)) * chartWidth;
+            const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+          });
+        };
+        
+        drawLine(dataset1, "#1a1916");
+        drawLine(dataset2, "#2d4baa");
+        
+        // Draw x-axis labels
+        ctx.fillStyle = "#7a7870";
+        ctx.textAlign = "center";
+        ctx.font = "10px 'DM Mono', monospace";
+        
+        const step = Math.ceil(labels.length / 6);
+        labels.forEach((label, i) => {
+          if (i % step === 0 || i === labels.length - 1) {
+            const x = padding.left + (i / (labels.length - 1)) * chartWidth;
+            ctx.fillText(label, x, height - 15);
+          }
+        });
+        
+        // Draw legend
+        ctx.font = "11px 'DM Sans', sans-serif";
+        ctx.textAlign = "left";
+        
+        ctx.fillStyle = "#1a1916";
+        ctx.beginPath();
+        ctx.arc(padding.left + 5, 15, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = "#7a7870";
+        ctx.fillText(label1, padding.left + 15, 19);
+        
+        ctx.fillStyle = "#2d4baa";
+        ctx.beginPath();
+        ctx.arc(padding.left + 60, 15, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = "#7a7870";
+        ctx.fillText(label2, padding.left + 70, 19);
+      }
+
+      /* ══════════════════════════════
+         DASHBOARD - Render principal
+      ══════════════════════════════ */
       function renderDashboard(period = "este_mes") {
         const content = document.getElementById("dashboardContent");
         const { start, end } = getDateRange(period);
@@ -1709,200 +1904,27 @@
         
         content.innerHTML = html;
         
-        // Create charts
+        // Draw charts using Canvas API
         const months = expPorMesData.map(d => d.label);
         const expCounts = expPorMesData.map(d => d.count);
-        
-        createChart("expPorMesChart", {
-          type: "bar",
-          data: {
-            labels: months,
-            datasets: [{
-              label: "Expedientes",
-              data: expCounts,
-              backgroundColor: "#1a1916",
-              borderRadius: 4,
-              borderSkipped: false
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: "#1a1916",
-                padding: 12,
-                cornerRadius: 8
-              }
-            },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
-              },
-              y: {
-                beginAtZero: true,
-                grid: { color: "#e2e0da", drawBorder: false },
-                ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
-              }
-            }
-          }
-        });
+        drawBarChart("expPorMesChart", months, expCounts);
         
         if (expPorTipoData.length > 0) {
           const tipoLabels = expPorTipoData.map(d => d[0]);
           const tipoValues = expPorTipoData.map(d => d[1]);
-          const tipoColors = ["#1a1916", "#2d4baa", "#166534", "#7a7870", "#b0ada4", "#8b6f47"];
-          
-          createChart("expPorTipoChart", {
-            type: "doughnut",
-            data: {
-              labels: tipoLabels,
-              datasets: [{
-                data: tipoValues,
-                backgroundColor: tipoColors.slice(0, tipoLabels.length),
-                borderWidth: 0,
-                borderRadius: 4
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: "bottom",
-                  labels: {
-                    font: { family: "DM Sans", size: 11 },
-                    color: "#7a7870",
-                    padding: 12,
-                    usePointStyle: true,
-                    pointStyle: "circle"
-                  }
-                },
-                tooltip: {
-                  backgroundColor: "#1a1916",
-                  padding: 12,
-                  cornerRadius: 8
-                }
-              },
-              cutout: "55%"
-            }
-          });
-        } else {
-          document.querySelector("#expPorTipoChart").parentElement.innerHTML = 
-            '<div class="empty-state"><p>Sin datos de tipos</p></div>';
+          drawDoughnutChart("expPorTipoChart", tipoLabels, tipoValues);
         }
         
         if (expPorURData && expPorURData.length > 0) {
           const urLabels = expPorURData.map(d => d[0]);
           const urValues = expPorURData.map(d => d[1]);
-          
-          createChart("expPorURChart", {
-            type: "bar",
-            data: {
-              labels: urLabels,
-              datasets: [{
-                label: "Expedientes",
-                data: urValues,
-                backgroundColor: "#2d4baa",
-                borderRadius: 4,
-                borderSkipped: false
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: "#1a1916",
-                  padding: 12,
-                  cornerRadius: 8
-                }
-              },
-              scales: {
-                x: {
-                  grid: { display: false },
-                  ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
-                },
-                y: {
-                  beginAtZero: true,
-                  grid: { color: "#e2e0da", drawBorder: false },
-                  ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
-                }
-              }
-            }
-          });
-        } else {
-          document.querySelector("#expPorURChart").parentElement.innerHTML = 
-            '<div class="empty-state"><p>Sin datos de unidades residenciales</p></div>';
+          drawBarChart("expPorURChart", urLabels, urValues, "#2d4baa");
         }
         
         const pecPafMonths = pecPafData.map(d => d.label);
         const pecValues = pecPafData.map(d => d.pec);
         const pafValues = pecPafData.map(d => d.paf);
-        
-        createChart("pecPafChart", {
-          type: "line",
-          data: {
-            labels: pecPafMonths,
-            datasets: [
-              {
-                label: "PEC",
-                data: pecValues,
-                borderColor: "#1a1916",
-                backgroundColor: "transparent",
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: "#1a1916",
-                tension: 0.3
-              },
-              {
-                label: "PAF",
-                data: pafValues,
-                borderColor: "#2d4baa",
-                backgroundColor: "transparent",
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: "#2d4baa",
-                tension: 0.3
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: "bottom",
-                labels: {
-                  font: { family: "DM Sans", size: 11 },
-                  color: "#7a7870",
-                  padding: 12,
-                  usePointStyle: true,
-                  pointStyle: "circle"
-                }
-              },
-              tooltip: {
-                backgroundColor: "#1a1916",
-                padding: 12,
-                cornerRadius: 8
-              }
-            },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
-              },
-              y: {
-                beginAtZero: true,
-                grid: { color: "#e2e0da", drawBorder: false },
-                ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
-              }
-            }
-          }
-        });
+        drawLineChart("pecPafChart", pecPafMonths, pecValues, pafValues, "PEC", "PAF");
       }
 
       window.cargarDashboard = async function () {
@@ -1917,8 +1939,6 @@
             <span style="font-size:13px;">Cargando estadísticas...</span>
           </div>
         `;
-        
-        destroyDashboardCharts();
         
         try {
           // Fetch expedientes
@@ -2726,6 +2746,24 @@
       }
 
       function showErr(el, msg) { el.textContent=msg; el.classList.add("show"); }
+
+      // Polyfill for roundRect if not available
+      if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+          if (typeof r === "number") r = { tl: r, tr: r, br: r, bl: r };
+          this.moveTo(x + r.tl, y);
+          this.lineTo(x + w - r.tr, y);
+          this.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+          this.lineTo(x + w, y + h - r.br);
+          this.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+          this.lineTo(x + r.bl, y + h);
+          this.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+          this.lineTo(x, y + r.tl);
+          this.quadraticCurveTo(x, y, x + r.tl, y);
+          this.closePath();
+          return this;
+        };
+      }
 
       document.getElementById("password").addEventListener("keydown", e => { if (e.key==="Enter") login(); });
     </script>
