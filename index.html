@@ -729,52 +729,6 @@
           </div>
         </div>
 
-        <!-- ══ Panel Nuevo Pedido ══ -->
-        <div class="panel" id="panelNuevoPedido">
-          <div class="topbar">
-            <div>
-              <div class="page-title">Nuevo pedido</div>
-              <div class="page-sub">Se guarda como expediente con tag "pedido"</div>
-            </div>
-          </div>
-          <div class="form-section" style="flex:1">
-            <div class="form-grid form-grid-4" style="max-width:720px">
-              <div class="field col-2">
-                <label for="pd_numero">N° expediente *</label>
-                <input id="pd_numero" placeholder="EX-2026-..."/>
-              </div>
-              <div class="field col-2">
-                <label for="pd_fecha">Fecha</label>
-                <input id="pd_fecha" type="date"/>
-              </div>
-              <div class="field col-4">
-                <label for="pd_detalle">Detalle *</label>
-                <textarea id="pd_detalle" placeholder="masomenos de que es"></textarea>
-              </div>
-              <div class="field col-2">
-                <label for="pd_interno">Interno</label>
-                <input id="pd_interno" placeholder="Nombre del interno"/>
-              </div>
-              <div class="field col-2">
-                <label for="pd_lpu">LPU</label>
-                <input id="pd_lpu" placeholder="LPU"/>
-              </div>
-            </div>
-            <div class="error-msg" id="pdFormError"></div>
-            <div class="form-actions" style="margin-top:20px">
-              <button class="btn btn-primary" onclick="guardarPedido()">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                  <polyline points="17 21 17 13 7 13 7 21"/>
-                  <polyline points="7 3 7 8 15 8"/>
-                </svg>
-                Guardar
-              </button>
-              <button class="btn btn-ghost" onclick="limpiarFormularioPedido()">Limpiar</button>
-            </div>
-          </div>
-        </div>
-
         <!-- ══ Panel Personal ══ -->
         <div class="panel" id="panelPersonal">
           <div class="topbar">
