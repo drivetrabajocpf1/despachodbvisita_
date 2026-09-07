@@ -10,6 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
       :root {
@@ -274,9 +275,108 @@
       .modal-close:hover { color:var(--text); background:var(--bg); }
       .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
 
-      /* ── Misc ── */
-      .error-msg { font-size:12px; color:var(--danger); padding:8px 12px; background:var(--danger-bg); border-radius:var(--radius); margin-top:10px; display:none; }
-      .error-msg.show { display:block; }
+      /* ── Dashboard ── */
+      .dashboard-wrap { flex:1; padding:24px 32px; background:var(--bg); overflow-y:auto; }
+      
+      .dashboard-header {
+        display:flex; align-items:center; justify-content:space-between; 
+        margin-bottom:20px; flex-wrap:wrap; gap:12px;
+      }
+      
+      .dashboard-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      
+      .dashboard-select {
+        font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px;
+        border:1px solid var(--border); border-radius:var(--radius);
+        background:var(--surface); color:var(--text); cursor:pointer;
+        outline:none; transition:border-color .15s; min-width:140px;
+        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237a7870' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        -webkit-appearance:none;
+        -moz-appearance:none;
+        appearance:none;
+      }
+      
+      .dashboard-select:hover { border-color:var(--border-md); }
+      .dashboard-select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
+      
+      .dashboard-cards {
+        display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+        gap:12px; margin-bottom:24px;
+      }
+      
+      .dashboard-card {
+        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+        padding:20px; transition:border-color .15s,box-shadow .15s;
+      }
+      
+      .dashboard-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+      
+      .dashboard-card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:8px; }
+      
+      .dashboard-card-value { font-size:32px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; color:var(--text); line-height:1; }
+      
+      .dashboard-card-sub { font-size:12px; color:var(--faint); margin-top:6px; font-family:"DM Mono",monospace; }
+      
+      .dashboard-charts {
+        display:grid; grid-template-columns:repeat(auto-fit, minmax(480px, 1fr));
+        gap:16px; margin-bottom:16px;
+      }
+      
+      .chart-card {
+        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+        padding:20px; transition:border-color .15s,box-shadow .15s;
+      }
+      
+      .chart-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+      
+      .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:16px; color:var(--text); }
+      
+      .chart-card-body { position:relative; height:300px; display:flex; align-items:center; justify-content:center; }
+      
+      .chart-card-body canvas { width:100% !important; height:100% !important; }
+      
+      .dashboard-summary {
+        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+        padding:20px; transition:border-color .15s,box-shadow .15s;
+      }
+      
+      .dashboard-summary:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+      
+      .dashboard-summary-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:16px; color:var(--text); }
+      
+      .dashboard-summary-grid {
+        display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+        gap:12px;
+      }
+      
+      .summary-item {
+        padding:12px; border:1px solid var(--border); border-radius:var(--radius);
+        background:var(--bg);
+      }
+      
+      .summary-item-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:4px; }
+      
+      .summary-item-value { font-size:14px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text); }
+      
+      .dashboard-loading {
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        padding:40px; color:var(--muted); gap:12px;
+      }
+      
+      .spinner {
+        width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--text);
+        border-radius:50%; animation:spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin { to { transform:rotate(360deg); } }
+      
+      .dashboard-error {
+        background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger);
+        padding:16px; border-radius:var(--radius); margin-bottom:16px;
+        text-align:center; font-size:14px;
+      }
 
       /* ── Responsive ── */
       @media (max-width:720px) {
@@ -284,8 +384,10 @@
         .sidebar { position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); }
         .form-grid-2,.form-grid-3,.form-grid-4 { grid-template-columns:1fr; }
         .col-2,.col-3,.col-4 { grid-column:span 1; }
-        .form-section,.results-wrap,.filter-bar,.stats-bar,.topbar { padding-left:16px; padding-right:16px; }
+        .form-section,.results-wrap,.filter-bar,.stats-bar,.topbar,.dashboard-wrap { padding-left:16px; padding-right:16px; }
         .login-wrap { padding:20px; }
+        .dashboard-charts { grid-template-columns:1fr; }
+        .dashboard-cards { grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); }
       }
     </style>
   </head>
@@ -344,8 +446,21 @@
         </div>
 
         <div class="sidebar-section">
+          <div class="sidebar-label">Dashboard</div>
+          <button class="nav-item active" id="navDashboard" onclick="setPanel('dashboard',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            Dashboard
+          </button>
+        </div>
+
+        <div class="sidebar-section">
           <div class="sidebar-label">Expedientes</div>
-          <button class="nav-item active" id="navLista" onclick="setPanel('lista',this)">
+          <button class="nav-item" id="navLista" onclick="setPanel('lista',this)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
               <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
@@ -440,8 +555,37 @@
 
       <main class="main">
 
+        <!-- ══ Panel Dashboard ══ -->
+        <div class="panel active" id="panelDashboard">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Dashboard</div>
+              <div class="page-sub">Resumen general de actividad</div>
+            </div>
+            <div class="dashboard-filters">
+              <select id="dashboardPeriodo" class="dashboard-select" onchange="cargarDashboard()">
+                <option value="este_mes">Este mes</option>
+                <option value="mes_anterior">Mes anterior</option>
+                <option value="ultimos_3">Últimos 3 meses</option>
+                <option value="ultimos_6">Últimos 6 meses</option>
+                <option value="este_ano">Este año</option>
+                <option value="ano_anterior">Año anterior</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="dashboard-wrap">
+            <div id="dashboardContent">
+              <div class="dashboard-loading">
+                <div class="spinner"></div>
+                <span style="font-size:13px;">Cargando estadísticas...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ══ Panel Lista Expedientes ══ -->
-        <div class="panel active" id="panelLista">
+        <div class="panel" id="panelLista">
           <div class="topbar">
             <div>
               <div class="page-title">Expedientes</div>
@@ -726,6 +870,52 @@
             </div>
             <div id="pdResultados"></div>
             <div class="pagination" id="pdPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Pedido ══ -->
+        <div class="panel" id="panelNuevoPedido">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo pedido</div>
+              <div class="page-sub">Se guarda como expediente con tag "pedido"</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:720px">
+              <div class="field col-2">
+                <label for="pd_numero">N° expediente *</label>
+                <input id="pd_numero" placeholder="EX-2026-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_fecha">Fecha</label>
+                <input id="pd_fecha" type="date"/>
+              </div>
+              <div class="field col-4">
+                <label for="pd_detalle">Detalle *</label>
+                <textarea id="pd_detalle" placeholder="masomenos de que es"></textarea>
+              </div>
+              <div class="field col-2">
+                <label for="pd_interno">Interno</label>
+                <input id="pd_interno" placeholder="Nombre del interno"/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_lpu">LPU</label>
+                <input id="pd_lpu" placeholder="LPU"/>
+              </div>
+            </div>
+            <div class="error-msg" id="pdFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarPedido()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioPedido()">Limpiar</button>
+            </div>
           </div>
         </div>
 
@@ -1048,6 +1238,13 @@
 
       const personalMap = {};
 
+      // Dashboard
+      let dashboardCharts = [];
+      let dashboardData = {
+        expedientes: [],
+        personal: []
+      };
+
       /* ══════════════════════════════
          AUTH
       ══════════════════════════════ */
@@ -1055,11 +1252,13 @@
         if (u) {
           user = u;
           showApp();
+          cargarDashboard();
           buscar();
         } else {
           user = null;
           document.getElementById("loginWrap").style.display = "flex";
           document.getElementById("appWrap").style.display = "none";
+          destroyDashboardCharts();
         }
       });
 
@@ -1087,6 +1286,7 @@
       window.logout = async function () {
         await signOut(auth);
         document.getElementById("resultados").innerHTML = "";
+        destroyDashboardCharts();
       };
 
       function traducirErrorAuth(code) {
@@ -1112,6 +1312,632 @@
         if (name === "personal") buscarPersonal();
         if (name === "novedades") buscarNovedades();
         if (name === "pedidos") buscarPedidos();
+        if (name === "dashboard") cargarDashboard();
+        if (name === "lista") buscar();
+      };
+
+      /* ══════════════════════════════
+         DASHBOARD
+      ══════════════════════════════ */
+      function normalizeTag(tag) {
+        if (!tag) return "";
+        return tag.trim().toLowerCase().replace(/\s+/g, " ");
+      }
+
+      function normalizeUR(tag) {
+        if (!tag) return null;
+        const normalized = normalizeTag(tag);
+        const urMatch = normalized.match(/^ur\s*(\d+)$/);
+        if (urMatch) {
+          return `UR ${parseInt(urMatch[1])}`;
+        }
+        return null;
+      }
+
+      function getDateRange(period) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        
+        let start, end;
+        
+        switch(period) {
+          case "este_mes":
+            start = new Date(year, month, 1);
+            end = new Date(year, month + 1, 0);
+            break;
+          case "mes_anterior":
+            start = new Date(year, month - 1, 1);
+            end = new Date(year, month, 0);
+            break;
+          case "ultimos_3":
+            start = new Date(year, month - 2, 1);
+            end = new Date(year, month + 1, 0);
+            break;
+          case "ultimos_6":
+            start = new Date(year, month - 5, 1);
+            end = new Date(year, month + 1, 0);
+            break;
+          case "este_ano":
+            start = new Date(year, 0, 1);
+            end = new Date(year, 11, 31);
+            break;
+          case "ano_anterior":
+            start = new Date(year - 1, 0, 1);
+            end = new Date(year - 1, 11, 31);
+            break;
+          default:
+            start = new Date(year, month, 1);
+            end = new Date(year, month + 1, 0);
+        }
+        
+        return { start, end };
+      }
+
+      function formatMonthYear(date) {
+        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
+                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        return `${months[date.getMonth()]} ${date.getFullYear()}`;
+      }
+
+      function formatDateShort(date) {
+        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
+                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        return `${date.getDate()} ${months[date.getMonth()]}`;
+      }
+
+      function isValidDate(dateString) {
+        if (!dateString) return false;
+        const date = new Date(dateString);
+        return !isNaN(date.getTime());
+      }
+
+      function countByTag(data, tagName) {
+        const normalizedTag = normalizeTag(tagName);
+        return data.filter(e => normalizeTag(e.tag) === normalizedTag).length;
+      }
+
+      function prepareDataExpedientesPorMes(data) {
+        const last12Months = [];
+        const now = new Date();
+        
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          last12Months.push({
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            label: formatMonthYear(date),
+            count: 0
+          });
+        }
+        
+        data.forEach(e => {
+          if (isValidDate(e.fecha)) {
+            const date = new Date(e.fecha);
+            const monthIndex = last12Months.findIndex(m => 
+              m.year === date.getFullYear() && m.month === date.getMonth()
+            );
+            if (monthIndex >= 0) {
+              last12Months[monthIndex].count++;
+            }
+          }
+        });
+        
+        return last12Months;
+      }
+
+      function prepareDataPorTipo(data) {
+        const tagCounts = {};
+        
+        data.forEach(e => {
+          const tag = normalizeTag(e.tag) || "Sin tag";
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        });
+        
+        let sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+        
+        let topTags = [];
+        let othersCount = 0;
+        
+        if (sortedTags.length > 6) {
+          topTags = sortedTags.slice(0, 5);
+          othersCount = sortedTags.slice(5).reduce((sum, item) => sum + item[1], 0);
+          if (othersCount > 0) {
+            topTags.push(["Otros", othersCount]);
+          }
+        } else {
+          topTags = sortedTags;
+        }
+        
+        return topTags;
+      }
+
+      function prepareDataPorUnidad(data) {
+        const urCounts = {};
+        
+        data.forEach(e => {
+          const ur = normalizeUR(e.tag);
+          if (ur) {
+            urCounts[ur] = (urCounts[ur] || 0) + 1;
+          }
+        });
+        
+        const sortedURs = Object.entries(urCounts)
+          .sort((a, b) => {
+            const numA = parseInt(a[0].replace(/\D/g, ""));
+            const numB = parseInt(b[0].replace(/\D/g, ""));
+            return numA - numB;
+          });
+        
+        if (sortedURs.length === 0) {
+          return null;
+        }
+        
+        return sortedURs;
+      }
+
+      function prepareDataPecPaf(data) {
+        const last12Months = [];
+        const now = new Date();
+        
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          last12Months.push({
+            label: formatMonthYear(date),
+            pec: 0,
+            paf: 0
+          });
+        }
+        
+        data.forEach(e => {
+          if (isValidDate(e.fecha)) {
+            const tag = normalizeTag(e.tag);
+            const date = new Date(e.fecha);
+            const monthIndex = last12Months.findIndex(m => {
+              const monthDate = new Date(m.label);
+              return monthDate.getMonth() === date.getMonth() && 
+                     monthDate.getFullYear() === date.getFullYear();
+            });
+            
+            if (monthIndex >= 0) {
+              if (tag === "pec") last12Months[monthIndex].pec++;
+              if (tag === "paf") last12Months[monthIndex].paf++;
+            }
+          }
+        });
+        
+        return last12Months;
+      }
+
+      function createChart(id, config) {
+        const ctx = document.getElementById(id);
+        if (!ctx) return null;
+        
+        if (window[id + "Chart"]) {
+          window[id + "Chart"].destroy();
+        }
+        
+        window[id + "Chart"] = new Chart(ctx, config);
+        dashboardCharts.push(window[id + "Chart"]);
+        return window[id + "Chart"];
+      }
+
+      function destroyDashboardCharts() {
+        dashboardCharts.forEach(chart => {
+          if (chart && typeof chart.destroy === "function") {
+            chart.destroy();
+          }
+        });
+        dashboardCharts = [];
+        
+        // Clean up window references
+        if (window.expPorMesChart) { window.expPorMesChart.destroy(); delete window.expPorMesChart; }
+        if (window.expPorTipoChart) { window.expPorTipoChart.destroy(); delete window.expPorTipoChart; }
+        if (window.expPorURChart) { window.expPorURChart.destroy(); delete window.expPorURChart; }
+        if (window.pecPafChart) { window.pecPafChart.destroy(); delete window.pecPafChart; }
+      }
+
+      function renderDashboard(period = "este_mes") {
+        const content = document.getElementById("dashboardContent");
+        const { start, end } = getDateRange(period);
+        const year = new Date().getFullYear();
+        
+        // Filter expeditions by date range
+        const periodExp = dashboardData.expedientes.filter(e => {
+          if (!isValidDate(e.fecha)) return false;
+          const date = new Date(e.fecha);
+          return date >= start && date <= end;
+        });
+        
+        // Calculate statistics
+        const totalExp = dashboardData.expedientes.length;
+        const periodExpCount = periodExp.length;
+        const todayStr = new Date().toISOString().split("T")[0];
+        const todayExp = dashboardData.expedientes.filter(e => e.fecha === todayStr).length;
+        const totalPersonal = dashboardData.personal.length;
+        
+        const pecMonth = periodExp.filter(e => normalizeTag(e.tag) === "pec").length;
+        const pafMonth = periodExp.filter(e => normalizeTag(e.tag) === "paf").length;
+        
+        // Year totals for PEC/PAF
+        const yearStart = new Date(year, 0, 1);
+        const yearEnd = new Date(year, 11, 31);
+        const yearExp = dashboardData.expedientes.filter(e => {
+          if (!isValidDate(e.fecha)) return false;
+          const date = new Date(e.fecha);
+          return date >= yearStart && date <= yearEnd;
+        });
+        const pecYear = yearExp.filter(e => normalizeTag(e.tag) === "pec").length;
+        const pafYear = yearExp.filter(e => normalizeTag(e.tag) === "paf").length;
+        
+        // Summary data
+        const sinTag = dashboardData.expedientes.filter(e => !normalizeTag(e.tag)).length;
+        
+        // Day with most expeditions in period
+        const dayCounts = {};
+        periodExp.forEach(e => {
+          if (isValidDate(e.fecha)) {
+            dayCounts[e.fecha] = (dayCounts[e.fecha] || 0) + 1;
+          }
+        });
+        let maxDay = null;
+        let maxDayCount = 0;
+        Object.entries(dayCounts).forEach(([day, count]) => {
+          if (count > maxDayCount) {
+            maxDay = day;
+            maxDayCount = count;
+          }
+        });
+        
+        // Month with most expeditions in last 12 months
+        const last12Data = prepareDataExpedientesPorMes(dashboardData.expedientes);
+        let maxMonth = null;
+        let maxMonthCount = 0;
+        last12Data.forEach(m => {
+          if (m.count > maxMonthCount) {
+            maxMonth = m.label;
+            maxMonthCount = m.count;
+          }
+        });
+        
+        // Prepare chart data
+        const expPorMesData = prepareDataExpedientesPorMes(dashboardData.expedientes);
+        const expPorTipoData = prepareDataPorTipo(dashboardData.expedientes);
+        const expPorURData = prepareDataPorUnidad(dashboardData.expedientes);
+        const pecPafData = prepareDataPecPaf(dashboardData.expedientes);
+        
+        // Render HTML
+        const periodLabels = {
+          "este_mes": "Este mes",
+          "mes_anterior": "Mes anterior",
+          "ultimos_3": "Últimos 3 meses",
+          "ultimos_6": "Últimos 6 meses",
+          "este_ano": "Este año",
+          "ano_anterior": "Año anterior"
+        };
+        
+        const periodLabel = periodLabels[period] || "Este mes";
+        
+        let html = `
+          <div class="dashboard-cards">
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">Total expedientes</div>
+              <div class="dashboard-card-value">${totalExp.toLocaleString()}</div>
+              <div class="dashboard-card-sub">Todos los registros</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">Este mes</div>
+              <div class="dashboard-card-value">${periodExpCount.toLocaleString()}</div>
+              <div class="dashboard-card-sub">${periodLabel}</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">Hoy</div>
+              <div class="dashboard-card-value">${todayExp.toLocaleString()}</div>
+              <div class="dashboard-card-sub">${formatDateShort(new Date())}</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">Personal registrado</div>
+              <div class="dashboard-card-value">${totalPersonal.toLocaleString()}</div>
+              <div class="dashboard-card-sub">Registros activos</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">PEC del mes</div>
+              <div class="dashboard-card-value">${pecMonth.toLocaleString()}</div>
+              <div class="dashboard-card-sub">${periodLabel}</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="dashboard-card-label">PAF del mes</div>
+              <div class="dashboard-card-value">${pafMonth.toLocaleString()}</div>
+              <div class="dashboard-card-sub">${periodLabel}</div>
+            </div>
+          </div>
+          
+          <div class="dashboard-charts">
+            <div class="chart-card">
+              <div class="chart-card-title">Expedientes por mes</div>
+              <div class="chart-card-body">
+                <canvas id="expPorMesChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title">Expedientes por tipo</div>
+              <div class="chart-card-body">
+                <canvas id="expPorTipoChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title">Expedientes por Unidad Residencial</div>
+              <div class="chart-card-body">
+                <canvas id="expPorURChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title">PEC / PAF por mes</div>
+              <div class="chart-card-body">
+                <canvas id="pecPafChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dashboard-summary">
+            <div class="dashboard-summary-title">Resumen de actividad</div>
+            <div class="dashboard-summary-grid">
+              <div class="summary-item">
+                <div class="summary-item-label">Mayor actividad</div>
+                <div class="summary-item-value">${maxDay ? `${formatDateShort(new Date(maxDay))} (${maxDayCount} exp.)` : "Sin datos"}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">Mejor mes (12 meses)</div>
+                <div class="summary-item-value">${maxMonth ? `${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">PEC del año</div>
+                <div class="summary-item-value">${pecYear.toLocaleString()}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">PAF del año</div>
+                <div class="summary-item-value">${pafYear.toLocaleString()}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">Expedientes sin tag</div>
+                <div class="summary-item-value">${sinTag.toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        content.innerHTML = html;
+        
+        // Create charts
+        const months = expPorMesData.map(d => d.label);
+        const expCounts = expPorMesData.map(d => d.count);
+        
+        createChart("expPorMesChart", {
+          type: "bar",
+          data: {
+            labels: months,
+            datasets: [{
+              label: "Expedientes",
+              data: expCounts,
+              backgroundColor: "#1a1916",
+              borderRadius: 4,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#1a1916",
+                padding: 12,
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: "#e2e0da", drawBorder: false },
+                ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
+              }
+            }
+          }
+        });
+        
+        if (expPorTipoData.length > 0) {
+          const tipoLabels = expPorTipoData.map(d => d[0]);
+          const tipoValues = expPorTipoData.map(d => d[1]);
+          const tipoColors = ["#1a1916", "#2d4baa", "#166534", "#7a7870", "#b0ada4", "#8b6f47"];
+          
+          createChart("expPorTipoChart", {
+            type: "doughnut",
+            data: {
+              labels: tipoLabels,
+              datasets: [{
+                data: tipoValues,
+                backgroundColor: tipoColors.slice(0, tipoLabels.length),
+                borderWidth: 0,
+                borderRadius: 4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: {
+                    font: { family: "DM Sans", size: 11 },
+                    color: "#7a7870",
+                    padding: 12,
+                    usePointStyle: true,
+                    pointStyle: "circle"
+                  }
+                },
+                tooltip: {
+                  backgroundColor: "#1a1916",
+                  padding: 12,
+                  cornerRadius: 8
+                }
+              },
+              cutout: "55%"
+            }
+          });
+        } else {
+          document.querySelector("#expPorTipoChart").parentElement.innerHTML = 
+            '<div class="empty-state"><p>Sin datos de tipos</p></div>';
+        }
+        
+        if (expPorURData && expPorURData.length > 0) {
+          const urLabels = expPorURData.map(d => d[0]);
+          const urValues = expPorURData.map(d => d[1]);
+          
+          createChart("expPorURChart", {
+            type: "bar",
+            data: {
+              labels: urLabels,
+              datasets: [{
+                label: "Expedientes",
+                data: urValues,
+                backgroundColor: "#2d4baa",
+                borderRadius: 4,
+                borderSkipped: false
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: "#1a1916",
+                  padding: 12,
+                  cornerRadius: 8
+                }
+              },
+              scales: {
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
+                },
+                y: {
+                  beginAtZero: true,
+                  grid: { color: "#e2e0da", drawBorder: false },
+                  ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
+                }
+              }
+            }
+          });
+        } else {
+          document.querySelector("#expPorURChart").parentElement.innerHTML = 
+            '<div class="empty-state"><p>Sin datos de unidades residenciales</p></div>';
+        }
+        
+        const pecPafMonths = pecPafData.map(d => d.label);
+        const pecValues = pecPafData.map(d => d.pec);
+        const pafValues = pecPafData.map(d => d.paf);
+        
+        createChart("pecPafChart", {
+          type: "line",
+          data: {
+            labels: pecPafMonths,
+            datasets: [
+              {
+                label: "PEC",
+                data: pecValues,
+                borderColor: "#1a1916",
+                backgroundColor: "transparent",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#1a1916",
+                tension: 0.3
+              },
+              {
+                label: "PAF",
+                data: pafValues,
+                borderColor: "#2d4baa",
+                backgroundColor: "transparent",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#2d4baa",
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  font: { family: "DM Sans", size: 11 },
+                  color: "#7a7870",
+                  padding: 12,
+                  usePointStyle: true,
+                  pointStyle: "circle"
+                }
+              },
+              tooltip: {
+                backgroundColor: "#1a1916",
+                padding: 12,
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: "DM Mono", size: 10 }, color: "#7a7870" }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: "#e2e0da", drawBorder: false },
+                ticks: { font: { family: "DM Mono", size: 11 }, color: "#7a7870", stepSize: 1 }
+              }
+            }
+          }
+        });
+      }
+
+      window.cargarDashboard = async function () {
+        if (!user) return;
+        
+        const content = document.getElementById("dashboardContent");
+        const period = document.getElementById("dashboardPeriodo").value;
+        
+        content.innerHTML = `
+          <div class="dashboard-loading">
+            <div class="spinner"></div>
+            <span style="font-size:13px;">Cargando estadísticas...</span>
+          </div>
+        `;
+        
+        destroyDashboardCharts();
+        
+        try {
+          // Fetch expedientes
+          const expSnap = await getDocs(collection(db, "expedientes"));
+          dashboardData.expedientes = [];
+          expSnap.forEach(d => dashboardData.expedientes.push({ id: d.id, ...d.data() }));
+          
+          // Fetch personal
+          const personalSnap = await getDocs(collection(db, "personal"));
+          dashboardData.personal = [];
+          personalSnap.forEach(d => dashboardData.personal.push({ id: d.id, ...d.data() }));
+          
+          renderDashboard(period);
+        } catch (error) {
+          content.innerHTML = `
+            <div class="dashboard-error">
+              Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
+            </div>
+          `;
+        }
       };
 
       /* ══════════════════════════════
