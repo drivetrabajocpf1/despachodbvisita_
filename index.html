@@ -1209,32 +1209,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import {
-        getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import {
-        getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyB1o6zNVuTGVbSW9Srp6ihKm600okjO1lo",
-        authDomain: "despachovisitacpf1.firebaseapp.com",
-        projectId: "despachovisitacpf1",
-        storageBucket: "despachovisitacpf1.firebasestorage.app",
-        messagingSenderId: "237378635866",
-        appId: "1:237378635866:web:704780e83e187bd3e67063"
+    <script>
+      // ============================================================
+      //  Variables GLOBALES (visibles desde window y desde el módulo)
+      // ============================================================
+      window.dashboardData = {
+        expedientes: [],
+        personal: []
       };
-
-      const app  = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db   = getFirestore(app);
+      window.dashboardChartsInstances = [];
+      window.user = null;
 
       const PAGE_SIZE = 10;
       const NOVEDADES_TAG = "novedades";
       const PEDIDOS_TAG = "pedido";
-      let user = null;
 
       // Expedientes
       let allData = [];
@@ -1253,1529 +1241,1420 @@
       let currentPageP = 1;
       let sortFieldP = "apellido";
       let sortAscP = true;
-
       const personalMap = {};
 
-      // Dashboard - Almacenar instancias de gráficos
-      let dashboardChartsInstances = [];
+      // ============================================================
+      //  Firebase (se carga en un módulo para usar import)
+      // ============================================================
+      (async function initFirebase() {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+        const { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } = await import(
+          "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+        );
+        const { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } = await import(
+          "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+        );
 
-      /* ══════════════════════════════
-         AUTH
-      ══════════════════════════════ */
-      onAuthStateChanged(auth, (u) => {
-        if (u) {
-          user = u;
-          showApp();
-          cargarDashboard();
-          buscar();
-        } else {
-          user = null;
-          document.getElementById("loginWrap").style.display = "flex";
-          document.getElementById("appWrap").style.display = "none";
-        }
-      });
-
-      function showApp() {
-        document.getElementById("loginWrap").style.display = "none";
-        document.getElementById("appWrap").style.display = "grid";
-        const email = user.email;
-        document.getElementById("userEmail").textContent = email;
-        document.getElementById("avatar").textContent = email.slice(0,2).toUpperCase();
-      }
-
-      window.login = async function () {
-        const emailVal = document.getElementById("email").value.trim();
-        const passVal  = document.getElementById("password").value;
-        const errEl    = document.getElementById("loginError");
-        errEl.classList.remove("show");
-        if (!emailVal || !passVal) { showErr(errEl,"Completá email y contraseña."); return; }
-        try {
-          await signInWithEmailAndPassword(auth, emailVal, passVal);
-        } catch (error) {
-          showErr(errEl, traducirErrorAuth(error.code));
-        }
-      };
-
-      window.logout = async function () {
-        await signOut(auth);
-        document.getElementById("resultados").innerHTML = "";
-      };
-
-      function traducirErrorAuth(code) {
-        const map = {
-          "auth/invalid-email": "Email inválido.",
-          "auth/user-not-found": "Usuario no encontrado.",
-          "auth/wrong-password": "Contraseña incorrecta.",
-          "auth/invalid-credential": "Email o contraseña incorrectos.",
-          "auth/too-many-requests": "Demasiados intentos. Probá más tarde.",
+        const firebaseConfig = {
+          apiKey: "AIzaSyB1o6zNVuTGVbSW9Srp6ihKm600okjO1lo",
+          authDomain: "despachovisitacpf1.firebaseapp.com",
+          projectId: "despachovisitacpf1",
+          storageBucket: "despachovisitacpf1.firebasestorage.app",
+          messagingSenderId: "237378635866",
+          appId: "1:237378635866:web:704780e83e187bd3e67063"
         };
-        return map[code] || "Error al iniciar sesión.";
-      }
 
-      /* ══════════════════════════════
-         PANELS
-      ══════════════════════════════ */
-      window.setPanel = function (name, btn) {
-        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-        document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-        const key = name.charAt(0).toUpperCase() + name.slice(1);
-        document.getElementById("panel" + key).classList.add("active");
-        btn.classList.add("active");
-        if (name === "personal") buscarPersonal();
-        if (name === "novedades") buscarNovedades();
-        if (name === "pedidos") buscarPedidos();
-        if (name === "dashboard") cargarDashboard();
-        if (name === "lista") buscar();
-      };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-      /* ══════════════════════════════
-         DASHBOARD - Funciones de utilidad
-      ══════════════════════════════ */
-      function normalizeTag(tag) {
-        if (!tag) return "";
-        return tag.trim().toLowerCase().replace(/\s+/g, " ");
-      }
+        // Exponer auth y db globalmente para las funciones
+        window.auth = auth;
+        window.db = db;
 
-      function normalizeUR(tag) {
-        if (!tag) return null;
-        const normalized = normalizeTag(tag);
-        const urMatch = normalized.match(/^ur\s*(\d+)$/);
-        if (urMatch) {
-          return `UR ${parseInt(urMatch[1])}`;
-        }
-        return null;
-      }
-
-      function getDateRange(period) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        
-        let start, end;
-        
-        switch(period) {
-          case "este_mes":
-            start = new Date(year, month, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "mes_anterior":
-            start = new Date(year, month - 1, 1);
-            end = new Date(year, month, 0);
-            break;
-          case "ultimos_3":
-            start = new Date(year, month - 2, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "ultimos_6":
-            start = new Date(year, month - 5, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "este_ano":
-            start = new Date(year, 0, 1);
-            end = new Date(year, 11, 31);
-            break;
-          case "ano_anterior":
-            start = new Date(year - 1, 0, 1);
-            end = new Date(year - 1, 11, 31);
-            break;
-          default:
-            start = new Date(year, month, 1);
-            end = new Date(year, month + 1, 0);
-        }
-        
-        return { start, end };
-      }
-
-      function formatMonthYear(date) {
-        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-        return `${months[date.getMonth()]} ${date.getFullYear()}`;
-      }
-
-      function formatDateShort(date) {
-        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-        return `${date.getDate()} ${months[date.getMonth()]}`;
-      }
-
-      function isValidDate(dateString) {
-        if (!dateString) return false;
-        const date = new Date(dateString);
-        return !isNaN(date.getTime());
-      }
-
-      /* ══════════════════════════════
-         DASHBOARD - Preparación de datos
-      ══════════════════════════════ */
-      function prepareDataExpedientesPorMes(data) {
-        const last12Months = [];
-        const now = new Date();
-        
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-          last12Months.push({
-            year: date.getFullYear(),
-            month: date.getMonth(),
-            label: formatMonthYear(date),
-            count: 0
-          });
-        }
-        
-        data.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            const date = new Date(e.fecha);
-            const monthIndex = last12Months.findIndex(m => 
-              m.year === date.getFullYear() && m.month === date.getMonth()
-            );
-            if (monthIndex >= 0) {
-              last12Months[monthIndex].count++;
-            }
+        // ── Funciones de autenticación ──
+        window.login = async function () {
+          const emailVal = document.getElementById("email").value.trim();
+          const passVal = document.getElementById("password").value;
+          const errEl = document.getElementById("loginError");
+          errEl.classList.remove("show");
+          if (!emailVal || !passVal) { showErr(errEl, "Completá email y contraseña."); return; }
+          try {
+            await signInWithEmailAndPassword(auth, emailVal, passVal);
+          } catch (error) {
+            showErr(errEl, traducirErrorAuth(error.code));
           }
-        });
-        
-        return last12Months;
-      }
-
-      function prepareDataPorTipo(data) {
-        const tagCounts = {};
-        
-        data.forEach(e => {
-          const tag = normalizeTag(e.tag) || "Sin tag";
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-        });
-        
-        let sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
-        
-        let topTags = [];
-        let othersCount = 0;
-        
-        if (sortedTags.length > 6) {
-          topTags = sortedTags.slice(0, 5);
-          othersCount = sortedTags.slice(5).reduce((sum, item) => sum + item[1], 0);
-          if (othersCount > 0) {
-            topTags.push(["Otros", othersCount]);
-          }
-        } else {
-          topTags = sortedTags;
-        }
-        
-        return topTags;
-      }
-
-      function prepareDataPorUnidad(data) {
-        const urCounts = {};
-        
-        data.forEach(e => {
-          const ur = normalizeUR(e.tag);
-          if (ur) {
-            urCounts[ur] = (urCounts[ur] || 0) + 1;
-          }
-        });
-        
-        const sortedURs = Object.entries(urCounts)
-          .sort((a, b) => b[1] - a[1]);
-        
-        return sortedURs;
-      }
-
-      function prepareDataPecPaf(data) {
-        const last12Months = [];
-        const now = new Date();
-        
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-          last12Months.push({
-            year: date.getFullYear(),
-            month: date.getMonth(),
-            label: formatMonthYear(date),
-            pec: 0,
-            paf: 0
-          });
-        }
-        
-        data.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            const tag = normalizeTag(e.tag);
-            const date = new Date(e.fecha);
-            const monthIndex = last12Months.findIndex(m => 
-              m.year === date.getFullYear() && m.month === date.getMonth()
-            );
-            
-            if (monthIndex >= 0) {
-              if (tag === "pec") last12Months[monthIndex].pec++;
-              if (tag === "paf") last12Months[monthIndex].paf++;
-            }
-          }
-        });
-        
-        return last12Months;
-      }
-
-      /* ══════════════════════════════
-         DASHBOARD - Render principal con Chart.js
-      ══════════════════════════════ */
-      function renderDashboard(period = "este_mes") {
-        const content = document.getElementById("dashboardContent");
-        const { start, end } = getDateRange(period);
-        const year = new Date().getFullYear();
-        
-        // Filter expeditions by date range
-        const periodExp = dashboardData.expedientes.filter(e => {
-          if (!isValidDate(e.fecha)) return false;
-          const date = new Date(e.fecha);
-          return date >= start && date <= end;
-        });
-        
-        // Calculate statistics
-        const totalExp = dashboardData.expedientes.length;
-        const periodExpCount = periodExp.length;
-        const todayStr = new Date().toISOString().split("T")[0];
-        const todayExp = dashboardData.expedientes.filter(e => e.fecha === todayStr).length;
-        const totalPersonal = dashboardData.personal.length;
-        
-        const pecMonth = periodExp.filter(e => normalizeTag(e.tag) === "pec").length;
-        const pafMonth = periodExp.filter(e => normalizeTag(e.tag) === "paf").length;
-        const novedadesCount = dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "novedades").length;
-        const pedidosCount = dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "pedido").length;
-        
-        // Year totals for PEC/PAF
-        const yearStart = new Date(year, 0, 1);
-        const yearEnd = new Date(year, 11, 31);
-        const yearExp = dashboardData.expedientes.filter(e => {
-          if (!isValidDate(e.fecha)) return false;
-          const date = new Date(e.fecha);
-          return date >= yearStart && date <= yearEnd;
-        });
-        const pecYear = yearExp.filter(e => normalizeTag(e.tag) === "pec").length;
-        const pafYear = yearExp.filter(e => normalizeTag(e.tag) === "paf").length;
-        
-        // Summary data
-        const sinTag = dashboardData.expedientes.filter(e => !normalizeTag(e.tag)).length;
-        
-        // Day with most expeditions in period
-        const dayCounts = {};
-        periodExp.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            dayCounts[e.fecha] = (dayCounts[e.fecha] || 0) + 1;
-          }
-        });
-        let maxDay = null;
-        let maxDayCount = 0;
-        Object.entries(dayCounts).forEach(([day, count]) => {
-          if (count > maxDayCount) {
-            maxDay = day;
-            maxDayCount = count;
-          }
-        });
-        
-        // Prepare chart data
-        const expPorMesData = prepareDataExpedientesPorMes(dashboardData.expedientes);
-        const expPorURData = prepareDataPorUnidad(dashboardData.expedientes);
-        const pecPafData = prepareDataPecPaf(dashboardData.expedientes);
-        
-        // Find max month
-        let maxMonth = null;
-        let maxMonthCount = 0;
-        expPorMesData.forEach(m => {
-          if (m.count > maxMonthCount) {
-            maxMonth = m.label;
-            maxMonthCount = m.count;
-          }
-        });
-        
-        // Render HTML
-        const periodLabels = {
-          "este_mes": "Este mes",
-          "mes_anterior": "Mes anterior",
-          "ultimos_3": "Últimos 3 meses",
-          "ultimos_6": "Últimos 6 meses",
-          "este_ano": "Este año",
-          "ano_anterior": "Año anterior"
         };
-        
-        const periodLabel = periodLabels[period] || "Este mes";
-        
-        let html = `
-          <!-- Fila 1: Tarjetas de métricas -->
-          <div class="dashboard-cards">
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Total expedientes</div>
-              <div class="dashboard-card-value">${totalExp.toLocaleString()}</div>
-              <div class="dashboard-card-sub">Todos los registros</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">${periodLabel}</div>
-              <div class="dashboard-card-value">${periodExpCount.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${periodExpCount > 0 ? `${Math.round(periodExpCount / totalExp * 100)}% del total` : "Sin registros"}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">PEC</div>
-              <div class="dashboard-card-value">${pecYear.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${pecMonth > 0 ? `${pecMonth} este mes` : "Sin PEC este mes"}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">PAF</div>
-              <div class="dashboard-card-value">${pafYear.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${pafMonth > 0 ? `${pafMonth} este mes` : "Sin PAF este mes"}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Novedades</div>
-              <div class="dashboard-card-value">${novedadesCount.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "novedades" && isValidDate(e.fecha) && new Date(e.fecha) >= start && new Date(e.fecha) <= end).length} en período</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Pedidos</div>
-              <div class="dashboard-card-value">${pedidosCount.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "pedido" && isValidDate(e.fecha) && new Date(e.fecha) >= start && new Date(e.fecha) <= end).length} en período</div>
-            </div>
-          </div>
-          
-          <!-- Fila 2: Gráfico principal - Expedientes por mes -->
-          <div class="dashboard-charts">
-            <div class="chart-card">
-              <div class="chart-card-title">
-                Expedientes por mes
-                <span class="chart-meta">${maxMonth ? `▲ Máximo: ${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</span>
-              </div>
-              <div class="chart-card-body">
-                <canvas id="expPorMesChart"></canvas>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Fila 3: Dos gráficos lado a lado -->
-          <div class="dashboard-charts-2col">
-            <div class="chart-card">
-              <div class="chart-card-title">
-                Expedientes por Unidad Residencial
-                <span class="chart-meta">${expPorURData.length} UR${expPorURData.length !== 1 ? "s" : ""}</span>
-              </div>
-              <div class="chart-card-body">
-                <canvas id="expPorURChart"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-card-title">
-                PEC / PAF por mes
-                <span class="chart-meta">Total PEC: ${pecYear} · Total PAF: ${pafYear}</span>
-              </div>
-              <div class="chart-card-body">
-                <canvas id="pecPafChart"></canvas>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Fila 4: Resumen -->
-          <div class="dashboard-summary">
-            <div class="dashboard-summary-title">Resumen de actividad</div>
-            <div class="dashboard-summary-grid">
-              <div class="summary-item">
-                <div class="summary-item-label">Mayor actividad (período)</div>
-                <div class="summary-item-value">${maxDay ? `${formatDateShort(new Date(maxDay))} (${maxDayCount} exp.)` : "Sin datos"}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">Mejor mes (12 meses)</div>
-                <div class="summary-item-value">${maxMonth ? `${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">PEC del año</div>
-                <div class="summary-item-value">${pecYear.toLocaleString()}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">PAF del año</div>
-                <div class="summary-item-value">${pafYear.toLocaleString()}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">Expedientes sin tag</div>
-                <div class="summary-item-value">${sinTag.toLocaleString()}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">Personal registrado</div>
-                <div class="summary-item-value">${totalPersonal.toLocaleString()}</div>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        content.innerHTML = html;
-        
-        // Inicializar gráficos con Chart.js
-        initCharts(expPorMesData, expPorURData, pecPafData);
-      }
 
-      /* ══════════════════════════════
-         DASHBOARD - Inicialización de gráficos Chart.js
-      ══════════════════════════════ */
-      function initCharts(expPorMesData, expPorURData, pecPafData) {
-        // Destruir gráficos anteriores
-        if (dashboardChartsInstances && dashboardChartsInstances.length > 0) {
-          dashboardChartsInstances.forEach(chart => {
-            if (chart) chart.destroy();
-          });
-          dashboardChartsInstances = [];
+        window.logout = async function () {
+          await signOut(auth);
+          document.getElementById("resultados").innerHTML = "";
+        };
+
+        function traducirErrorAuth(code) {
+          const map = {
+            "auth/invalid-email": "Email inválido.",
+            "auth/user-not-found": "Usuario no encontrado.",
+            "auth/wrong-password": "Contraseña incorrecta.",
+            "auth/invalid-credential": "Email o contraseña incorrectos.",
+            "auth/too-many-requests": "Demasiados intentos. Probá más tarde.",
+          };
+          return map[code] || "Error al iniciar sesión.";
         }
 
-        // 1. Gráfico: Expedientes por mes (barras)
-        const ctx1 = document.getElementById('expPorMesChart');
-        if (ctx1) {
-          const labels = expPorMesData.map(d => d.label);
-          const values = expPorMesData.map(d => d.count);
-          
-          const chart1 = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Expedientes',
-                data: values,
-                backgroundColor: '#1a1916',
-                borderColor: '#1a1916',
-                borderWidth: 1,
-                borderRadius: 3,
-                barPercentage: 0.7,
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      return `${context.parsed.y} expedientes`;
-                    },
-                    title: function(context) {
-                      return context[0].label;
-                    }
-                  }
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    stepSize: 1,
-                    font: { family: "'DM Mono', monospace", size: 10 }
-                  },
-                  grid: {
-                    color: '#e2e0da',
-                    drawBorder: false,
-                  }
-                },
-                x: {
-                  ticks: {
-                    font: { family: "'DM Sans', sans-serif", size: 10 },
-                    maxRotation: labels.length > 10 ? 45 : 0,
-                    autoSkip: labels.length > 12 ? true : false,
-                    maxTicksLimit: 15,
-                  },
-                  grid: {
-                    display: false
-                  }
-                }
+        // ── Estado de autenticación ──
+        onAuthStateChanged(auth, (u) => {
+          if (u) {
+            window.user = u;
+            showApp();
+            cargarDashboard();
+            buscar();
+          } else {
+            window.user = null;
+            document.getElementById("loginWrap").style.display = "flex";
+            document.getElementById("appWrap").style.display = "none";
+          }
+        });
+
+        function showApp() {
+          document.getElementById("loginWrap").style.display = "none";
+          document.getElementById("appWrap").style.display = "grid";
+          const email = window.user.email;
+          document.getElementById("userEmail").textContent = email;
+          document.getElementById("avatar").textContent = email.slice(0, 2).toUpperCase();
+        }
+
+        // ── Funciones de utilidad (compartidas) ──
+        function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
+        function esc(str) {
+          if (!str) return "";
+          return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+        function showErr(el, msg) { el.textContent = msg; el.classList.add("show"); }
+        function isValidDate(dateString) {
+          if (!dateString) return false;
+          const date = new Date(dateString);
+          return !isNaN(date.getTime());
+        }
+
+        function normalizeTag(tag) {
+          if (!tag) return "";
+          return tag.trim().toLowerCase().replace(/\s+/g, " ");
+        }
+
+        function normalizeUR(tag) {
+          if (!tag) return null;
+          const normalized = normalizeTag(tag);
+          const urMatch = normalized.match(/^ur\s*(\d+)$/);
+          if (urMatch) {
+            return `UR ${parseInt(urMatch[1])}`;
+          }
+          return null;
+        }
+
+        function getDateRange(period) {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth();
+          let start, end;
+          switch (period) {
+            case "este_mes":
+              start = new Date(year, month, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "mes_anterior":
+              start = new Date(year, month - 1, 1);
+              end = new Date(year, month, 0);
+              break;
+            case "ultimos_3":
+              start = new Date(year, month - 2, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "ultimos_6":
+              start = new Date(year, month - 5, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "este_ano":
+              start = new Date(year, 0, 1);
+              end = new Date(year, 11, 31);
+              break;
+            case "ano_anterior":
+              start = new Date(year - 1, 0, 1);
+              end = new Date(year - 1, 11, 31);
+              break;
+            default:
+              start = new Date(year, month, 1);
+              end = new Date(year, month + 1, 0);
+          }
+          return { start, end };
+        }
+
+        function formatMonthYear(date) {
+          const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        function formatDateShort(date) {
+          const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          return `${date.getDate()} ${months[date.getMonth()]}`;
+        }
+
+        // ── Preparación de datos para gráficos ──
+        function prepareDataExpedientesPorMes(data) {
+          const last12Months = [];
+          const now = new Date();
+          for (let i = 11; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            last12Months.push({
+              year: date.getFullYear(),
+              month: date.getMonth(),
+              label: formatMonthYear(date),
+              count: 0
+            });
+          }
+          data.forEach(e => {
+            if (isValidDate(e.fecha)) {
+              const date = new Date(e.fecha);
+              const monthIndex = last12Months.findIndex(m => m.year === date.getFullYear() && m.month === date.getMonth());
+              if (monthIndex >= 0) last12Months[monthIndex].count++;
+            }
+          });
+          return last12Months;
+        }
+
+        function prepareDataPorUnidad(data) {
+          const urCounts = {};
+          data.forEach(e => {
+            const ur = normalizeUR(e.tag);
+            if (ur) urCounts[ur] = (urCounts[ur] || 0) + 1;
+          });
+          return Object.entries(urCounts).sort((a, b) => b[1] - a[1]);
+        }
+
+        function prepareDataPecPaf(data) {
+          const last12Months = [];
+          const now = new Date();
+          for (let i = 11; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            last12Months.push({
+              year: date.getFullYear(),
+              month: date.getMonth(),
+              label: formatMonthYear(date),
+              pec: 0,
+              paf: 0
+            });
+          }
+          data.forEach(e => {
+            if (isValidDate(e.fecha)) {
+              const tag = normalizeTag(e.tag);
+              const date = new Date(e.fecha);
+              const monthIndex = last12Months.findIndex(m => m.year === date.getFullYear() && m.month === date.getMonth());
+              if (monthIndex >= 0) {
+                if (tag === "pec") last12Months[monthIndex].pec++;
+                if (tag === "paf") last12Months[monthIndex].paf++;
               }
             }
           });
-          dashboardChartsInstances.push(chart1);
+          return last12Months;
         }
 
-        // 2. Gráfico: Expedientes por Unidad Residencial (barras horizontales)
-        const ctx2 = document.getElementById('expPorURChart');
-        if (ctx2) {
-          const urLabels = expPorURData.map(d => d[0]);
-          const urValues = expPorURData.map(d => d[1]);
-          
-          // Si no hay datos, mostrar mensaje
-          if (urLabels.length === 0) {
-            const parent = ctx2.parentElement;
-            parent.innerHTML = '<div class="chart-loading">No hay datos de Unidades Residenciales</div>';
-          } else {
-            const chart2 = new Chart(ctx2, {
+        // ── Inicialización de gráficos con Chart.js ──
+        function initCharts(expPorMesData, expPorURData, pecPafData) {
+          // Destruir gráficos anteriores
+          if (window.dashboardChartsInstances && window.dashboardChartsInstances.length > 0) {
+            window.dashboardChartsInstances.forEach(chart => { if (chart) chart.destroy(); });
+            window.dashboardChartsInstances = [];
+          }
+
+          // 1. Expedientes por mes
+          const ctx1 = document.getElementById('expPorMesChart');
+          if (ctx1) {
+            const labels = expPorMesData.map(d => d.label);
+            const values = expPorMesData.map(d => d.count);
+            const chart1 = new Chart(ctx1, {
               type: 'bar',
               data: {
-                labels: urLabels,
+                labels,
                 datasets: [{
                   label: 'Expedientes',
-                  data: urValues,
-                  backgroundColor: '#2d4baa',
-                  borderColor: '#2d4baa',
+                  data: values,
+                  backgroundColor: '#1a1916',
+                  borderColor: '#1a1916',
                   borderWidth: 1,
                   borderRadius: 3,
+                  barPercentage: 0.7,
                 }]
               },
               options: {
-                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: ctx => `${ctx.parsed.y} expedientes`,
+                      title: ctx => ctx[0].label
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, font: { family: "'DM Mono', monospace", size: 10 } },
+                    grid: { color: '#e2e0da', drawBorder: false }
+                  },
+                  x: {
+                    ticks: {
+                      font: { family: "'DM Sans', sans-serif", size: 10 },
+                      maxRotation: labels.length > 10 ? 45 : 0,
+                      autoSkip: labels.length > 12,
+                      maxTicksLimit: 15,
+                    },
+                    grid: { display: false }
+                  }
+                }
+              }
+            });
+            window.dashboardChartsInstances.push(chart1);
+          }
+
+          // 2. Unidades Residenciales (barras horizontales)
+          const ctx2 = document.getElementById('expPorURChart');
+          if (ctx2) {
+            const urLabels = expPorURData.map(d => d[0]);
+            const urValues = expPorURData.map(d => d[1]);
+            if (urLabels.length === 0) {
+              ctx2.parentElement.innerHTML = '<div class="chart-loading">No hay datos de Unidades Residenciales</div>';
+            } else {
+              const chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                  labels: urLabels,
+                  datasets: [{
+                    label: 'Expedientes',
+                    data: urValues,
+                    backgroundColor: '#2d4baa',
+                    borderColor: '#2d4baa',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                  }]
+                },
+                options: {
+                  indexAxis: 'y',
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      callbacks: {
+                        label: ctx => `${ctx.parsed.x} expedientes`
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, autoSkip: false },
+                      grid: { display: false }
+                    },
+                    x: {
+                      beginAtZero: true,
+                      ticks: { stepSize: 1, font: { family: "'DM Mono', monospace", size: 10 } },
+                      grid: { color: '#e2e0da', drawBorder: false }
+                    }
+                  }
+                }
+              });
+              window.dashboardChartsInstances.push(chart2);
+
+              // Dibujar valores al final de las barras
+              setTimeout(() => {
+                const canvas = ctx2;
+                const ctx = canvas.getContext('2d');
+                const meta = chart2.getDatasetMeta(0);
+                const data = chart2.data.datasets[0].data;
+                meta.data.forEach((bar, idx) => {
+                  const val = data[idx];
+                  if (val > 0) {
+                    ctx.fillStyle = '#7a7870';
+                    ctx.font = "11px 'DM Mono', monospace";
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(val, bar.x + 6, bar.y);
+                  }
+                });
+              }, 100);
+            }
+          }
+
+          // 3. PEC / PAF por mes (barras agrupadas)
+          const ctx3 = document.getElementById('pecPafChart');
+          if (ctx3) {
+            const pecPafLabels = pecPafData.map(d => d.label);
+            const pecValues = pecPafData.map(d => d.pec);
+            const pafValues = pecPafData.map(d => d.paf);
+            const chart3 = new Chart(ctx3, {
+              type: 'bar',
+              data: {
+                labels: pecPafLabels,
+                datasets: [
+                  {
+                    label: 'PEC',
+                    data: pecValues,
+                    backgroundColor: '#1a1916',
+                    borderColor: '#1a1916',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                  },
+                  {
+                    label: 'PAF',
+                    data: pafValues,
+                    backgroundColor: '#2d4baa',
+                    borderColor: '#2d4baa',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                  }
+                ]
+              },
+              options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                   legend: {
-                    display: false,
+                    position: 'top',
+                    labels: {
+                      font: { family: "'DM Sans', sans-serif", size: 11 },
+                      boxWidth: 12,
+                      padding: 12,
+                      usePointStyle: true,
+                    }
                   },
                   tooltip: {
                     callbacks: {
-                      label: function(context) {
-                        return `${context.parsed.x} expedientes`;
+                      label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}`,
+                      afterBody: items => {
+                        const total = items.reduce((sum, item) => sum + item.parsed.y, 0);
+                        return `Total: ${total}`;
                       }
                     }
                   }
                 },
                 scales: {
                   y: {
-                    ticks: {
-                      font: { family: "'DM Sans', sans-serif", size: 11 },
-                      autoSkip: false,
-                    },
-                    grid: {
-                      display: false
-                    }
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, font: { family: "'DM Mono', monospace", size: 10 } },
+                    grid: { color: '#e2e0da', drawBorder: false }
                   },
                   x: {
-                    beginAtZero: true,
                     ticks: {
-                      stepSize: 1,
-                      font: { family: "'DM Mono', monospace", size: 10 }
+                      font: { family: "'DM Sans', sans-serif", size: 10 },
+                      maxRotation: pecPafLabels.length > 10 ? 45 : 0,
+                      autoSkip: pecPafLabels.length > 12,
+                      maxTicksLimit: 15,
                     },
-                    grid: {
-                      color: '#e2e0da',
-                      drawBorder: false,
-                    }
+                    grid: { display: false }
                   }
                 }
               }
             });
-            dashboardChartsInstances.push(chart2);
-            
-            // Dibujar valores al final de las barras
-            const canvas = ctx2;
-            const chart = chart2;
-            setTimeout(() => {
-              const ctx = canvas.getContext('2d');
-              const meta = chart.getDatasetMeta(0);
-              const data = chart.data.datasets[0].data;
-              
-              meta.data.forEach((bar, index) => {
-                const value = data[index];
-                if (value > 0) {
-                  ctx.fillStyle = '#7a7870';
-                  ctx.font = "11px 'DM Mono', monospace";
-                  ctx.textAlign = 'left';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillText(value, bar.x + 6, bar.y);
-                }
-              });
-            }, 100);
+            window.dashboardChartsInstances.push(chart3);
           }
         }
 
-        // 3. Gráfico: PEC / PAF por mes (barras agrupadas)
-        const ctx3 = document.getElementById('pecPafChart');
-        if (ctx3) {
-          const pecPafLabels = pecPafData.map(d => d.label);
-          const pecValues = pecPafData.map(d => d.pec);
-          const pafValues = pecPafData.map(d => d.paf);
-          
-          const chart3 = new Chart(ctx3, {
-            type: 'bar',
-            data: {
-              labels: pecPafLabels,
-              datasets: [
-                {
-                  label: 'PEC',
-                  data: pecValues,
-                  backgroundColor: '#1a1916',
-                  borderColor: '#1a1916',
-                  borderWidth: 1,
-                  borderRadius: 3,
-                },
-                {
-                  label: 'PAF',
-                  data: pafValues,
-                  backgroundColor: '#2d4baa',
-                  borderColor: '#2d4baa',
-                  borderWidth: 1,
-                  borderRadius: 3,
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'top',
-                  labels: {
-                    font: { family: "'DM Sans', sans-serif", size: 11 },
-                    boxWidth: 12,
-                    padding: 12,
-                    usePointStyle: true,
-                  }
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      return `${context.dataset.label}: ${context.parsed.y}`;
-                    },
-                    afterBody: function(tooltipItems) {
-                      const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
-                      return `Total: ${total}`;
-                    }
-                  }
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    stepSize: 1,
-                    font: { family: "'DM Mono', monospace", size: 10 }
-                  },
-                  grid: {
-                    color: '#e2e0da',
-                    drawBorder: false,
-                  }
-                },
-                x: {
-                  ticks: {
-                    font: { family: "'DM Sans', sans-serif", size: 10 },
-                    maxRotation: pecPafLabels.length > 10 ? 45 : 0,
-                    autoSkip: pecPafLabels.length > 12 ? true : false,
-                    maxTicksLimit: 15,
-                  },
-                  grid: {
-                    display: false
-                  }
-                }
-              }
+        // ── Render del Dashboard ──
+        function renderDashboard(period = "este_mes") {
+          const content = document.getElementById("dashboardContent");
+          const { start, end } = getDateRange(period);
+          const year = new Date().getFullYear();
+
+          const periodExp = window.dashboardData.expedientes.filter(e => {
+            if (!isValidDate(e.fecha)) return false;
+            const date = new Date(e.fecha);
+            return date >= start && date <= end;
+          });
+
+          const totalExp = window.dashboardData.expedientes.length;
+          const periodExpCount = periodExp.length;
+          const todayStr = new Date().toISOString().split("T")[0];
+          const todayExp = window.dashboardData.expedientes.filter(e => e.fecha === todayStr).length;
+          const totalPersonal = window.dashboardData.personal.length;
+
+          const pecMonth = periodExp.filter(e => normalizeTag(e.tag) === "pec").length;
+          const pafMonth = periodExp.filter(e => normalizeTag(e.tag) === "paf").length;
+          const novedadesCount = window.dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "novedades").length;
+          const pedidosCount = window.dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "pedido").length;
+
+          const yearStart = new Date(year, 0, 1);
+          const yearEnd = new Date(year, 11, 31);
+          const yearExp = window.dashboardData.expedientes.filter(e => {
+            if (!isValidDate(e.fecha)) return false;
+            const date = new Date(e.fecha);
+            return date >= yearStart && date <= yearEnd;
+          });
+          const pecYear = yearExp.filter(e => normalizeTag(e.tag) === "pec").length;
+          const pafYear = yearExp.filter(e => normalizeTag(e.tag) === "paf").length;
+
+          const sinTag = window.dashboardData.expedientes.filter(e => !normalizeTag(e.tag)).length;
+
+          const dayCounts = {};
+          periodExp.forEach(e => {
+            if (isValidDate(e.fecha)) {
+              dayCounts[e.fecha] = (dayCounts[e.fecha] || 0) + 1;
             }
           });
-          dashboardChartsInstances.push(chart3);
-        }
-      }
+          let maxDay = null;
+          let maxDayCount = 0;
+          Object.entries(dayCounts).forEach(([day, count]) => {
+            if (count > maxDayCount) {
+              maxDay = day;
+              maxDayCount = count;
+            }
+          });
 
-      window.cargarDashboard = async function () {
-        if (!user) return;
-        
-        const content = document.getElementById("dashboardContent");
-        const period = document.getElementById("dashboardPeriodo").value;
-        
-        content.innerHTML = `
-          <div class="dashboard-loading">
-            <div class="spinner"></div>
-            <span style="font-size:13px;">Cargando estadísticas...</span>
-          </div>
-        `;
-        
-        try {
-          // Fetch expedientes
-          const expSnap = await getDocs(collection(db, "expedientes"));
-          dashboardData.expedientes = [];
-          expSnap.forEach(d => dashboardData.expedientes.push({ id: d.id, ...d.data() }));
-          
-          // Fetch personal
-          const personalSnap = await getDocs(collection(db, "personal"));
-          dashboardData.personal = [];
-          personalSnap.forEach(d => dashboardData.personal.push({ id: d.id, ...d.data() }));
-          
-          renderDashboard(period);
-        } catch (error) {
-          console.error("Error al cargar dashboard:", error);
+          const expPorMesData = prepareDataExpedientesPorMes(window.dashboardData.expedientes);
+          const expPorURData = prepareDataPorUnidad(window.dashboardData.expedientes);
+          const pecPafData = prepareDataPecPaf(window.dashboardData.expedientes);
+
+          let maxMonth = null;
+          let maxMonthCount = 0;
+          expPorMesData.forEach(m => {
+            if (m.count > maxMonthCount) {
+              maxMonth = m.label;
+              maxMonthCount = m.count;
+            }
+          });
+
+          const periodLabels = {
+            "este_mes": "Este mes",
+            "mes_anterior": "Mes anterior",
+            "ultimos_3": "Últimos 3 meses",
+            "ultimos_6": "Últimos 6 meses",
+            "este_ano": "Este año",
+            "ano_anterior": "Año anterior"
+          };
+          const periodLabel = periodLabels[period] || "Este mes";
+
           content.innerHTML = `
-            <div class="dashboard-error">
-              Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
-              <br><small style="font-size:12px; margin-top:8px; display:block;">${error.message || "Error desconocido"}</small>
+            <!-- Fila 1: Tarjetas de métricas -->
+            <div class="dashboard-cards">
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">Total expedientes</div>
+                <div class="dashboard-card-value">${totalExp.toLocaleString()}</div>
+                <div class="dashboard-card-sub">Todos los registros</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">${periodLabel}</div>
+                <div class="dashboard-card-value">${periodExpCount.toLocaleString()}</div>
+                <div class="dashboard-card-sub">${periodExpCount > 0 ? `${Math.round(periodExpCount / totalExp * 100)}% del total` : "Sin registros"}</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">PEC</div>
+                <div class="dashboard-card-value">${pecYear.toLocaleString()}</div>
+                <div class="dashboard-card-sub">${pecMonth > 0 ? `${pecMonth} este mes` : "Sin PEC este mes"}</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">PAF</div>
+                <div class="dashboard-card-value">${pafYear.toLocaleString()}</div>
+                <div class="dashboard-card-sub">${pafMonth > 0 ? `${pafMonth} este mes` : "Sin PAF este mes"}</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">Novedades</div>
+                <div class="dashboard-card-value">${novedadesCount.toLocaleString()}</div>
+                <div class="dashboard-card-sub">${window.dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "novedades" && isValidDate(e.fecha) && new Date(e.fecha) >= start && new Date(e.fecha) <= end).length} en período</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-card-label">Pedidos</div>
+                <div class="dashboard-card-value">${pedidosCount.toLocaleString()}</div>
+                <div class="dashboard-card-sub">${window.dashboardData.expedientes.filter(e => normalizeTag(e.tag) === "pedido" && isValidDate(e.fecha) && new Date(e.fecha) >= start && new Date(e.fecha) <= end).length} en período</div>
+              </div>
+            </div>
+
+            <!-- Fila 2: Gráfico principal -->
+            <div class="dashboard-charts">
+              <div class="chart-card">
+                <div class="chart-card-title">
+                  Expedientes por mes
+                  <span class="chart-meta">${maxMonth ? `▲ Máximo: ${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</span>
+                </div>
+                <div class="chart-card-body">
+                  <canvas id="expPorMesChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila 3: Dos gráficos -->
+            <div class="dashboard-charts-2col">
+              <div class="chart-card">
+                <div class="chart-card-title">
+                  Expedientes por Unidad Residencial
+                  <span class="chart-meta">${expPorURData.length} UR${expPorURData.length !== 1 ? "s" : ""}</span>
+                </div>
+                <div class="chart-card-body">
+                  <canvas id="expPorURChart"></canvas>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-card-title">
+                  PEC / PAF por mes
+                  <span class="chart-meta">Total PEC: ${pecYear} · Total PAF: ${pafYear}</span>
+                </div>
+                <div class="chart-card-body">
+                  <canvas id="pecPafChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila 4: Resumen -->
+            <div class="dashboard-summary">
+              <div class="dashboard-summary-title">Resumen de actividad</div>
+              <div class="dashboard-summary-grid">
+                <div class="summary-item">
+                  <div class="summary-item-label">Mayor actividad (período)</div>
+                  <div class="summary-item-value">${maxDay ? `${formatDateShort(new Date(maxDay))} (${maxDayCount} exp.)` : "Sin datos"}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-item-label">Mejor mes (12 meses)</div>
+                  <div class="summary-item-value">${maxMonth ? `${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-item-label">PEC del año</div>
+                  <div class="summary-item-value">${pecYear.toLocaleString()}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-item-label">PAF del año</div>
+                  <div class="summary-item-value">${pafYear.toLocaleString()}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-item-label">Expedientes sin tag</div>
+                  <div class="summary-item-value">${sinTag.toLocaleString()}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-item-label">Personal registrado</div>
+                  <div class="summary-item-value">${totalPersonal.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          initCharts(expPorMesData, expPorURData, pecPafData);
+        }
+
+        // ── Cargar Dashboard (expone globalmente) ──
+        window.cargarDashboard = async function () {
+          if (!window.user) return;
+          const content = document.getElementById("dashboardContent");
+          const period = document.getElementById("dashboardPeriodo").value;
+
+          content.innerHTML = `
+            <div class="dashboard-loading">
+              <div class="spinner"></div>
+              <span style="font-size:13px;">Cargando estadísticas...</span>
+            </div>
+          `;
+
+          try {
+            const expSnap = await getDocs(collection(db, "expedientes"));
+            window.dashboardData.expedientes = [];
+            expSnap.forEach(d => window.dashboardData.expedientes.push({ id: d.id, ...d.data() }));
+
+            const personalSnap = await getDocs(collection(db, "personal"));
+            window.dashboardData.personal = [];
+            personalSnap.forEach(d => window.dashboardData.personal.push({ id: d.id, ...d.data() }));
+
+            renderDashboard(period);
+          } catch (error) {
+            console.error("Error al cargar dashboard:", error);
+            content.innerHTML = `
+              <div class="dashboard-error">
+                Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
+                <br><small style="font-size:12px; margin-top:8px; display:block;">${error.message || "Error desconocido"}</small>
+              </div>
+            `;
+          }
+        };
+
+        // ── EXPEDIENTES CRUD ──
+        window.guardar = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("formError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("numero"),
+            detalle: v("detalle"),
+            interno: v("interno"),
+            lpu: v("lpu"),
+            tag: v("tag"),
+            fecha: v("fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormulario();
+            setPanel("lista", document.getElementById("navLista"));
+            buscar();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscar = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+          const fn = v("f_numero"),
+            ft = v("f_tag"),
+            ff = v("f_fecha"),
+            fi = v("f_interno"),
+            fl = v("f_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ft) data = data.filter(e => (e.tag || "").toLowerCase().includes(ft.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+
+          allData = data;
+          currentPage = 1;
+          actualizarStats(allData);
+          renderPagina();
+        };
+
+        function actualizarStats(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("statTotal").textContent = data.length;
+          document.getElementById("statMes").textContent = esteMes;
+          document.getElementById("statFiltrados").textContent = data.length;
+          const filtrado = v("f_numero") || v("f_tag") || v("f_fecha") || v("f_interno") || v("f_lpu");
+          document.getElementById("resultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} expediente${data.length !== 1 ? "s" : ""}`;
+        }
+
+        function renderPagina() {
+          const total = allData.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPage > totalPages) currentPage = totalPages;
+          const start = (currentPage - 1) * PAGE_SIZE;
+          renderResultados(allData.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "paginacion", "expedientes");
+        }
+
+        function renderResultados(data, offset = 0) {
+          const el = document.getElementById("resultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <p>No hay expedientes</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    ${e.tag ? `<span class="chip chip-tag">${esc(e.tag)}</span>` : ""}
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        window.eliminar = async function (id) {
+          if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
+          try {
+            await deleteDoc(doc(db, "expedientes", id));
+            buscar();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.abrirEdicion = function (id) {
+          const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id) || allPedidos.find(x => x.id === id);
+          if (!e) return alert("No se encontró el registro.");
+          document.getElementById("editId").value = e.id;
+          document.getElementById("editNumero").value = e.numero_expediente || "";
+          document.getElementById("editDetalle").value = e.detalle || "";
+          document.getElementById("editInterno").value = e.interno || "";
+          document.getElementById("editLpu").value = e.lpu || "";
+          document.getElementById("editTag").value = e.tag || "";
+          document.getElementById("editFecha").value = e.fecha || "";
+          document.getElementById("editOverlay").classList.add("open");
+        };
+
+        window.guardarEdicion = async function () {
+          const payload = {
+            numero_expediente: document.getElementById("editNumero").value,
+            detalle: document.getElementById("editDetalle").value,
+            interno: document.getElementById("editInterno").value,
+            lpu: document.getElementById("editLpu").value,
+            tag: document.getElementById("editTag").value,
+            fecha: document.getElementById("editFecha").value || null,
+          };
+          const id = document.getElementById("editId").value;
+          try {
+            await updateDoc(doc(db, "expedientes", id), payload);
+            cerrarModal("editOverlay");
+            buscar();
+            buscarNovedades();
+            buscarPedidos();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.exportarExcel = function () {
+          if (!allData.length) { alert("No hay expedientes para exportar."); return; }
+          const rows = allData.map(e => ({
+            "N° Expediente": e.numero_expediente || "",
+            "Fecha": e.fecha || "",
+            "Detalle": e.detalle || "",
+            "Interno": e.interno || "",
+            "LPU": e.lpu || "",
+            "Tag": e.tag || "",
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || "").length), 12) }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
+          XLSX.writeFile(wb, `expedientes_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
+
+        // ── NOVEDADES ──
+        window.guardarNovedad = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("nFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("n_numero"),
+            detalle: v("n_detalle"),
+            interno: v("n_interno"),
+            lpu: v("n_lpu"),
+            tag: NOVEDADES_TAG,
+            fecha: v("n_fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormularioNovedad();
+            setPanel("novedades", document.getElementById("navNovedades"));
+            buscarNovedades();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarNovedades = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+          data = data.filter(e => (e.tag || "").toLowerCase() === NOVEDADES_TAG);
+
+          const fn = v("nf_numero"),
+            ff = v("nf_fecha"),
+            fi = v("nf_interno"),
+            fl = v("nf_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+          allNovedades = data;
+          currentPageN = 1;
+          actualizarStatsNovedades(allNovedades);
+          renderPaginaNovedades();
+        };
+
+        function actualizarStatsNovedades(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("nStatTotal").textContent = data.length;
+          document.getElementById("nStatMes").textContent = esteMes;
+          document.getElementById("nStatFiltrados").textContent = data.length;
+          const filtrado = v("nf_numero") || v("nf_fecha") || v("nf_interno") || v("nf_lpu");
+          document.getElementById("nResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} novedad${data.length !== 1 ? "es" : ""}`;
+        }
+
+        function renderPaginaNovedades() {
+          const total = allNovedades.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPageN > totalPages) currentPageN = totalPages;
+          const start = (currentPageN - 1) * PAGE_SIZE;
+          renderResultadosNovedades(allNovedades.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "nPaginacion", "novedades");
+        }
+
+        function renderResultadosNovedades(data, offset = 0) {
+          const el = document.getElementById("nResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <p>No hay novedades</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    <span class="chip chip-tag">novedades</span>
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        window.exportarNovedadesExcel = function () {
+          if (!allNovedades.length) { alert("No hay novedades para exportar."); return; }
+          const rows = allNovedades.map(e => ({
+            "N° Expediente": e.numero_expediente || "",
+            "Fecha": e.fecha || "",
+            "Detalle": e.detalle || "",
+            "Interno": e.interno || "",
+            "LPU": e.lpu || "",
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || "").length), 12) }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Novedades");
+          XLSX.writeFile(wb, `novedades_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
+
+        window.limpiarFiltrosNovedades = function () {
+          ["nf_numero", "nf_fecha", "nf_interno", "nf_lpu"].forEach(id => document.getElementById(id).value = "");
+          buscarNovedades();
+        };
+        window.limpiarFormularioNovedad = function () {
+          ["n_numero", "n_detalle", "n_interno", "n_lpu", "n_fecha"].forEach(id => document.getElementById(id).value = "");
+        };
+
+        // ── PEDIDOS ──
+        window.guardarPedido = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("pdFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("pd_numero"),
+            detalle: v("pd_detalle"),
+            interno: v("pd_interno"),
+            lpu: v("pd_lpu"),
+            tag: PEDIDOS_TAG,
+            fecha: v("pd_fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormularioPedido();
+            setPanel("pedidos", document.getElementById("navPedidos"));
+            buscarPedidos();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarPedidos = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+          data = data.filter(e => (e.tag || "").toLowerCase() === PEDIDOS_TAG);
+
+          const fn = v("pdf_numero"),
+            ff = v("pdf_fecha"),
+            fi = v("pdf_interno"),
+            fl = v("pdf_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+          allPedidos = data;
+          currentPagePd = 1;
+          actualizarStatsPedidos(allPedidos);
+          renderPaginaPedidos();
+        };
+
+        function actualizarStatsPedidos(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("pdStatTotal").textContent = data.length;
+          document.getElementById("pdStatMes").textContent = esteMes;
+          document.getElementById("pdStatFiltrados").textContent = data.length;
+          const filtrado = v("pdf_numero") || v("pdf_fecha") || v("pdf_interno") || v("pdf_lpu");
+          document.getElementById("pdResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} pedido${data.length !== 1 ? "s" : ""}`;
+        }
+
+        function renderPaginaPedidos() {
+          const total = allPedidos.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPagePd > totalPages) currentPagePd = totalPages;
+          const start = (currentPagePd - 1) * PAGE_SIZE;
+          renderResultadosPedidos(allPedidos.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "pdPaginacion", "pedidos");
+        }
+
+        function renderResultadosPedidos(data, offset = 0) {
+          const el = document.getElementById("pdResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <p>No hay pedidos</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    <span class="chip chip-tag">pedido</span>
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        window.exportarPedidosExcel = function () {
+          if (!allPedidos.length) { alert("No hay pedidos para exportar."); return; }
+          const rows = allPedidos.map(e => ({
+            "N° Expediente": e.numero_expediente || "",
+            "Fecha": e.fecha || "",
+            "Detalle": e.detalle || "",
+            "Interno": e.interno || "",
+            "LPU": e.lpu || "",
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || "").length), 12) }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+          XLSX.writeFile(wb, `pedidos_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
+
+        window.limpiarFiltrosPedidos = function () {
+          ["pdf_numero", "pdf_fecha", "pdf_interno", "pdf_lpu"].forEach(id => document.getElementById(id).value = "");
+          buscarPedidos();
+        };
+        window.limpiarFormularioPedido = function () {
+          ["pd_numero", "pd_detalle", "pd_interno", "pd_lpu", "pd_fecha"].forEach(id => document.getElementById(id).value = "");
+        };
+
+        // ── PERSONAL ──
+        window.guardarPersonal = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("pFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            grado: v("p_grado"),
+            nombre: v("p_nombre"),
+            apellido: v("p_apellido"),
+            credencial: v("p_credencial"),
+            dni: v("p_dni"),
+            cuil: v("p_cuil"),
+            telefono: v("p_telefono"),
+            mail: v("p_mail"),
+            usuario_gde: v("p_usuario_gde"),
+            direccion: v("p_direccion"),
+            expediente_oi: v("p_expediente_oi"),
+            numero_oi: v("p_numero_oi"),
+            curso_titulo: v("p_curso_titulo"),
+            sector: v("p_sector"),
+            turno: v("p_turno"),
+            detalle: v("p_detalle"),
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.nombre || !payload.apellido) {
+            showErr(errEl, "Nombre y apellido son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "personal"), payload);
+            limpiarFormularioPersonal();
+            setPanel("personal", document.getElementById("navPersonal"));
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarPersonal = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "personal"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+          const fn = v("pf_nombre"),
+            fg = v("pf_grado"),
+            fc = v("pf_credencial"),
+            fs = v("pf_sector"),
+            fcu = v("pf_curso"),
+            ft = v("pf_turno");
+
+          if (fn) data = data.filter(p =>
+            (p.nombre || "").toLowerCase().includes(fn.toLowerCase()) ||
+            (p.apellido || "").toLowerCase().includes(fn.toLowerCase())
+          );
+          if (fg) data = data.filter(p => (p.grado || "").toLowerCase().includes(fg.toLowerCase()));
+          if (fc) data = data.filter(p => (p.credencial || "").toLowerCase().includes(fc.toLowerCase()));
+          if (fs) data = data.filter(p => (p.sector || "").toLowerCase().includes(fs.toLowerCase()));
+          if (fcu) data = data.filter(p => (p.curso_titulo || "").toLowerCase().includes(fcu.toLowerCase()));
+          if (ft) data = data.filter(p => (p.turno || "").toLowerCase() === ft.toLowerCase());
+
+          allPersonal = data;
+          allPersonal.forEach(p => { personalMap[p.id] = p; });
+          currentPageP = 1;
+          actualizarStatsPersonal(allPersonal);
+          renderPaginaPersonal();
+        };
+
+        function actualizarStatsPersonal(data) {
+          const sectores = new Set(data.map(p => p.sector).filter(Boolean)).size;
+          document.getElementById("pStatTotal").textContent = data.length;
+          document.getElementById("pStatSectores").textContent = sectores;
+          document.getElementById("pStatFiltrados").textContent = data.length;
+          const filtrado = v("pf_nombre") || v("pf_grado") || v("pf_credencial") || v("pf_sector") || v("pf_curso");
+          document.getElementById("pResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} persona${data.length !== 1 ? "s" : ""}`;
+        }
+
+        window.setSortPersonal = function (field, btn) {
+          if (sortFieldP === field) {
+            sortAscP = !sortAscP;
+          } else {
+            sortFieldP = field;
+            sortAscP = true;
+          }
+          document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const arrowEl = document.getElementById("sortArrow_" + field);
+          document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
+          if (arrowEl) arrowEl.textContent = sortAscP ? "↑" : "↓";
+          renderPaginaPersonal();
+        };
+
+        function renderPaginaPersonal() {
+          const sorted = [...allPersonal].sort((a, b) => {
+            const va = (a[sortFieldP] || "").toLowerCase();
+            const vb = (b[sortFieldP] || "").toLowerCase();
+            const cmp = va.localeCompare(vb, "es");
+            return sortAscP ? cmp : -cmp;
+          });
+          const total = sorted.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPageP > totalPages) currentPageP = totalPages;
+          const start = (currentPageP - 1) * PAGE_SIZE;
+          renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "pPaginacion", "personal");
+        }
+
+        function renderResultadosPersonal(data, offset = 0) {
+          const el = document.getElementById("pResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              <p>No hay personal registrado</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((p) => {
+            const initials = ((p.nombre || "").charAt(0) + (p.apellido || "").charAt(0)).toUpperCase();
+            return `
+            <div class="personal-card">
+              <div class="personal-card-inner">
+                <div class="personal-avatar">${initials}</div>
+                <div class="personal-body">
+                  <div class="personal-name">${esc(p.apellido)}, ${esc(p.nombre)}</div>
+                  <div class="personal-sub">${p.grado ? esc(p.grado) + " · " : ""}${p.sector ? esc(p.sector) : "Sin sector"}</div>
+                  <div class="personal-grid">
+                    ${p.credencial ? `<div class="personal-field"><span class="personal-field-label">Credencial</span><span class="personal-field-value">${esc(p.credencial)}</span></div>` : ""}
+                    ${p.dni ? `<div class="personal-field"><span class="personal-field-label">DNI</span><span class="personal-field-value">${esc(p.dni)}</span></div>` : ""}
+                    ${p.cuil ? `<div class="personal-field"><span class="personal-field-label">CUIL</span><span class="personal-field-value">${esc(p.cuil)}</span></div>` : ""}
+                    ${p.telefono ? `<div class="personal-field"><span class="personal-field-label">Tel.</span><span class="personal-field-value">${esc(p.telefono)}</span></div>` : ""}
+                    ${p.mail ? `<div class="personal-field"><span class="personal-field-label">Mail</span><span class="personal-field-value">${esc(p.mail)}</span></div>` : ""}
+                    ${p.usuario_gde ? `<div class="personal-field"><span class="personal-field-label">GDE</span><span class="personal-field-value">${esc(p.usuario_gde)}</span></div>` : ""}
+                    ${p.numero_oi ? `<div class="personal-field"><span class="personal-field-label">Nro. OI</span><span class="personal-field-value">${esc(p.numero_oi)}</span></div>` : ""}
+                  </div>
+                  <div class="card-chips">
+                    ${p.curso_titulo ? `<span class="chip chip-tag">${esc(p.curso_titulo)}</span>` : ""}
+                    ${p.turno ? `<span class="chip chip-green">${esc(p.turno)}</span>` : ""}
+                    ${p.expediente_oi ? `<span class="chip">OI: ${esc(p.expediente_oi)}</span>` : ""}
+                    ${p.direccion ? `<span class="chip chip-fecha">${esc(p.direccion)}</span>` : ""}
+                  </div>
+                  ${p.detalle ? `<div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5">${esc(p.detalle)}</div>` : ""}
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicionPersonal('${p.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminarPersonal('${p.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `}).join("");
+        }
+
+        window.eliminarPersonal = async function (id) {
+          if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
+          try {
+            await deleteDoc(doc(db, "personal", id));
+            buscarPersonal();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.abrirEdicionPersonal = function (id) {
+          const p = personalMap[id];
+          if (!p) return alert("No se encontró el registro.");
+          const fields = ["id", "grado", "nombre", "apellido", "credencial", "dni", "cuil", "telefono",
+            "mail", "usuario_gde", "direccion", "expediente_oi", "numero_oi",
+            "curso_titulo", "sector", "turno", "detalle"
+          ];
+          fields.forEach(f => {
+            const el = document.getElementById("ep_" + f);
+            if (el) el.value = p[f] || "";
+          });
+          document.getElementById("editPersonalOverlay").classList.add("open");
+        };
+
+        window.guardarEdicionPersonal = async function () {
+          const id = document.getElementById("ep_id").value;
+          const payload = {
+            grado: document.getElementById("ep_grado").value,
+            nombre: document.getElementById("ep_nombre").value,
+            apellido: document.getElementById("ep_apellido").value,
+            credencial: document.getElementById("ep_credencial").value,
+            dni: document.getElementById("ep_dni").value,
+            cuil: document.getElementById("ep_cuil").value,
+            telefono: document.getElementById("ep_telefono").value,
+            mail: document.getElementById("ep_mail").value,
+            usuario_gde: document.getElementById("ep_usuario_gde").value,
+            direccion: document.getElementById("ep_direccion").value,
+            expediente_oi: document.getElementById("ep_expediente_oi").value,
+            numero_oi: document.getElementById("ep_numero_oi").value,
+            curso_titulo: document.getElementById("ep_curso_titulo").value,
+            sector: document.getElementById("ep_sector").value,
+            turno: document.getElementById("ep_turno").value,
+            detalle: document.getElementById("ep_detalle").value,
+          };
+          try {
+            await updateDoc(doc(db, "personal", id), payload);
+            cerrarModal("editPersonalOverlay");
+            buscarPersonal();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.exportarPersonalExcel = function () {
+          if (!allPersonal.length) { alert("No hay personal para exportar."); return; }
+          const rows = allPersonal.map(p => ({
+            "Grado": p.grado || "",
+            "Apellido": p.apellido || "",
+            "Nombre": p.nombre || "",
+            "Credencial": p.credencial || "",
+            "DNI": p.dni || "",
+            "CUIL": p.cuil || "",
+            "Teléfono": p.telefono || "",
+            "Mail": p.mail || "",
+            "Usuario GDE": p.usuario_gde || "",
+            "Dirección": p.direccion || "",
+            "Expediente OI": p.expediente_oi || "",
+            "Número OI": p.numero_oi || "",
+            "Curso / Título": p.curso_titulo || "",
+            "Sector": p.sector || "",
+            "Turno": p.turno || "",
+            "Detalle": p.detalle || "",
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || "").length), 12) }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Personal");
+          XLSX.writeFile(wb, `personal_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        };
+
+        // ── PAGINACIÓN ──
+        window.cambiarPagina = function (containerType, p) {
+          if (containerType === "expedientes") { currentPage = p;
+            renderPagina(); } else if (containerType === "novedades") { currentPageN = p;
+            renderPaginaNovedades(); } else if (containerType === "pedidos") { currentPagePd = p;
+            renderPaginaPedidos(); } else { currentPageP = p;
+            renderPaginaPersonal(); }
+        };
+
+        function renderPaginacion(total, totalPages, containerId, containerType) {
+          const pag = document.getElementById(containerId);
+          const cp = containerType === "expedientes" ? currentPage :
+            containerType === "novedades" ? currentPageN :
+            containerType === "pedidos" ? currentPagePd :
+            currentPageP;
+          if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
+          pag.style.display = "flex";
+
+          let pages = [];
+          if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+          } else {
+            pages = [1];
+            const left = Math.max(2, cp - 1);
+            const right = Math.min(totalPages - 1, cp + 1);
+            if (left > 2) pages.push("…");
+            for (let i = left; i <= right; i++) pages.push(i);
+            if (right < totalPages - 1) pages.push("…");
+            pages.push(totalPages);
+          }
+
+          const startItem = (cp - 1) * PAGE_SIZE + 1;
+          const endItem = Math.min(cp * PAGE_SIZE, total);
+
+          pag.innerHTML = `
+            <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
+            <div class="pagination-controls">
+              <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp - 1})" ${cp === 1 ? "disabled" : ""}>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              ${pages.map(p => p === "…" ?
+                `<span class="page-btn" style="cursor:default;opacity:.4">…</span>` :
+                `<button class="page-btn ${p === cp ? "active" : ""}" onclick="cambiarPagina('${containerType}', ${p})">${p}</button>`
+              ).join("")}
+              <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp + 1})" ${cp === totalPages ? "disabled" : ""}>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
           `;
         }
-      };
 
-      /* ══════════════════════════════
-         EXPEDIENTES — CRUD
-      ══════════════════════════════ */
-      window.guardar = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("formError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("numero"),
-          detalle: v("detalle"),
-          interno: v("interno"),
-          lpu: v("lpu"),
-          tag: v("tag"),
-          fecha: v("fecha") || null,
-          created_at: new Date().toISOString(),
-        };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormulario();
-          setPanel("lista", document.getElementById("navLista"));
+        // ── MODALES ──
+        window.cerrarModal = function (id) { document.getElementById(id).classList.remove("open"); };
+        window.overlayClick = function (e) { if (e.target === e.currentTarget) cerrarModal("editOverlay"); };
+        window.overlayClickPersonal = function (e) { if (e.target === e.currentTarget) cerrarModal("editPersonalOverlay"); };
+
+        // ── LIMPIAR FILTROS / FORMULARIOS ──
+        window.limpiarFiltros = function () {
+          ["f_numero", "f_tag", "f_fecha", "f_interno", "f_lpu"].forEach(id => document.getElementById(id).value = "");
           buscar();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscar = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        const fn = v("f_numero"), ft = v("f_tag"), ff = v("f_fecha"),
-              fi = v("f_interno"), fl = v("f_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ft) data = data.filter(e => (e.tag||"").toLowerCase().includes(ft.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allData = data;
-        currentPage = 1;
-        actualizarStats(allData);
-        renderPagina();
-      };
-
-      function actualizarStats(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("statTotal").textContent = data.length;
-        document.getElementById("statMes").textContent   = esteMes;
-        document.getElementById("statFiltrados").textContent = data.length;
-        const filtrado = v("f_numero")||v("f_tag")||v("f_fecha")||v("f_interno")||v("f_lpu");
-        document.getElementById("resultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} expediente${data.length!==1?"s":""}`;
-      }
-
-      function renderPagina() {
-        const total = allData.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPage > totalPages) currentPage = totalPages;
-        const start = (currentPage - 1) * PAGE_SIZE;
-        renderResultados(allData.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "paginacion", "expedientes");
-      }
-
-      function renderResultados(data, offset=0) {
-        const el = document.getElementById("resultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <p>No hay expedientes</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  ${e.tag    ? `<span class="chip chip-tag">${esc(e.tag)}</span>` : ""}
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.eliminar = async function (id) {
-        if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
-        try {
-          await deleteDoc(doc(db, "expedientes", id));
-          buscar();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
-
-      window.abrirEdicion = function (id) {
-        const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id) || allPedidos.find(x => x.id === id);
-        if (!e) return alert("No se encontró el registro.");
-        document.getElementById("editId").value      = e.id;
-        document.getElementById("editNumero").value  = e.numero_expediente || "";
-        document.getElementById("editDetalle").value = e.detalle || "";
-        document.getElementById("editInterno").value = e.interno || "";
-        document.getElementById("editLpu").value     = e.lpu || "";
-        document.getElementById("editTag").value     = e.tag || "";
-        document.getElementById("editFecha").value   = e.fecha || "";
-        document.getElementById("editOverlay").classList.add("open");
-      };
-
-      window.guardarEdicion = async function () {
-        const payload = {
-          numero_expediente: document.getElementById("editNumero").value,
-          detalle:  document.getElementById("editDetalle").value,
-          interno:  document.getElementById("editInterno").value,
-          lpu:      document.getElementById("editLpu").value,
-          tag:      document.getElementById("editTag").value,
-          fecha:    document.getElementById("editFecha").value || null,
         };
-        const id = document.getElementById("editId").value;
-        try {
-          await updateDoc(doc(db, "expedientes", id), payload);
-          cerrarModal("editOverlay");
-          buscar();
-          buscarNovedades();
-          buscarPedidos();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
-
-      window.exportarExcel = function () {
-        if (!allData.length) { alert("No hay expedientes para exportar."); return; }
-        const rows = allData.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-          "Tag":           e.tag || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
-        XLSX.writeFile(wb, `expedientes_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      /* ══════════════════════════════
-         NOVEDADES — reutiliza "expedientes", tag fijo
-      ══════════════════════════════ */
-      window.guardarNovedad = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("nFormError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("n_numero"),
-          detalle: v("n_detalle"),
-          interno: v("n_interno"),
-          lpu: v("n_lpu"),
-          tag: NOVEDADES_TAG,
-          fecha: v("n_fecha") || null,
-          created_at: new Date().toISOString(),
+        window.limpiarFormulario = function () {
+          ["numero", "detalle", "interno", "lpu", "tag", "fecha"].forEach(id => document.getElementById(id).value = "");
         };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormularioNovedad();
-          setPanel("novedades", document.getElementById("navNovedades"));
-          buscarNovedades();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscarNovedades = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        // Siempre filtrado por tag "novedades"
-        data = data.filter(e => (e.tag||"").toLowerCase() === NOVEDADES_TAG);
-
-        const fn = v("nf_numero"), ff = v("nf_fecha"),
-              fi = v("nf_interno"), fl = v("nf_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allNovedades = data;
-        currentPageN = 1;
-        actualizarStatsNovedades(allNovedades);
-        renderPaginaNovedades();
-      };
-
-      function actualizarStatsNovedades(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("nStatTotal").textContent = data.length;
-        document.getElementById("nStatMes").textContent   = esteMes;
-        document.getElementById("nStatFiltrados").textContent = data.length;
-        const filtrado = v("nf_numero")||v("nf_fecha")||v("nf_interno")||v("nf_lpu");
-        document.getElementById("nResultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} novedad${data.length!==1?"es":""}`;
-      }
-
-      function renderPaginaNovedades() {
-        const total = allNovedades.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPageN > totalPages) currentPageN = totalPages;
-        const start = (currentPageN - 1) * PAGE_SIZE;
-        renderResultadosNovedades(allNovedades.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "nPaginacion", "novedades");
-      }
-
-      function renderResultadosNovedades(data, offset=0) {
-        const el = document.getElementById("nResultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <p>No hay novedades</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  <span class="chip chip-tag">novedades</span>
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.exportarNovedadesExcel = function () {
-        if (!allNovedades.length) { alert("No hay novedades para exportar."); return; }
-        const rows = allNovedades.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Novedades");
-        XLSX.writeFile(wb, `novedades_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      window.limpiarFiltrosNovedades = function () {
-        ["nf_numero","nf_fecha","nf_interno","nf_lpu"].forEach(id => document.getElementById(id).value="");
-        buscarNovedades();
-      };
-      window.limpiarFormularioNovedad = function () {
-        ["n_numero","n_detalle","n_interno","n_lpu","n_fecha"].forEach(id => document.getElementById(id).value="");
-      };
-
-      /* ══════════════════════════════
-         PEDIDOS — reutiliza "expedientes", tag fijo
-      ══════════════════════════════ */
-      window.guardarPedido = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("pdFormError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("pd_numero"),
-          detalle: v("pd_detalle"),
-          interno: v("pd_interno"),
-          lpu: v("pd_lpu"),
-          tag: PEDIDOS_TAG,
-          fecha: v("pd_fecha") || null,
-          created_at: new Date().toISOString(),
-        };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormularioPedido();
-          setPanel("pedidos", document.getElementById("navPedidos"));
-          buscarPedidos();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscarPedidos = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        // Siempre filtrado por tag "pedido"
-        data = data.filter(e => (e.tag||"").toLowerCase() === PEDIDOS_TAG);
-
-        const fn = v("pdf_numero"), ff = v("pdf_fecha"),
-              fi = v("pdf_interno"), fl = v("pdf_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allPedidos = data;
-        currentPagePd = 1;
-        actualizarStatsPedidos(allPedidos);
-        renderPaginaPedidos();
-      };
-
-      function actualizarStatsPedidos(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("pdStatTotal").textContent = data.length;
-        document.getElementById("pdStatMes").textContent   = esteMes;
-        document.getElementById("pdStatFiltrados").textContent = data.length;
-        const filtrado = v("pdf_numero")||v("pdf_fecha")||v("pdf_interno")||v("pdf_lpu");
-        document.getElementById("pdResultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} pedido${data.length!==1?"s":""}`;
-      }
-
-      function renderPaginaPedidos() {
-        const total = allPedidos.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPagePd > totalPages) currentPagePd = totalPages;
-        const start = (currentPagePd - 1) * PAGE_SIZE;
-        renderResultadosPedidos(allPedidos.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "pdPaginacion", "pedidos");
-      }
-
-      function renderResultadosPedidos(data, offset=0) {
-        const el = document.getElementById("pdResultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-              <path d="M3 6h18"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-            <p>No hay pedidos</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  <span class="chip chip-tag">pedido</span>
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.exportarPedidosExcel = function () {
-        if (!allPedidos.length) { alert("No hay pedidos para exportar."); return; }
-        const rows = allPedidos.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
-        XLSX.writeFile(wb, `pedidos_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      window.limpiarFiltrosPedidos = function () {
-        ["pdf_numero","pdf_fecha","pdf_interno","pdf_lpu"].forEach(id => document.getElementById(id).value="");
-        buscarPedidos();
-      };
-      window.limpiarFormularioPedido = function () {
-        ["pd_numero","pd_detalle","pd_interno","pd_lpu","pd_fecha"].forEach(id => document.getElementById(id).value="");
-      };
-
-      /* ══════════════════════════════
-         PERSONAL — CRUD
-      ══════════════════════════════ */
-      window.guardarPersonal = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("pFormError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id:        user.uid,
-          grado:          v("p_grado"),
-          nombre:         v("p_nombre"),
-          apellido:       v("p_apellido"),
-          credencial:     v("p_credencial"),
-          dni:            v("p_dni"),
-          cuil:           v("p_cuil"),
-          telefono:       v("p_telefono"),
-          mail:           v("p_mail"),
-          usuario_gde:    v("p_usuario_gde"),
-          direccion:      v("p_direccion"),
-          expediente_oi:  v("p_expediente_oi"),
-          numero_oi:      v("p_numero_oi"),
-          curso_titulo:   v("p_curso_titulo"),
-          sector:         v("p_sector"),
-          turno:          v("p_turno"),
-          detalle:        v("p_detalle"),
-          created_at:     new Date().toISOString(),
-        };
-        if (!payload.nombre || !payload.apellido) {
-          showErr(errEl,"Nombre y apellido son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "personal"), payload);
-          limpiarFormularioPersonal();
-          setPanel("personal", document.getElementById("navPersonal"));
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscarPersonal = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "personal"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        const fn = v("pf_nombre"), fg = v("pf_grado"),
-              fc = v("pf_credencial"), fs = v("pf_sector"), fcu = v("pf_curso"), ft = v("pf_turno");
-
-        if (fn) data = data.filter(p =>
-          (p.nombre||"").toLowerCase().includes(fn.toLowerCase()) ||
-          (p.apellido||"").toLowerCase().includes(fn.toLowerCase())
-        );
-        if (fg) data = data.filter(p => (p.grado||"").toLowerCase().includes(fg.toLowerCase()));
-        if (fc) data = data.filter(p => (p.credencial||"").toLowerCase().includes(fc.toLowerCase()));
-        if (fs) data = data.filter(p => (p.sector||"").toLowerCase().includes(fs.toLowerCase()));
-        if (fcu) data = data.filter(p => (p.curso_titulo||"").toLowerCase().includes(fcu.toLowerCase()));
-        if (ft) data = data.filter(p => (p.turno||"").toLowerCase() === ft.toLowerCase());
-
-        allPersonal = data;
-        allPersonal.forEach(p => { personalMap[p.id] = p; });
-
-        currentPageP = 1;
-        actualizarStatsPersonal(allPersonal);
-        renderPaginaPersonal();
-      };
-
-      function actualizarStatsPersonal(data) {
-        const sectores = new Set(data.map(p => p.sector).filter(Boolean)).size;
-        document.getElementById("pStatTotal").textContent    = data.length;
-        document.getElementById("pStatSectores").textContent = sectores;
-        document.getElementById("pStatFiltrados").textContent = data.length;
-        const filtrado = v("pf_nombre")||v("pf_grado")||v("pf_credencial")||v("pf_sector")||v("pf_curso");
-        document.getElementById("pResultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} persona${data.length!==1?"s":""}`;
-      }
-
-      window.setSortPersonal = function (field, btn) {
-        if (sortFieldP === field) {
-          sortAscP = !sortAscP;
-        } else {
-          sortFieldP = field;
-          sortAscP = true;
-        }
-
-        document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        const arrowEl = document.getElementById("sortArrow_" + field);
-        document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
-        if (arrowEl) arrowEl.textContent = sortAscP ? "↑" : "↓";
-
-        renderPaginaPersonal();
-      };
-
-      function renderPaginaPersonal() {
-        const sorted = [...allPersonal].sort((a,b) => {
-          const va = (a[sortFieldP] || "").toLowerCase();
-          const vb = (b[sortFieldP] || "").toLowerCase();
-          const cmp = va.localeCompare(vb, "es");
-          return sortAscP ? cmp : -cmp;
-        });
-
-        const total = sorted.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPageP > totalPages) currentPageP = totalPages;
-        const start = (currentPageP - 1) * PAGE_SIZE;
-        renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "pPaginacion", "personal");
-      }
-
-      function renderResultadosPersonal(data, offset=0) {
-        const el = document.getElementById("pResultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
-            <p>No hay personal registrado</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((p) => {
-          const initials = ((p.nombre||"").charAt(0) + (p.apellido||"").charAt(0)).toUpperCase();
-          return `
-          <div class="personal-card">
-            <div class="personal-card-inner">
-              <div class="personal-avatar">${initials}</div>
-              <div class="personal-body">
-                <div class="personal-name">${esc(p.apellido)}, ${esc(p.nombre)}</div>
-                <div class="personal-sub">${p.grado ? esc(p.grado) + " · " : ""}${p.sector ? esc(p.sector) : "Sin sector"}</div>
-                <div class="personal-grid">
-                  ${p.credencial ? `<div class="personal-field"><span class="personal-field-label">Credencial</span><span class="personal-field-value">${esc(p.credencial)}</span></div>` : ""}
-                  ${p.dni        ? `<div class="personal-field"><span class="personal-field-label">DNI</span><span class="personal-field-value">${esc(p.dni)}</span></div>` : ""}
-                  ${p.cuil       ? `<div class="personal-field"><span class="personal-field-label">CUIL</span><span class="personal-field-value">${esc(p.cuil)}</span></div>` : ""}
-                  ${p.telefono   ? `<div class="personal-field"><span class="personal-field-label">Tel.</span><span class="personal-field-value">${esc(p.telefono)}</span></div>` : ""}
-                  ${p.mail       ? `<div class="personal-field"><span class="personal-field-label">Mail</span><span class="personal-field-value">${esc(p.mail)}</span></div>` : ""}
-                  ${p.usuario_gde? `<div class="personal-field"><span class="personal-field-label">GDE</span><span class="personal-field-value">${esc(p.usuario_gde)}</span></div>` : ""}
-                  ${p.numero_oi  ? `<div class="personal-field"><span class="personal-field-label">Nro. OI</span><span class="personal-field-value">${esc(p.numero_oi)}</span></div>` : ""}
-                </div>
-                <div class="card-chips">
-                  ${p.curso_titulo    ? `<span class="chip chip-tag">${esc(p.curso_titulo)}</span>` : ""}
-                  ${p.turno          ? `<span class="chip chip-green">${esc(p.turno)}</span>` : ""}
-                  ${p.expediente_oi  ? `<span class="chip">OI: ${esc(p.expediente_oi)}</span>` : ""}
-                  ${p.direccion      ? `<span class="chip chip-fecha">${esc(p.direccion)}</span>` : ""}
-                </div>
-                ${p.detalle ? `<div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5">${esc(p.detalle)}</div>` : ""}
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicionPersonal('${p.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminarPersonal('${p.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `}).join("");
-      }
-
-      window.eliminarPersonal = async function (id) {
-        if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
-        try {
-          await deleteDoc(doc(db, "personal", id));
+        window.limpiarFiltrosPersonal = function () {
+          ["pf_nombre", "pf_grado", "pf_credencial", "pf_sector", "pf_curso", "pf_turno"].forEach(id => document.getElementById(id).value = "");
           buscarPersonal();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
-
-      window.abrirEdicionPersonal = function (id) {
-        const p = personalMap[id];
-        if (!p) return alert("No se encontró el registro.");
-        const fields = ["id","grado","nombre","apellido","credencial","dni","cuil","telefono",
-                        "mail","usuario_gde","direccion","expediente_oi","numero_oi",
-                        "curso_titulo","sector","turno","detalle"];
-        fields.forEach(f => {
-          const el = document.getElementById("ep_" + f);
-          if (el) el.value = p[f] || "";
-        });
-        document.getElementById("editPersonalOverlay").classList.add("open");
-      };
-
-      window.guardarEdicionPersonal = async function () {
-        const id = document.getElementById("ep_id").value;
-        const payload = {
-          grado:         document.getElementById("ep_grado").value,
-          nombre:        document.getElementById("ep_nombre").value,
-          apellido:      document.getElementById("ep_apellido").value,
-          credencial:    document.getElementById("ep_credencial").value,
-          dni:           document.getElementById("ep_dni").value,
-          cuil:          document.getElementById("ep_cuil").value,
-          telefono:      document.getElementById("ep_telefono").value,
-          mail:          document.getElementById("ep_mail").value,
-          usuario_gde:   document.getElementById("ep_usuario_gde").value,
-          direccion:     document.getElementById("ep_direccion").value,
-          expediente_oi: document.getElementById("ep_expediente_oi").value,
-          numero_oi:     document.getElementById("ep_numero_oi").value,
-          curso_titulo:  document.getElementById("ep_curso_titulo").value,
-          sector:        document.getElementById("ep_sector").value,
-          turno:         document.getElementById("ep_turno").value,
-          detalle:       document.getElementById("ep_detalle").value,
         };
-        try {
-          await updateDoc(doc(db, "personal", id), payload);
-          cerrarModal("editPersonalOverlay");
-          buscarPersonal();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
+        window.limpiarFormularioPersonal = function () {
+          ["p_grado", "p_nombre", "p_apellido", "p_credencial", "p_dni", "p_cuil", "p_telefono",
+            "p_mail", "p_usuario_gde", "p_direccion", "p_expediente_oi", "p_numero_oi",
+            "p_curso_titulo", "p_sector", "p_turno", "p_detalle"
+          ].forEach(id => document.getElementById(id).value = "");
+        };
 
-      window.exportarPersonalExcel = function () {
-        if (!allPersonal.length) { alert("No hay personal para exportar."); return; }
-        const rows = allPersonal.map(p => ({
-          "Grado":          p.grado || "",
-          "Apellido":       p.apellido || "",
-          "Nombre":         p.nombre || "",
-          "Credencial":     p.credencial || "",
-          "DNI":            p.dni || "",
-          "CUIL":           p.cuil || "",
-          "Teléfono":       p.telefono || "",
-          "Mail":           p.mail || "",
-          "Usuario GDE":    p.usuario_gde || "",
-          "Dirección":      p.direccion || "",
-          "Expediente OI":  p.expediente_oi || "",
-          "Número OI":      p.numero_oi || "",
-          "Curso / Título": p.curso_titulo || "",
-          "Sector":         p.sector || "",
-          "Turno":          p.turno || "",
-          "Detalle":        p.detalle || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Personal");
-        XLSX.writeFile(wb, `personal_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
+        window.setPanel = function (name, btn) {
+          document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+          document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+          const key = name.charAt(0).toUpperCase() + name.slice(1);
+          document.getElementById("panel" + key).classList.add("active");
+          btn.classList.add("active");
+          if (name === "personal") buscarPersonal();
+          if (name === "novedades") buscarNovedades();
+          if (name === "pedidos") buscarPedidos();
+          if (name === "dashboard") cargarDashboard();
+          if (name === "lista") buscar();
+        };
 
-      /* ══════════════════════════════
-         PAGINACIÓN GENÉRICA
-      ══════════════════════════════ */
-      window.cambiarPagina = function (containerType, p) {
-        if (containerType === "expedientes") { currentPage = p; renderPagina(); }
-        else if (containerType === "novedades") { currentPageN = p; renderPaginaNovedades(); }
-        else if (containerType === "pedidos") { currentPagePd = p; renderPaginaPedidos(); }
-        else { currentPageP = p; renderPaginaPersonal(); }
-      };
-
-      function renderPaginacion(total, totalPages, containerId, containerType) {
-        const pag = document.getElementById(containerId);
-        const cp  = containerType === "expedientes" ? currentPage
-                  : containerType === "novedades" ? currentPageN
-                  : containerType === "pedidos" ? currentPagePd
-                  : currentPageP;
-        if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
-        pag.style.display = "flex";
-
-        let pages = [];
-        if (totalPages <= 7) {
-          for (let i=1;i<=totalPages;i++) pages.push(i);
-        } else {
-          pages = [1];
-          const left  = Math.max(2, cp-1);
-          const right = Math.min(totalPages-1, cp+1);
-          if (left > 2) pages.push("…");
-          for (let i=left;i<=right;i++) pages.push(i);
-          if (right < totalPages-1) pages.push("…");
-          pages.push(totalPages);
-        }
-
-        const startItem = (cp-1)*PAGE_SIZE+1;
-        const endItem   = Math.min(cp*PAGE_SIZE, total);
-
-        pag.innerHTML = `
-          <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
-          <div class="pagination-controls">
-            <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp-1})" ${cp===1?"disabled":""}>
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            ${pages.map(p => p==="…"
-              ? `<span class="page-btn" style="cursor:default;opacity:.4">…</span>`
-              : `<button class="page-btn ${p===cp?"active":""}" onclick="cambiarPagina('${containerType}', ${p})">${p}</button>`
-            ).join("")}
-            <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp+1})" ${cp===totalPages?"disabled":""}>
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-        `;
-      }
-
-      /* ══════════════════════════════
-         MODALES
-      ══════════════════════════════ */
-      window.cerrarModal = function (id) { document.getElementById(id).classList.remove("open"); };
-      window.overlayClick = function (e) { if (e.target===e.currentTarget) cerrarModal("editOverlay"); };
-      window.overlayClickPersonal = function (e) { if (e.target===e.currentTarget) cerrarModal("editPersonalOverlay"); };
-
-      /* ══════════════════════════════
-         HELPERS
-      ══════════════════════════════ */
-      window.limpiarFiltros = function () {
-        ["f_numero","f_tag","f_fecha","f_interno","f_lpu"].forEach(id => document.getElementById(id).value="");
-        buscar();
-      };
-      window.limpiarFormulario = function () {
-        ["numero","detalle","interno","lpu","tag","fecha"].forEach(id => document.getElementById(id).value="");
-      };
-      window.limpiarFiltrosPersonal = function () {
-        ["pf_nombre","pf_grado","pf_credencial","pf_sector","pf_curso","pf_turno"].forEach(id => document.getElementById(id).value="");
-        buscarPersonal();
-      };
-      window.limpiarFormularioPersonal = function () {
-        ["p_grado","p_nombre","p_apellido","p_credencial","p_dni","p_cuil","p_telefono",
-         "p_mail","p_usuario_gde","p_direccion","p_expediente_oi","p_numero_oi",
-         "p_curso_titulo","p_sector","p_turno","p_detalle"].forEach(id => document.getElementById(id).value="");
-      };
-
-      function v(id) { return document.getElementById(id)?.value?.trim()||""; }
-
-      function esc(str) {
-        if (!str) return "";
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-      }
-
-      function showErr(el, msg) { el.textContent=msg; el.classList.add("show"); }
-
-      document.getElementById("password").addEventListener("keydown", e => { if (e.key==="Enter") login(); });
+        document.getElementById("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+      })();
     </script>
   </body>
 </html>
