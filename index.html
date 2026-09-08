@@ -275,109 +275,51 @@
       .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
 
       /* ── Dashboard ── */
-      .dashboard-wrap { flex:1; padding:24px 32px; background:var(--bg); overflow-y:auto; }
-      
-      .dashboard-header {
-        display:flex; align-items:center; justify-content:space-between; 
-        margin-bottom:20px; flex-wrap:wrap; gap:12px;
-      }
-      
+      .dashboard-wrap { flex:1; padding:24px 32px 32px; background:var(--bg); overflow-y:auto; }
+      .dashboard-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
       .dashboard-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-      
-      .dashboard-select {
-        font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px;
-        border:1px solid var(--border); border-radius:var(--radius);
-        background:var(--surface); color:var(--text); cursor:pointer;
-        outline:none; transition:border-color .15s; min-width:140px;
-        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237a7870' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        -webkit-appearance:none;
-        -moz-appearance:none;
-        appearance:none;
-      }
-      
+      .dashboard-select { font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); color:var(--text); cursor:pointer; outline:none; transition:border-color .15s,box-shadow .15s; min-width:155px; background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237a7870' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; -webkit-appearance:none; -moz-appearance:none; appearance:none; }
       .dashboard-select:hover { border-color:var(--border-md); }
       .dashboard-select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
-      
-      .dashboard-cards {
-        display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-        gap:12px; margin-bottom:24px;
-      }
-      
-      .dashboard-card {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
+      .dashboard-cards { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+      .dashboard-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:17px 18px; min-width:0; transition:border-color .15s,box-shadow .15s; }
       .dashboard-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .dashboard-card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:8px; }
-      
-      .dashboard-card-value { font-size:32px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; color:var(--text); line-height:1; }
-      
-      .dashboard-card-sub { font-size:12px; color:var(--faint); margin-top:6px; font-family:"DM Mono",monospace; }
-      
-      .dashboard-charts {
-        display:grid; grid-template-columns:repeat(auto-fit, minmax(480px, 1fr));
-        gap:16px; margin-bottom:16px;
-      }
-      
-      .chart-card {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
+      .dashboard-card-label { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .dashboard-card-value { font-size:28px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; color:var(--text); line-height:1; }
+      .dashboard-card-sub { font-size:11px; color:var(--faint); margin-top:7px; font-family:"DM Mono",monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .dashboard-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:16px; }
+      .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; transition:border-color .15s,box-shadow .15s; min-width:0; }
       .chart-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:16px; color:var(--text); }
-      
-      .chart-card-body { position:relative; min-height:250px; display:flex; align-items:center; justify-content:center; }
-      
-      .chart-card-body canvas { width:100% !important; height:auto !important; max-height:300px; }
-      
-      .dashboard-summary {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
+      .chart-card-wide { grid-column:1 / -1; }
+      .chart-card-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:4px; }
+      .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; color:var(--text); }
+      .chart-card-subtitle { font-size:11.5px; color:var(--muted); line-height:1.4; margin-top:3px; }
+      .chart-card-meta { font-size:11px; color:var(--muted); font-family:"DM Mono",monospace; white-space:nowrap; }
+      .chart-card-body { position:relative; min-height:300px; height:300px; display:flex; align-items:stretch; justify-content:center; margin-top:12px; }
+      .chart-card-wide .chart-card-body { height:330px; min-height:330px; }
+      .chart-card-body canvas { width:100% !important; height:100% !important; display:block; }
+      .chart-empty { height:100%; min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:var(--faint); text-align:center; }
+      .chart-empty strong { color:var(--muted); font-size:13px; font-weight:500; }
+      .chart-empty span { font-size:11.5px; }
+      .dashboard-summary { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; transition:border-color .15s,box-shadow .15s; }
       .dashboard-summary:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .dashboard-summary-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:16px; color:var(--text); }
-      
-      .dashboard-summary-grid {
-        display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-        gap:12px;
-      }
-      
-      .summary-item {
-        padding:12px; border:1px solid var(--border); border-radius:var(--radius);
-        background:var(--bg);
-      }
-      
-      .summary-item-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:4px; }
-      
-      .summary-item-value { font-size:14px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text); }
-      
-      .dashboard-loading {
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        padding:40px; color:var(--muted); gap:12px;
-      }
-      
-      .spinner {
-        width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--text);
-        border-radius:50%; animation:spin 0.8s linear infinite;
-      }
-      
+      .dashboard-summary-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:14px; color:var(--text); }
+      .dashboard-summary-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+      .summary-item { padding:12px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg); min-width:0; }
+      .summary-item-label { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:5px; }
+      .summary-item-value { font-size:13px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .dashboard-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:70px 40px; color:var(--muted); gap:12px; }
+      .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--text); border-radius:50%; animation:spin .8s linear infinite; }
       @keyframes spin { to { transform:rotate(360deg); } }
-      
-      .dashboard-error {
-        background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger);
-        padding:16px; border-radius:var(--radius); margin-bottom:16px;
-        text-align:center; font-size:14px;
-      }
-
-      /* ── Responsive ── */
+      .dashboard-error { background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger); padding:16px; border-radius:var(--radius); margin-bottom:16px; text-align:center; font-size:14px; }
+      .chart-tooltip { position:fixed; z-index:9999; pointer-events:none; display:none; min-width:130px; max-width:230px; padding:9px 11px; border:1px solid var(--border-md); border-radius:9px; background:rgba(255,255,255,.97); box-shadow:var(--shadow-md); font-size:11.5px; color:var(--text); }
+      .chart-tooltip .tt-title { font-weight:500; margin-bottom:5px; }
+      .chart-tooltip .tt-row { display:flex; justify-content:space-between; gap:14px; line-height:1.6; color:var(--muted); }
+      .chart-tooltip .tt-value { font-family:"DM Mono",monospace; color:var(--text); font-weight:500; }
+      .chart-legend { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:7px; }
+      .chart-legend-item { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
+      .chart-legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+/* ── Responsive ── */
       @media (max-width:720px) {
         .layout { grid-template-columns:1fr; }
         .sidebar { position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); }
@@ -388,7 +330,18 @@
         .dashboard-charts { grid-template-columns:1fr; }
         .dashboard-cards { grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); }
       }
-    </style>
+    
+      @media (max-width:1200px) {
+        .dashboard-cards { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .dashboard-summary-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      }
+      @media (max-width:900px) {
+        .dashboard-charts { grid-template-columns:1fr; }
+        .chart-card-wide { grid-column:auto; }
+        .dashboard-cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .dashboard-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      }
+</style>
   </head>
 
   <body>
@@ -1316,1114 +1269,378 @@
       /* ══════════════════════════════
          DASHBOARD - Funciones de utilidad
       ══════════════════════════════ */
+      let dashboardTooltip = null;
+
       function normalizeTag(tag) {
+        if (Array.isArray(tag)) return tag.map(normalizeTag).filter(Boolean).join(" ");
         if (!tag) return "";
-        return tag.trim().toLowerCase().replace(/\s+/g, " ");
+        return String(tag).trim().toLowerCase().replace(/\s+/g, " ");
       }
 
-      function normalizeUR(tag) {
-        if (!tag) return null;
-        const normalized = normalizeTag(tag);
-        const urMatch = normalized.match(/^ur\s*(\d+)$/);
-        if (urMatch) {
-          return `UR ${parseInt(urMatch[1])}`;
+      function extractUR(value) {
+        if (value === null || value === undefined) return null;
+        const raw = Array.isArray(value) ? value.join(" ") : String(value);
+        const normalized = raw.toLowerCase().replace(/\s+/g, " ");
+        const patterns = [
+          /\bur\s*[-._:]?\s*(\d+)\b/i,
+          /\bunidad\s+residencial\s*[-._:]?\s*(\d+)\b/i,
+          /\bu\.r\.\s*(\d+)\b/i
+        ];
+        for (const pattern of patterns) {
+          const match = normalized.match(pattern);
+          if (match) return `UR ${parseInt(match[1],10)}`;
         }
         return null;
+      }
+
+      function normalizeUR(tag) { return extractUR(tag); }
+
+      function parseLocalDate(value) {
+        if (!value) return null;
+        if (value && typeof value.toDate === "function") return value.toDate();
+        if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+        const str = String(value).trim();
+        let d = null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+          const [y,m,day] = str.split("-").map(Number);
+          d = new Date(y,m-1,day);
+        } else {
+          d = new Date(str);
+        }
+        return d && !isNaN(d.getTime()) ? d : null;
       }
 
       function getDateRange(period) {
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
-        
         let start, end;
-        
         switch(period) {
-          case "este_mes":
-            start = new Date(year, month, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "mes_anterior":
-            start = new Date(year, month - 1, 1);
-            end = new Date(year, month, 0);
-            break;
-          case "ultimos_3":
-            start = new Date(year, month - 2, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "ultimos_6":
-            start = new Date(year, month - 5, 1);
-            end = new Date(year, month + 1, 0);
-            break;
-          case "este_ano":
-            start = new Date(year, 0, 1);
-            end = new Date(year, 11, 31);
-            break;
-          case "ano_anterior":
-            start = new Date(year - 1, 0, 1);
-            end = new Date(year - 1, 11, 31);
-            break;
-          default:
-            start = new Date(year, month, 1);
-            end = new Date(year, month + 1, 0);
+          case "este_mes": start = new Date(year, month, 1); end = new Date(year, month + 1, 0, 23,59,59,999); break;
+          case "mes_anterior": start = new Date(year, month - 1, 1); end = new Date(year, month, 0, 23,59,59,999); break;
+          case "ultimos_3": start = new Date(year, month - 2, 1); end = new Date(year, month + 1, 0, 23,59,59,999); break;
+          case "ultimos_6": start = new Date(year, month - 5, 1); end = new Date(year, month + 1, 0, 23,59,59,999); break;
+          case "este_ano": start = new Date(year,0,1); end = new Date(year,11,31,23,59,59,999); break;
+          case "ano_anterior": start = new Date(year-1,0,1); end = new Date(year-1,11,31,23,59,59,999); break;
+          default: start = new Date(year,month,1); end = new Date(year,month+1,0,23,59,59,999);
         }
-        
-        return { start, end };
+        return {start,end};
       }
 
       function formatMonthYear(date) {
-        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        const months = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        return `${months[date.getMonth()]} ${date.getFullYear()}`;
+      }
+
+      function formatMonthYearLong(date) {
+        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         return `${months[date.getMonth()]} ${date.getFullYear()}`;
       }
 
       function formatDateShort(date) {
-        const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        const months = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
         return `${date.getDate()} ${months[date.getMonth()]}`;
       }
 
-      function isValidDate(dateString) {
-        if (!dateString) return false;
-        const date = new Date(dateString);
-        return !isNaN(date.getTime());
+      function isValidDate(dateString) { return !!parseLocalDate(dateString); }
+
+      function monthKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`; }
+
+      function buildMonthSeries(count) {
+        const result = [];
+        const now = new Date();
+        for (let i=count-1; i>=0; i--) {
+          const date = new Date(now.getFullYear(), now.getMonth()-i, 1);
+          result.push({ key:monthKey(date), date, label:formatMonthYear(date), count:0, pec:0, paf:0 });
+        }
+        return result;
       }
 
-      /* ══════════════════════════════
-         DASHBOARD - Preparación de datos
-      ══════════════════════════════ */
       function prepareDataExpedientesPorMes(data) {
-        const last12Months = [];
-        const now = new Date();
-        
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-          last12Months.push({
-            year: date.getFullYear(),
-            month: date.getMonth(),
-            label: formatMonthYear(date),
-            count: 0
-          });
-        }
-        
+        const months = buildMonthSeries(12);
+        const map = new Map(months.map(m => [m.key,m]));
         data.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            const date = new Date(e.fecha);
-            const monthIndex = last12Months.findIndex(m => 
-              m.year === date.getFullYear() && m.month === date.getMonth()
-            );
-            if (monthIndex >= 0) {
-              last12Months[monthIndex].count++;
-            }
-          }
+          const date = parseLocalDate(e.fecha);
+          if (!date) return;
+          const m = map.get(monthKey(date));
+          if (m) m.count++;
         });
-        
-        return last12Months;
+        return months;
       }
 
       function prepareDataPorTipo(data) {
         const tagCounts = {};
-        
         data.forEach(e => {
-          const tag = normalizeTag(e.tag) || "Sin tag";
+          const raw = normalizeTag(e.tag);
+          const tag = raw || "Sin tag";
           tagCounts[tag] = (tagCounts[tag] || 0) + 1;
         });
-        
-        let sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
-        
-        let topTags = [];
-        let othersCount = 0;
-        
-        if (sortedTags.length > 6) {
-          topTags = sortedTags.slice(0, 5);
-          othersCount = sortedTags.slice(5).reduce((sum, item) => sum + item[1], 0);
-          if (othersCount > 0) {
-            topTags.push(["Otros", othersCount]);
-          }
-        } else {
-          topTags = sortedTags;
-        }
-        
-        return topTags;
+        const sorted = Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]);
+        if (sorted.length <= 6) return sorted;
+        const top = sorted.slice(0,5);
+        const others = sorted.slice(5).reduce((sum,item)=>sum+item[1],0);
+        if (others) top.push(["Otros",others]);
+        return top;
       }
 
       function prepareDataPorUnidad(data) {
         const urCounts = {};
-        
         data.forEach(e => {
-          const ur = normalizeUR(e.tag);
-          if (ur) {
-            urCounts[ur] = (urCounts[ur] || 0) + 1;
-          }
+          const candidates = [e.unidad_residencial,e.unidadResidencial,e.ur,e.UR,e.tag];
+          let ur = null;
+          for (const value of candidates) { ur = extractUR(value); if (ur) break; }
+          if (ur) urCounts[ur] = (urCounts[ur] || 0) + 1;
         });
-        
-        const sortedURs = Object.entries(urCounts)
-          .sort((a, b) => {
-            const numA = parseInt(a[0].replace(/\D/g, ""));
-            const numB = parseInt(b[0].replace(/\D/g, ""));
-            return numA - numB;
-          });
-        
-        if (sortedURs.length === 0) {
-          return null;
-        }
-        
-        return sortedURs;
+        return Object.entries(urCounts).sort((a,b) => {
+          const na=parseInt(a[0].replace(/\D/g,""),10), nb=parseInt(b[0].replace(/\D/g,""),10);
+          return nb-na;
+        });
       }
 
       function prepareDataPecPaf(data) {
-        const last12Months = [];
-        const now = new Date();
-        
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-          last12Months.push({
-            label: formatMonthYear(date),
-            pec: 0,
-            paf: 0
-          });
-        }
-        
+        const months = buildMonthSeries(12);
+        const map = new Map(months.map(m=>[m.key,m]));
         data.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            const tag = normalizeTag(e.tag);
-            const date = new Date(e.fecha);
-            const monthIndex = last12Months.findIndex(m => {
-              const monthDate = new Date(m.label);
-              return monthDate.getMonth() === date.getMonth() && 
-                     monthDate.getFullYear() === date.getFullYear();
-            });
-            
-            if (monthIndex >= 0) {
-              if (tag === "pec") last12Months[monthIndex].pec++;
-              if (tag === "paf") last12Months[monthIndex].paf++;
-            }
-          }
+          const date = parseLocalDate(e.fecha);
+          if (!date) return;
+          const m = map.get(monthKey(date));
+          if (!m) return;
+          const tag = normalizeTag(e.tag);
+          if (tag === "pec") m.pec++;
+          if (tag === "paf") m.paf++;
         });
-        
-        return last12Months;
+        return months;
       }
 
-      /* ══════════════════════════════
-         DASHBOARD - Dibujo de gráficos con Canvas API
-      ══════════════════════════════ */
-      function drawBarChart(canvasId, labels, values, color = "#1a1916") {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext("2d");
-        const width = canvas.parentElement.clientWidth - 40;
-        const height = 250;
-        canvas.width = width;
-        canvas.height = height;
-        
-        const padding = { top: 20, right: 20, bottom: 40, left: 40 };
-        const chartWidth = width - padding.left - padding.right;
-        const chartHeight = height - padding.top - padding.bottom;
-        
-        const maxValue = Math.max(...values, 1);
-        const barWidth = chartWidth / labels.length * 0.7;
-        const barGap = chartWidth / labels.length * 0.3;
-        
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height);
-        
-        // Draw grid lines
-        ctx.strokeStyle = "#e2e0da";
-        ctx.lineWidth = 1;
-        ctx.font = "10px 'DM Mono', monospace";
-        ctx.fillStyle = "#7a7870";
-        
-        for (let i = 0; i <= 5; i++) {
-          const y = padding.top + chartHeight - (chartHeight * i / 5);
-          ctx.beginPath();
-          ctx.moveTo(padding.left, y);
-          ctx.lineTo(width - padding.right, y);
-          ctx.stroke();
-          
-          const value = Math.round(maxValue * i / 5);
-          ctx.textAlign = "right";
-          ctx.fillText(value.toString(), padding.left - 10, y + 3);
+      function ensureDashboardTooltip() {
+        if (dashboardTooltip) return dashboardTooltip;
+        dashboardTooltip = document.createElement("div");
+        dashboardTooltip.className = "chart-tooltip";
+        dashboardTooltip.id = "dashboardChartTooltip";
+        document.body.appendChild(dashboardTooltip);
+        return dashboardTooltip;
+      }
+
+      function hideDashboardTooltip() {
+        if (dashboardTooltip) dashboardTooltip.style.display = "none";
+      }
+
+      function showDashboardTooltip(event, title, rows) {
+        const tt = ensureDashboardTooltip();
+        tt.innerHTML = `<div class="tt-title">${esc(title)}</div>${rows.map(r=>`<div class="tt-row"><span>${esc(r[0])}</span><span class="tt-value">${esc(String(r[1]))}</span></div>`).join("")}`;
+        tt.style.display = "block";
+        const margin=12;
+        let left=event.clientX+14, top=event.clientY+14;
+        const rect=tt.getBoundingClientRect();
+        if (left+rect.width>window.innerWidth-margin) left=event.clientX-rect.width-14;
+        if (top+rect.height>window.innerHeight-margin) top=event.clientY-rect.height-14;
+        tt.style.left=`${Math.max(margin,left)}px`; tt.style.top=`${Math.max(margin,top)}px`;
+      }
+
+      function prepareCanvas(canvas, height) {
+        const rect=canvas.getBoundingClientRect();
+        const dpr=Math.max(1,window.devicePixelRatio||1);
+        const width=Math.max(320,Math.floor(rect.width));
+        const h=Math.max(220,height);
+        canvas.width=Math.floor(width*dpr); canvas.height=Math.floor(h*dpr);
+        canvas.style.width="100%"; canvas.style.height=`${h}px`;
+        const ctx=canvas.getContext("2d");
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        ctx.clearRect(0,0,width,h);
+        return {ctx,width,height:h};
+      }
+
+      function chartBase(ctx,width,height,padding) {
+        ctx.font="10.5px 'DM Mono', monospace";
+        ctx.fillStyle="#7a7870";
+        ctx.strokeStyle="#e8e6e0";
+        ctx.lineWidth=1;
+        for(let i=0;i<=5;i++){
+          const y=padding.top+(height-padding.top-padding.bottom)*(1-i/5);
+          ctx.beginPath(); ctx.moveTo(padding.left,y); ctx.lineTo(width-padding.right,y); ctx.stroke();
+          const val=i;
+          ctx.textAlign="right"; ctx.fillStyle="#9a978f"; ctx.fillText(String(val),padding.left-9,y+3);
         }
-        
-        // Draw bars
-        labels.forEach((label, i) => {
-          const x = padding.left + i * (chartWidth / labels.length) + barGap / 2;
-          const barHeight = (values[i] / maxValue) * chartHeight;
-          const y = padding.top + chartHeight - barHeight;
-          
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.roundRect(x, y, barWidth, barHeight, 3);
-          ctx.fill();
-          
-          // Draw label
-          ctx.fillStyle = "#7a7870";
-          ctx.textAlign = "center";
-          ctx.font = "10px 'DM Mono', monospace";
-          if (labels.length <= 12) {
-            ctx.fillText(label, x + barWidth / 2, height - 15);
-          } else {
-            // Rotate labels if too many
-            ctx.save();
-            ctx.translate(x + barWidth / 2, height - 15);
-            ctx.rotate(-Math.PI / 4);
-            ctx.fillText(label, 0, 0);
-            ctx.restore();
+      }
+
+      function niceMax(value) {
+        if (value<=0) return 1;
+        const magnitude=Math.pow(10,Math.floor(Math.log10(value)));
+        const normalized=value/magnitude;
+        let nice=normalized<=1?1:normalized<=2?2:normalized<=5?5:10;
+        return nice*magnitude;
+      }
+
+      function drawBarChart(canvasId, labels, values, options={}) {
+        const canvas=document.getElementById(canvasId); if(!canvas) return;
+        const height=options.height||300;
+        const {ctx,width}=prepareCanvas(canvas,height);
+        const horizontal=!!options.horizontal;
+        const maxValue=niceMax(Math.max(...values,0));
+        const padding=horizontal ? {top:18,right:42,bottom:22,left:72} : {top:24,right:18,bottom:58,left:42};
+        const cw=width-padding.left-padding.right, ch=height-padding.top-padding.bottom;
+        ctx.clearRect(0,0,width,height);
+        if(!values.length){ hideDashboardTooltip(); return; }
+
+        if(horizontal){
+          const rows=labels.length, rowH=ch/rows, barH=Math.min(26,rowH*.62);
+          for(let i=0;i<=5;i++){
+            const x=padding.left+cw*i/5; ctx.strokeStyle="#e8e6e0"; ctx.beginPath(); ctx.moveTo(x,padding.top); ctx.lineTo(x,padding.top+ch); ctx.stroke();
+            ctx.fillStyle="#9a978f"; ctx.font="10px 'DM Mono',monospace"; ctx.textAlign="center"; ctx.fillText(String(Math.round(maxValue*i/5)),x,height-4);
           }
-        });
+          labels.forEach((label,i)=>{
+            const y=padding.top+i*rowH+(rowH-barH)/2, w=(values[i]/maxValue)*cw;
+            ctx.fillStyle="#eef0f4"; ctx.beginPath(); ctx.roundRect(padding.left,y,cw,barH,5); ctx.fill();
+            ctx.fillStyle=options.color||"#2d4baa"; ctx.beginPath(); ctx.roundRect(padding.left,y,Math.max(w,values[i]?2:0),barH,5); ctx.fill();
+            ctx.fillStyle="#5f5c56"; ctx.font="11px 'DM Sans',sans-serif"; ctx.textAlign="right"; ctx.fillText(label,padding.left-10,y+barH/2+4);
+            ctx.fillStyle="#1a1916"; ctx.font="11px 'DM Mono',monospace"; ctx.textAlign="left"; ctx.fillText(String(values[i]),padding.left+w+7,y+barH/2+4);
+          });
+        } else {
+          for(let i=0;i<=5;i++){
+            const y=padding.top+ch*(1-i/5); ctx.strokeStyle="#e8e6e0"; ctx.beginPath(); ctx.moveTo(padding.left,y); ctx.lineTo(width-padding.right,y); ctx.stroke();
+            ctx.fillStyle="#9a978f"; ctx.font="10px 'DM Mono',monospace"; ctx.textAlign="right"; ctx.fillText(String(Math.round(maxValue*i/5)),padding.left-9,y+3);
+          }
+          const slot=cw/Math.max(labels.length,1), barW=Math.min(52,slot*.62);
+          labels.forEach((label,i)=>{
+            const x=padding.left+i*slot+(slot-barW)/2, bh=(values[i]/maxValue)*ch, y=padding.top+ch-bh;
+            ctx.fillStyle=options.color||"#1a1916"; ctx.beginPath(); ctx.roundRect(x,y,barW,Math.max(2,bh),5); ctx.fill();
+            ctx.fillStyle="#5f5c56"; ctx.font="10px 'DM Mono',monospace"; ctx.textAlign="center";
+            ctx.fillText(label.split(" ")[0],x+barW/2,height-31);
+            ctx.fillText(label.split(" ")[1]||"",x+barW/2,height-17);
+            if(values[i]>0){ctx.fillStyle="#1a1916";ctx.font="10px 'DM Mono',monospace";ctx.fillText(String(values[i]),x+barW/2,Math.max(padding.top+10,y-7));}
+          });
+        }
+        canvas.onmousemove=(event)=>{
+          const r=canvas.getBoundingClientRect(), mx=event.clientX-r.left, my=event.clientY-r.top;
+          let idx=-1;
+          if(horizontal){ const rowH=ch/labels.length; idx=Math.floor((my-padding.top)/rowH); }
+          else { const slot=cw/labels.length; idx=Math.floor((mx-padding.left)/slot); }
+          if(idx>=0&&idx<labels.length){ canvas.style.cursor="pointer"; showDashboardTooltip(event,labels[idx],[[options.valueLabel||"Expedientes",values[idx]]]); }
+          else { canvas.style.cursor="default"; hideDashboardTooltip(); }
+        };
+        canvas.onmouseleave=hideDashboardTooltip;
       }
 
       function drawDoughnutChart(canvasId, labels, values) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext("2d");
-        const width = canvas.parentElement.clientWidth - 40;
-        const height = 250;
-        canvas.width = width;
-        canvas.height = height;
-        
-        const centerX = width / 3;
-        const centerY = height / 2;
-        const radius = Math.min(centerX, centerY) - 40;
-        const innerRadius = radius * 0.55;
-        
-        const colors = ["#1a1916", "#2d4baa", "#166534", "#7a7870", "#b0ada4", "#8b6f47"];
-        const total = values.reduce((sum, v) => sum + v, 0);
-        
-        ctx.clearRect(0, 0, width, height);
-        
-        let startAngle = -Math.PI / 2;
-        
-        values.forEach((value, i) => {
-          const sliceAngle = (value / total) * 2 * Math.PI;
-          const endAngle = startAngle + sliceAngle;
-          
-          ctx.fillStyle = colors[i % colors.length];
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-          ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
-          ctx.closePath();
-          ctx.fill();
-          
-          startAngle = endAngle;
-        });
-        
-        // Draw legend
-        const legendX = width * 0.65;
-        const legendY = height / 2 - (labels.length * 20) / 2;
-        
-        labels.forEach((label, i) => {
-          const y = legendY + i * 20;
-          
-          ctx.fillStyle = colors[i % colors.length];
-          ctx.beginPath();
-          ctx.arc(legendX, y + 5, 5, 0, 2 * Math.PI);
-          ctx.fill();
-          
-          ctx.fillStyle = "#7a7870";
-          ctx.font = "11px 'DM Sans', sans-serif";
-          ctx.textAlign = "left";
-          ctx.fillText(`${label} (${values[i]})`, legendX + 15, y + 9);
-        });
+        const canvas=document.getElementById(canvasId); if(!canvas) return;
+        const {ctx,width,height}=prepareCanvas(canvas,300);
+        ctx.clearRect(0,0,width,height);
+        if(!values.length){hideDashboardTooltip();return;}
+        const colors=["#1a1916","#2d4baa","#166534","#7a7870","#b0ada4","#8b6f47"];
+        const total=values.reduce((a,b)=>a+b,0)||1;
+        const compact=width<520;
+        const cx=compact?width*.34:width*.31, cy=height/2, radius=Math.min(height*.31,width*.18), inner=radius*.58;
+        let start=-Math.PI/2;
+        values.forEach((v,i)=>{const end=start+(v/total)*Math.PI*2;ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(cx,cy,radius,start,end);ctx.arc(cx,cy,inner,end,start,true);ctx.closePath();ctx.fill();start=end;});
+        ctx.fillStyle="#1a1916";ctx.font="500 18px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(String(total),cx,cy+5);ctx.fillStyle="#9a978f";ctx.font="10px 'DM Sans',sans-serif";ctx.fillText("total",cx,cy+20);
+        const lx=compact?width*.59:width*.55, rowH=Math.min(32,(height-24)/labels.length), startY=height/2-(labels.length*rowH)/2;
+        labels.forEach((label,i)=>{const y=startY+i*rowH;ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(lx,y+5,5,0,Math.PI*2);ctx.fill();ctx.fillStyle="#5f5c56";ctx.font="11px 'DM Sans',sans-serif";ctx.textAlign="left";ctx.fillText(label,lx+14,y+9);ctx.fillStyle="#1a1916";ctx.font="11px 'DM Mono',monospace";ctx.textAlign="right";ctx.fillText(String(values[i]),width-18,y+9);});
+        canvas.onmousemove=(event)=>{
+          const r=canvas.getBoundingClientRect(), mx=event.clientX-r.left,my=event.clientY-r.top;
+          const dx=mx-cx,dy=my-cy,dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist>=inner&&dist<=radius){let angle=Math.atan2(dy,dx);if(angle< -Math.PI/2) angle+=Math.PI*2;let cursor=-Math.PI/2;let found=-1;for(let i=0;i<values.length;i++){const end=cursor+(values[i]/total)*Math.PI*2;if(angle>=cursor&&angle<=end){found=i;break;}cursor=end;}if(found>=0){canvas.style.cursor="pointer";showDashboardTooltip(event,labels[found],[["Cantidad",values[found]],["Participación",`${((values[found]/total)*100).toFixed(1)}%`]]);return;}}
+          hideDashboardTooltip();canvas.style.cursor="default";
+        };canvas.onmouseleave=hideDashboardTooltip;
       }
 
       function drawLineChart(canvasId, labels, dataset1, dataset2, label1, label2) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext("2d");
-        const width = canvas.parentElement.clientWidth - 40;
-        const height = 250;
-        canvas.width = width;
-        canvas.height = height;
-        
-        const padding = { top: 20, right: 20, bottom: 40, left: 40 };
-        const chartWidth = width - padding.left - padding.right;
-        const chartHeight = height - padding.top - padding.bottom;
-        
-        const maxValue = Math.max(...dataset1, ...dataset2, 1);
-        
-        ctx.clearRect(0, 0, width, height);
-        
-        // Draw grid lines
-        ctx.strokeStyle = "#e2e0da";
-        ctx.lineWidth = 1;
-        ctx.font = "10px 'DM Mono', monospace";
-        ctx.fillStyle = "#7a7870";
-        
-        for (let i = 0; i <= 5; i++) {
-          const y = padding.top + chartHeight - (chartHeight * i / 5);
-          ctx.beginPath();
-          ctx.moveTo(padding.left, y);
-          ctx.lineTo(width - padding.right, y);
-          ctx.stroke();
-          
-          const value = Math.round(maxValue * i / 5);
-          ctx.textAlign = "right";
-          ctx.fillText(value.toString(), padding.left - 10, y + 3);
-        }
-        
-        // Draw lines
-        const drawLine = (data, color) => {
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          
-          data.forEach((value, i) => {
-            const x = padding.left + (i / (data.length - 1)) * chartWidth;
-            const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
-            
-            if (i === 0) {
-              ctx.moveTo(x, y);
-            } else {
-              ctx.lineTo(x, y);
-            }
-          });
-          ctx.stroke();
-          
-          // Draw points
-          data.forEach((value, i) => {
-            const x = padding.left + (i / (data.length - 1)) * chartWidth;
-            const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
-            
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2 * Math.PI);
-            ctx.fill();
-          });
-        };
-        
-        drawLine(dataset1, "#1a1916");
-        drawLine(dataset2, "#2d4baa");
-        
-        // Draw x-axis labels
-        ctx.fillStyle = "#7a7870";
-        ctx.textAlign = "center";
-        ctx.font = "10px 'DM Mono', monospace";
-        
-        const step = Math.ceil(labels.length / 6);
-        labels.forEach((label, i) => {
-          if (i % step === 0 || i === labels.length - 1) {
-            const x = padding.left + (i / (labels.length - 1)) * chartWidth;
-            ctx.fillText(label, x, height - 15);
-          }
-        });
-        
-        // Draw legend
-        ctx.font = "11px 'DM Sans', sans-serif";
-        ctx.textAlign = "left";
-        
-        ctx.fillStyle = "#1a1916";
-        ctx.beginPath();
-        ctx.arc(padding.left + 5, 15, 3, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.fillStyle = "#7a7870";
-        ctx.fillText(label1, padding.left + 15, 19);
-        
-        ctx.fillStyle = "#2d4baa";
-        ctx.beginPath();
-        ctx.arc(padding.left + 60, 15, 3, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.fillStyle = "#7a7870";
-        ctx.fillText(label2, padding.left + 70, 19);
+        const canvas=document.getElementById(canvasId);if(!canvas)return;
+        const height=330,{ctx,width}=prepareCanvas(canvas,height);const padding={top:34,right:20,bottom:58,left:42};const cw=width-padding.left-padding.right,ch=height-padding.top-padding.bottom;const maxValue=niceMax(Math.max(...dataset1,...dataset2,0));
+        ctx.clearRect(0,0,width,height);
+        for(let i=0;i<=5;i++){const y=padding.top+ch*(1-i/5);ctx.strokeStyle="#e8e6e0";ctx.beginPath();ctx.moveTo(padding.left,y);ctx.lineTo(width-padding.right,y);ctx.stroke();ctx.fillStyle="#9a978f";ctx.font="10px 'DM Mono',monospace";ctx.textAlign="right";ctx.fillText(String(Math.round(maxValue*i/5)),padding.left-9,y+3);}
+        const xAt=i=>padding.left+(labels.length===1?cw/2:(i/(labels.length-1))*cw);
+        const yAt=v=>padding.top+ch-(v/maxValue)*ch;
+        const series=[{data:dataset1,color:"#1a1916",label:label1},{data:dataset2,color:"#2d4baa",label:label2}];
+        series.forEach(series=>{ctx.strokeStyle=series.color;ctx.lineWidth=2.3;ctx.beginPath();series.data.forEach((v,i)=>{const x=xAt(i),y=yAt(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();series.data.forEach((v,i)=>{const x=xAt(i),y=yAt(v);ctx.fillStyle=series.color;ctx.beginPath();ctx.arc(x,y,3.6,0,Math.PI*2);ctx.fill();});});
+        labels.forEach((label,i)=>{if(i===0||i===labels.length-1||i%2===0){const x=xAt(i);ctx.fillStyle="#5f5c56";ctx.font="10px 'DM Mono',monospace";ctx.textAlign="center";const parts=label.split(" ");ctx.fillText(parts[0],x,height-31);ctx.fillText(parts[1]||"",x,height-17);}});
+        ctx.font="11px 'DM Sans',sans-serif";let lx=padding.left;series.forEach(series=>{ctx.fillStyle=series.color;ctx.beginPath();ctx.arc(lx+4,15,4,0,Math.PI*2);ctx.fill();ctx.fillStyle="#5f5c56";ctx.textAlign="left";ctx.fillText(series.label,lx+13,19);lx+=58;});
+        canvas.onmousemove=(event)=>{const r=canvas.getBoundingClientRect(),mx=event.clientX-r.left,my=event.clientY-r.top;let best=-1,dist=Infinity;labels.forEach((_,i)=>{const d=Math.abs(mx-xAt(i));if(d<dist){dist=d;best=i;}});if(best>=0&&dist<Math.max(18,cw/labels.length*.45)){canvas.style.cursor="pointer";showDashboardTooltip(event,labels[best],[[label1,dataset1[best]],[label2,dataset2[best]],["Total",dataset1[best]+dataset2[best]]]);}else{canvas.style.cursor="default";hideDashboardTooltip();}};canvas.onmouseleave=hideDashboardTooltip;
       }
 
-      /* ══════════════════════════════
-         DASHBOARD - Render principal
-      ══════════════════════════════ */
-      function renderDashboard(period = "este_mes") {
-        const content = document.getElementById("dashboardContent");
-        const { start, end } = getDateRange(period);
-        const year = new Date().getFullYear();
-        
-        // Filter expeditions by date range
-        const periodExp = dashboardData.expedientes.filter(e => {
-          if (!isValidDate(e.fecha)) return false;
-          const date = new Date(e.fecha);
-          return date >= start && date <= end;
-        });
-        
-        // Calculate statistics
-        const totalExp = dashboardData.expedientes.length;
-        const periodExpCount = periodExp.length;
-        const todayStr = new Date().toISOString().split("T")[0];
-        const todayExp = dashboardData.expedientes.filter(e => e.fecha === todayStr).length;
-        const totalPersonal = dashboardData.personal.length;
-        
-        const pecMonth = periodExp.filter(e => normalizeTag(e.tag) === "pec").length;
-        const pafMonth = periodExp.filter(e => normalizeTag(e.tag) === "paf").length;
-        
-        // Year totals for PEC/PAF
-        const yearStart = new Date(year, 0, 1);
-        const yearEnd = new Date(year, 11, 31);
-        const yearExp = dashboardData.expedientes.filter(e => {
-          if (!isValidDate(e.fecha)) return false;
-          const date = new Date(e.fecha);
-          return date >= yearStart && date <= yearEnd;
-        });
-        const pecYear = yearExp.filter(e => normalizeTag(e.tag) === "pec").length;
-        const pafYear = yearExp.filter(e => normalizeTag(e.tag) === "paf").length;
-        
-        // Summary data
-        const sinTag = dashboardData.expedientes.filter(e => !normalizeTag(e.tag)).length;
-        
-        // Day with most expeditions in period
-        const dayCounts = {};
-        periodExp.forEach(e => {
-          if (isValidDate(e.fecha)) {
-            dayCounts[e.fecha] = (dayCounts[e.fecha] || 0) + 1;
-          }
-        });
-        let maxDay = null;
-        let maxDayCount = 0;
-        Object.entries(dayCounts).forEach(([day, count]) => {
-          if (count > maxDayCount) {
-            maxDay = day;
-            maxDayCount = count;
-          }
-        });
-        
-        // Month with most expeditions in last 12 months
-        const last12Data = prepareDataExpedientesPorMes(dashboardData.expedientes);
-        let maxMonth = null;
-        let maxMonthCount = 0;
-        last12Data.forEach(m => {
-          if (m.count > maxMonthCount) {
-            maxMonth = m.label;
-            maxMonthCount = m.count;
-          }
-        });
-        
-        // Prepare chart data
-        const expPorMesData = prepareDataExpedientesPorMes(dashboardData.expedientes);
-        const expPorTipoData = prepareDataPorTipo(dashboardData.expedientes);
-        const expPorURData = prepareDataPorUnidad(dashboardData.expedientes);
-        const pecPafData = prepareDataPecPaf(dashboardData.expedientes);
-        
-        // Render HTML
-        const periodLabels = {
-          "este_mes": "Este mes",
-          "mes_anterior": "Mes anterior",
-          "ultimos_3": "Últimos 3 meses",
-          "ultimos_6": "Últimos 6 meses",
-          "este_ano": "Este año",
-          "ano_anterior": "Año anterior"
-        };
-        
-        const periodLabel = periodLabels[period] || "Este mes";
-        
-        let html = `
+      function renderChartEmpty(id,title="Sin datos") { const el=document.getElementById(id); if(el) el.innerHTML=`<div class="chart-empty"><strong>${esc(title)}</strong><span>No hay registros suficientes para mostrar esta visualización.</span></div>`; }
+
+      function renderDashboard(period="este_mes") {
+        const content=document.getElementById("dashboardContent");
+        const {start,end}=getDateRange(period);
+        const periodExp=dashboardData.expedientes.filter(e=>{const d=parseLocalDate(e.fecha);return d&&d>=start&&d<=end;});
+        const totalExp=dashboardData.expedientes.length;
+        const totalPersonal=dashboardData.personal.length;
+        const now=new Date();
+        const todayExp=dashboardData.expedientes.filter(e=>{const d=parseLocalDate(e.fecha);return d&&d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();}).length;
+        const pecPeriod=periodExp.filter(e=>normalizeTag(e.tag)==="pec").length;
+        const pafPeriod=periodExp.filter(e=>normalizeTag(e.tag)==="paf").length;
+        const year=now.getFullYear();
+        const yearExp=dashboardData.expedientes.filter(e=>{const d=parseLocalDate(e.fecha);return d&&d.getFullYear()===year;});
+        const pecYear=yearExp.filter(e=>normalizeTag(e.tag)==="pec").length;
+        const pafYear=yearExp.filter(e=>normalizeTag(e.tag)==="paf").length;
+        const sinTag=dashboardData.expedientes.filter(e=>!normalizeTag(e.tag)).length;
+        const expPorMesData=prepareDataExpedientesPorMes(dashboardData.expedientes);
+        const expPorTipoData=prepareDataPorTipo(periodExp);
+        const expPorURData=prepareDataPorUnidad(periodExp);
+        const pecPafData=prepareDataPecPaf(dashboardData.expedientes);
+        const dayCounts={};periodExp.forEach(e=>{const d=parseLocalDate(e.fecha);if(d){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;dayCounts[k]=(dayCounts[k]||0)+1;}});
+        const maxDayEntry=Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
+        const maxDay=maxDayEntry?parseLocalDate(maxDayEntry[0]):null;
+        const maxMonth=[...expPorMesData].sort((a,b)=>b.count-a.count)[0];
+        const periodLabels={este_mes:"Este mes",mes_anterior:"Mes anterior",ultimos_3:"Últimos 3 meses",ultimos_6:"Últimos 6 meses",este_ano:"Este año",ano_anterior:"Año anterior"};
+        const periodLabel=periodLabels[period]||"Período seleccionado";
+        const prevRange=(()=>{if(period==="este_mes"){const d=new Date(start);d.setMonth(d.getMonth()-1);return{start:d,end:new Date(start.getFullYear(),start.getMonth(),0,23,59,59,999)}}return null;})();
+        let comparison="";
+        if(prevRange){const prev=dashboardData.expedientes.filter(e=>{const d=parseLocalDate(e.fecha);return d&&d>=prevRange.start&&d<=prevRange.end;}).length;const diff=periodExp.length-prev;comparison=`${diff>0?"+":""}${diff} vs. mes anterior`;}
+        content.innerHTML=`
           <div class="dashboard-cards">
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Total expedientes</div>
-              <div class="dashboard-card-value">${totalExp.toLocaleString()}</div>
-              <div class="dashboard-card-sub">Todos los registros</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Este mes</div>
-              <div class="dashboard-card-value">${periodExpCount.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${periodLabel}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Hoy</div>
-              <div class="dashboard-card-value">${todayExp.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${formatDateShort(new Date())}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">Personal registrado</div>
-              <div class="dashboard-card-value">${totalPersonal.toLocaleString()}</div>
-              <div class="dashboard-card-sub">Registros activos</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">PEC del mes</div>
-              <div class="dashboard-card-value">${pecMonth.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${periodLabel}</div>
-            </div>
-            <div class="dashboard-card">
-              <div class="dashboard-card-label">PAF del mes</div>
-              <div class="dashboard-card-value">${pafMonth.toLocaleString()}</div>
-              <div class="dashboard-card-sub">${periodLabel}</div>
-            </div>
+            <div class="dashboard-card"><div class="dashboard-card-label">Total expedientes</div><div class="dashboard-card-value">${totalExp.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">Todos los registros</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-label">Expedientes del período</div><div class="dashboard-card-value">${periodExp.length.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">${esc(periodLabel)}${comparison?` · ${esc(comparison)}`:""}</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-label">Expedientes hoy</div><div class="dashboard-card-value">${todayExp.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">${formatDateShort(now)}</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-label">Personal registrado</div><div class="dashboard-card-value">${totalPersonal.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">Registros activos</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-label">PEC del período</div><div class="dashboard-card-value">${pecPeriod.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">${esc(periodLabel)}</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-label">PAF del período</div><div class="dashboard-card-value">${pafPeriod.toLocaleString("es-AR")}</div><div class="dashboard-card-sub">${esc(periodLabel)}</div></div>
           </div>
-          
           <div class="dashboard-charts">
-            <div class="chart-card">
-              <div class="chart-card-title">Expedientes por mes</div>
-              <div class="chart-card-body">
-                <canvas id="expPorMesChart"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-card-title">Expedientes por tipo</div>
-              <div class="chart-card-body">
-                <canvas id="expPorTipoChart"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-card-title">Expedientes por Unidad Residencial</div>
-              <div class="chart-card-body">
-                <canvas id="expPorURChart"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-card-title">PEC / PAF por mes</div>
-              <div class="chart-card-body">
-                <canvas id="pecPafChart"></canvas>
-              </div>
-            </div>
+            <div class="chart-card chart-card-wide"><div class="chart-card-title-row"><div><div class="chart-card-title">Expedientes por mes</div><div class="chart-card-subtitle">Evolución de los últimos 12 meses · las etiquetas muestran mes y año</div></div><div class="chart-card-meta">Total: ${expPorMesData.reduce((a,b)=>a+b.count,0).toLocaleString("es-AR")}</div></div><div class="chart-card-body"><canvas id="expPorMesChart"></canvas></div></div>
+            <div class="chart-card"><div class="chart-card-title-row"><div><div class="chart-card-title">Expedientes por tipo</div><div class="chart-card-subtitle">Distribución durante ${esc(periodLabel.toLowerCase())}</div></div></div><div class="chart-card-body"><canvas id="expPorTipoChart"></canvas></div></div>
+            <div class="chart-card"><div class="chart-card-title-row"><div><div class="chart-card-title">Expedientes por Unidad Residencial</div><div class="chart-card-subtitle">Comparación de unidades · ordenadas de mayor a menor</div></div><div class="chart-card-meta">${expPorURData.reduce((a,b)=>a+b[1],0).toLocaleString("es-AR")} exp.</div></div><div class="chart-card-body"><canvas id="expPorURChart"></canvas></div></div>
+            <div class="chart-card chart-card-wide"><div class="chart-card-title-row"><div><div class="chart-card-title">PEC / PAF por mes</div><div class="chart-card-subtitle">Comparación mensual de ambas categorías durante los últimos 12 meses</div></div><div class="chart-card-meta">PEC ${pecPafData.reduce((a,b)=>a+b.pec,0)} · PAF ${pecPafData.reduce((a,b)=>a+b.paf,0)}</div></div><div class="chart-legend"><span class="chart-legend-item"><span class="chart-legend-dot" style="background:#1a1916"></span>PEC</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:#2d4baa"></span>PAF</span></div><div class="chart-card-body"><canvas id="pecPafChart"></canvas></div></div>
           </div>
-          
-          <div class="dashboard-summary">
-            <div class="dashboard-summary-title">Resumen de actividad</div>
-            <div class="dashboard-summary-grid">
-              <div class="summary-item">
-                <div class="summary-item-label">Mayor actividad</div>
-                <div class="summary-item-value">${maxDay ? `${formatDateShort(new Date(maxDay))} (${maxDayCount} exp.)` : "Sin datos"}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">Mejor mes (12 meses)</div>
-                <div class="summary-item-value">${maxMonth ? `${maxMonth} (${maxMonthCount} exp.)` : "Sin datos"}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">PEC del año</div>
-                <div class="summary-item-value">${pecYear.toLocaleString()}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">PAF del año</div>
-                <div class="summary-item-value">${pafYear.toLocaleString()}</div>
-              </div>
-              <div class="summary-item">
-                <div class="summary-item-label">Expedientes sin tag</div>
-                <div class="summary-item-value">${sinTag.toLocaleString()}</div>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        content.innerHTML = html;
-        
-        // Draw charts using Canvas API
-        const months = expPorMesData.map(d => d.label);
-        const expCounts = expPorMesData.map(d => d.count);
-        drawBarChart("expPorMesChart", months, expCounts);
-        
-        if (expPorTipoData.length > 0) {
-          const tipoLabels = expPorTipoData.map(d => d[0]);
-          const tipoValues = expPorTipoData.map(d => d[1]);
-          drawDoughnutChart("expPorTipoChart", tipoLabels, tipoValues);
-        }
-        
-        if (expPorURData && expPorURData.length > 0) {
-          const urLabels = expPorURData.map(d => d[0]);
-          const urValues = expPorURData.map(d => d[1]);
-          drawBarChart("expPorURChart", urLabels, urValues, "#2d4baa");
-        }
-        
-        const pecPafMonths = pecPafData.map(d => d.label);
-        const pecValues = pecPafData.map(d => d.pec);
-        const pafValues = pecPafData.map(d => d.paf);
-        drawLineChart("pecPafChart", pecPafMonths, pecValues, pafValues, "PEC", "PAF");
+          <div class="dashboard-summary"><div class="dashboard-summary-title">Resumen de actividad</div><div class="dashboard-summary-grid">
+            <div class="summary-item"><div class="summary-item-label">Mayor actividad diaria</div><div class="summary-item-value">${maxDay?`${formatDateShort(maxDay)} (${maxDayEntry[1]} exp.)`:"Sin datos"}</div></div>
+            <div class="summary-item"><div class="summary-item-label">Mejor mes · 12 meses</div><div class="summary-item-value">${maxMonth&&maxMonth.count?`${maxMonth.label} (${maxMonth.count} exp.)`:"Sin datos"}</div></div>
+            <div class="summary-item"><div class="summary-item-label">PEC del año</div><div class="summary-item-value">${pecYear.toLocaleString("es-AR")}</div></div>
+            <div class="summary-item"><div class="summary-item-label">PAF del año</div><div class="summary-item-value">${pafYear.toLocaleString("es-AR")}</div></div>
+            <div class="summary-item"><div class="summary-item-label">Expedientes sin tag</div><div class="summary-item-value">${sinTag.toLocaleString("es-AR")}</div></div>
+          </div></div>`;
+
+        drawBarChart("expPorMesChart",expPorMesData.map(d=>d.label),expPorMesData.map(d=>d.count),{color:"#1a1916",valueLabel:"Expedientes",height:330});
+        if(expPorTipoData.length) drawDoughnutChart("expPorTipoChart",expPorTipoData.map(d=>d[0]),expPorTipoData.map(d=>d[1])); else renderChartEmpty("expPorTipoChart");
+        if(expPorURData.length) drawBarChart("expPorURChart",expPorURData.map(d=>d[0]),expPorURData.map(d=>d[1]),{horizontal:true,color:"#2d4baa",valueLabel:"Expedientes",height:300}); else renderChartEmpty("expPorURChart","No hay Unidades Residenciales identificadas");
+        drawLineChart("pecPafChart",pecPafData.map(d=>d.label),pecPafData.map(d=>d.pec),pecPafData.map(d=>d.paf),"PEC","PAF");
       }
 
-      window.cargarDashboard = async function () {
-        if (!user) return;
-        
-        const content = document.getElementById("dashboardContent");
-        const period = document.getElementById("dashboardPeriodo").value;
-        
-        content.innerHTML = `
-          <div class="dashboard-loading">
-            <div class="spinner"></div>
-            <span style="font-size:13px;">Cargando estadísticas...</span>
-          </div>
-        `;
-        
-        try {
-          // Fetch expedientes
-          const expSnap = await getDocs(collection(db, "expedientes"));
-          dashboardData.expedientes = [];
-          expSnap.forEach(d => dashboardData.expedientes.push({ id: d.id, ...d.data() }));
-          
-          // Fetch personal
-          const personalSnap = await getDocs(collection(db, "personal"));
-          dashboardData.personal = [];
-          personalSnap.forEach(d => dashboardData.personal.push({ id: d.id, ...d.data() }));
-          
+      window.cargarDashboard=async function(){
+        if(!user)return;
+        const content=document.getElementById("dashboardContent");
+        const period=document.getElementById("dashboardPeriodo").value;
+        hideDashboardTooltip();
+        content.innerHTML=`<div class="dashboard-loading"><div class="spinner"></div><span style="font-size:13px;">Cargando estadísticas...</span></div>`;
+        try{
+          const [expSnap,personalSnap]=await Promise.all([getDocs(collection(db,"expedientes")),getDocs(collection(db,"personal"))]);
+          dashboardData.expedientes=[];expSnap.forEach(d=>dashboardData.expedientes.push({id:d.id,...d.data()}));
+          dashboardData.personal=[];personalSnap.forEach(d=>dashboardData.personal.push({id:d.id,...d.data()}));
           renderDashboard(period);
-        } catch (error) {
-          console.error("Error al cargar dashboard:", error);
-          content.innerHTML = `
-            <div class="dashboard-error">
-              Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
-              <br><small style="font-size:12px; margin-top:8px; display:block;">${error.message || "Error desconocido"}</small>
-            </div>
-          `;
-        }
+        }catch(error){console.error("Error al cargar dashboard:",error);content.innerHTML=`<div class="dashboard-error">Error al cargar los datos del dashboard. Por favor, intentá nuevamente.</div>`;}
       };
 
-      /* ══════════════════════════════
-         EXPEDIENTES — CRUD
-      ══════════════════════════════ */
-      window.guardar = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("formError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("numero"),
-          detalle: v("detalle"),
-          interno: v("interno"),
-          lpu: v("lpu"),
-          tag: v("tag"),
-          fecha: v("fecha") || null,
-          created_at: new Date().toISOString(),
-        };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormulario();
-          setPanel("lista", document.getElementById("navLista"));
-          buscar();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscar = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        const fn = v("f_numero"), ft = v("f_tag"), ff = v("f_fecha"),
-              fi = v("f_interno"), fl = v("f_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ft) data = data.filter(e => (e.tag||"").toLowerCase().includes(ft.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allData = data;
-        currentPage = 1;
-        actualizarStats(allData);
-        renderPagina();
-      };
-
-      function actualizarStats(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("statTotal").textContent = data.length;
-        document.getElementById("statMes").textContent   = esteMes;
-        document.getElementById("statFiltrados").textContent = data.length;
-        const filtrado = v("f_numero")||v("f_tag")||v("f_fecha")||v("f_interno")||v("f_lpu");
-        document.getElementById("resultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} expediente${data.length!==1?"s":""}`;
-      }
-
-      function renderPagina() {
-        const total = allData.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPage > totalPages) currentPage = totalPages;
-        const start = (currentPage - 1) * PAGE_SIZE;
-        renderResultados(allData.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "paginacion", "expedientes");
-      }
-
-      function renderResultados(data, offset=0) {
-        const el = document.getElementById("resultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <p>No hay expedientes</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  ${e.tag    ? `<span class="chip chip-tag">${esc(e.tag)}</span>` : ""}
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.eliminar = async function (id) {
-        if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
-        try {
-          await deleteDoc(doc(db, "expedientes", id));
-          buscar();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
-
-      window.abrirEdicion = function (id) {
-        const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id) || allPedidos.find(x => x.id === id);
-        if (!e) return alert("No se encontró el registro.");
-        document.getElementById("editId").value      = e.id;
-        document.getElementById("editNumero").value  = e.numero_expediente || "";
-        document.getElementById("editDetalle").value = e.detalle || "";
-        document.getElementById("editInterno").value = e.interno || "";
-        document.getElementById("editLpu").value     = e.lpu || "";
-        document.getElementById("editTag").value     = e.tag || "";
-        document.getElementById("editFecha").value   = e.fecha || "";
-        document.getElementById("editOverlay").classList.add("open");
-      };
-
-      window.guardarEdicion = async function () {
-        const payload = {
-          numero_expediente: document.getElementById("editNumero").value,
-          detalle:  document.getElementById("editDetalle").value,
-          interno:  document.getElementById("editInterno").value,
-          lpu:      document.getElementById("editLpu").value,
-          tag:      document.getElementById("editTag").value,
-          fecha:    document.getElementById("editFecha").value || null,
-        };
-        const id = document.getElementById("editId").value;
-        try {
-          await updateDoc(doc(db, "expedientes", id), payload);
-          cerrarModal("editOverlay");
-          buscar();
-          buscarNovedades();
-          buscarPedidos();
-        } catch (error) {
-          alert(error.message);
-        }
-      };
-
-      window.exportarExcel = function () {
-        if (!allData.length) { alert("No hay expedientes para exportar."); return; }
-        const rows = allData.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-          "Tag":           e.tag || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Expedientes");
-        XLSX.writeFile(wb, `expedientes_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      /* ══════════════════════════════
-         NOVEDADES — reutiliza "expedientes", tag fijo
-      ══════════════════════════════ */
-      window.guardarNovedad = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("nFormError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("n_numero"),
-          detalle: v("n_detalle"),
-          interno: v("n_interno"),
-          lpu: v("n_lpu"),
-          tag: NOVEDADES_TAG,
-          fecha: v("n_fecha") || null,
-          created_at: new Date().toISOString(),
-        };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormularioNovedad();
-          setPanel("novedades", document.getElementById("navNovedades"));
-          buscarNovedades();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscarNovedades = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        // Siempre filtrado por tag "novedades"
-        data = data.filter(e => (e.tag||"").toLowerCase() === NOVEDADES_TAG);
-
-        const fn = v("nf_numero"), ff = v("nf_fecha"),
-              fi = v("nf_interno"), fl = v("nf_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allNovedades = data;
-        currentPageN = 1;
-        actualizarStatsNovedades(allNovedades);
-        renderPaginaNovedades();
-      };
-
-      function actualizarStatsNovedades(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("nStatTotal").textContent = data.length;
-        document.getElementById("nStatMes").textContent   = esteMes;
-        document.getElementById("nStatFiltrados").textContent = data.length;
-        const filtrado = v("nf_numero")||v("nf_fecha")||v("nf_interno")||v("nf_lpu");
-        document.getElementById("nResultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} novedad${data.length!==1?"es":""}`;
-      }
-
-      function renderPaginaNovedades() {
-        const total = allNovedades.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPageN > totalPages) currentPageN = totalPages;
-        const start = (currentPageN - 1) * PAGE_SIZE;
-        renderResultadosNovedades(allNovedades.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "nPaginacion", "novedades");
-      }
-
-      function renderResultadosNovedades(data, offset=0) {
-        const el = document.getElementById("nResultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <p>No hay novedades</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  <span class="chip chip-tag">novedades</span>
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.exportarNovedadesExcel = function () {
-        if (!allNovedades.length) { alert("No hay novedades para exportar."); return; }
-        const rows = allNovedades.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Novedades");
-        XLSX.writeFile(wb, `novedades_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      window.limpiarFiltrosNovedades = function () {
-        ["nf_numero","nf_fecha","nf_interno","nf_lpu"].forEach(id => document.getElementById(id).value="");
-        buscarNovedades();
-      };
-      window.limpiarFormularioNovedad = function () {
-        ["n_numero","n_detalle","n_interno","n_lpu","n_fecha"].forEach(id => document.getElementById(id).value="");
-      };
-
-      /* ══════════════════════════════
-         PEDIDOS — reutiliza "expedientes", tag fijo
-      ══════════════════════════════ */
-      window.guardarPedido = async function () {
-        if (!user) return;
-        const errEl = document.getElementById("pdFormError");
-        errEl.classList.remove("show");
-        const payload = {
-          user_id: user.uid,
-          numero_expediente: v("pd_numero"),
-          detalle: v("pd_detalle"),
-          interno: v("pd_interno"),
-          lpu: v("pd_lpu"),
-          tag: PEDIDOS_TAG,
-          fecha: v("pd_fecha") || null,
-          created_at: new Date().toISOString(),
-        };
-        if (!payload.numero_expediente || !payload.detalle) {
-          showErr(errEl,"N° expediente y detalle son obligatorios."); return;
-        }
-        try {
-          await addDoc(collection(db, "expedientes"), payload);
-          limpiarFormularioPedido();
-          setPanel("pedidos", document.getElementById("navPedidos"));
-          buscarPedidos();
-        } catch (error) {
-          showErr(errEl, error.message);
-        }
-      };
-
-      window.buscarPedidos = async function () {
-        if (!user) return;
-        const snap = await getDocs(collection(db, "expedientes"));
-        let data = [];
-        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
-
-        // Siempre filtrado por tag "pedido"
-        data = data.filter(e => (e.tag||"").toLowerCase() === PEDIDOS_TAG);
-
-        const fn = v("pdf_numero"), ff = v("pdf_fecha"),
-              fi = v("pdf_interno"), fl = v("pdf_lpu");
-
-        if (fn) data = data.filter(e => (e.numero_expediente||"").toLowerCase().includes(fn.toLowerCase()));
-        if (ff) data = data.filter(e => e.fecha === ff);
-        if (fi) data = data.filter(e => (e.interno||"").toLowerCase().includes(fi.toLowerCase()));
-        if (fl) data = data.filter(e => (e.lpu||"").toLowerCase().includes(fl.toLowerCase()));
-
-        data.sort((a,b) => (b.fecha||"").localeCompare(a.fecha||""));
-
-        allPedidos = data;
-        currentPagePd = 1;
-        actualizarStatsPedidos(allPedidos);
-        renderPaginaPedidos();
-      };
-
-      function actualizarStatsPedidos(data) {
-        const now = new Date();
-        const esteMes = data.filter(e => {
-          if (!e.fecha) return false;
-          const d = new Date(e.fecha + "T00:00:00");
-          return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-        }).length;
-        document.getElementById("pdStatTotal").textContent = data.length;
-        document.getElementById("pdStatMes").textContent   = esteMes;
-        document.getElementById("pdStatFiltrados").textContent = data.length;
-        const filtrado = v("pdf_numero")||v("pdf_fecha")||v("pdf_interno")||v("pdf_lpu");
-        document.getElementById("pdResultsCount").textContent = filtrado
-          ? `${data.length} resultado${data.length!==1?"s":""} filtrado${data.length!==1?"s":""}`
-          : `${data.length} pedido${data.length!==1?"s":""}`;
-      }
-
-      function renderPaginaPedidos() {
-        const total = allPedidos.length;
-        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        if (currentPagePd > totalPages) currentPagePd = totalPages;
-        const start = (currentPagePd - 1) * PAGE_SIZE;
-        renderResultadosPedidos(allPedidos.slice(start, start + PAGE_SIZE), start);
-        renderPaginacion(total, totalPages, "pdPaginacion", "pedidos");
-      }
-
-      function renderResultadosPedidos(data, offset=0) {
-        const el = document.getElementById("pdResultados");
-        if (!data.length) {
-          el.innerHTML = `<div class="empty-state">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-              <path d="M3 6h18"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-            <p>No hay pedidos</p>
-          </div>`;
-          return;
-        }
-        el.innerHTML = data.map((e,i) => `
-          <div class="card">
-            <div class="card-inner">
-              <div class="card-index">${String(offset+i+1).padStart(2,"0")}</div>
-              <div class="card-body">
-                <div class="card-head">
-                  <span class="card-num">${esc(e.numero_expediente)}</span>
-                </div>
-                <div class="card-detalle">${esc(e.detalle)}</div>
-                <div class="card-chips">
-                  ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
-                  ${e.lpu    ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
-                  <span class="chip chip-tag">pedido</span>
-                  ${e.fecha  ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
-                <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      window.exportarPedidosExcel = function () {
-        if (!allPedidos.length) { alert("No hay pedidos para exportar."); return; }
-        const rows = allPedidos.map(e => ({
-          "N° Expediente": e.numero_expediente || "",
-          "Fecha":         e.fecha || "",
-          "Detalle":       e.detalle || "",
-          "Interno":       e.interno || "",
-          "LPU":           e.lpu || "",
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k]||"").length), 12) }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
-        XLSX.writeFile(wb, `pedidos_${new Date().toISOString().slice(0,10)}.xlsx`);
-      };
-
-      window.limpiarFiltrosPedidos = function () {
-        ["pdf_numero","pdf_fecha","pdf_interno","pdf_lpu"].forEach(id => document.getElementById(id).value="");
-        buscarPedidos();
-      };
-      window.limpiarFormularioPedido = function () {
-        ["pd_numero","pd_detalle","pd_interno","pd_lpu","pd_fecha"].forEach(id => document.getElementById(id).value="");
-      };
+      window.addEventListener("resize",()=>{
+        if(!document.getElementById("panelDashboard")?.classList.contains("active"))return;
+        clearTimeout(window.__dashboardResizeTimer);
+        window.__dashboardResizeTimer=setTimeout(()=>{if(dashboardData.expedientes.length)renderDashboard(document.getElementById("dashboardPeriodo").value);},120);
+      });
+      document.addEventListener("scroll",hideDashboardTooltip,{passive:true});
 
       /* ══════════════════════════════
          PERSONAL — CRUD
+      ══════════════════════════════ */
+
       ══════════════════════════════ */
       window.guardarPersonal = async function () {
         if (!user) return;
