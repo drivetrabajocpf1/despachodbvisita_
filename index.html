@@ -1208,7 +1208,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1257,12 +1256,8 @@
 
       const personalMap = {};
 
-      // Dashboard
-      let dashboardCharts = [];
-      let dashboardData = {
-        expedientes: [],
-        personal: []
-      };
+      // Dashboard - Almacenar instancias de gráficos
+      let dashboardChartsInstances = [];
 
       /* ══════════════════════════════
          AUTH
@@ -1713,11 +1708,11 @@
       ══════════════════════════════ */
       function initCharts(expPorMesData, expPorURData, pecPafData) {
         // Destruir gráficos anteriores
-        if (window.dashboardCharts && window.dashboardCharts.length > 0) {
-          window.dashboardCharts.forEach(chart => {
+        if (dashboardChartsInstances && dashboardChartsInstances.length > 0) {
+          dashboardChartsInstances.forEach(chart => {
             if (chart) chart.destroy();
           });
-          window.dashboardCharts = [];
+          dashboardChartsInstances = [];
         }
 
         // 1. Gráfico: Expedientes por mes (barras)
@@ -1784,7 +1779,7 @@
               }
             }
           });
-          window.dashboardCharts.push(chart1);
+          dashboardChartsInstances.push(chart1);
         }
 
         // 2. Gráfico: Expedientes por Unidad Residencial (barras horizontales)
@@ -1849,28 +1844,29 @@
                     }
                   }
                 }
-              },
-              plugins: [ChartDataLabels && ChartDataLabels.default ? ChartDataLabels.default : {
-                id: 'datalabels',
-                afterDraw: function(chart) {
-                  const ctx = chart.ctx;
-                  chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((bar, index) => {
-                      const data = dataset.data[index];
-                      if (data > 0) {
-                        ctx.fillStyle = '#7a7870';
-                        ctx.font = "11px 'DM Mono', monospace";
-                        ctx.textAlign = 'left';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(data, bar.x + 6, bar.y);
-                      }
-                    });
-                  });
-                }
-              }]
+              }
             });
-            window.dashboardCharts.push(chart2);
+            dashboardChartsInstances.push(chart2);
+            
+            // Dibujar valores al final de las barras
+            const canvas = ctx2;
+            const chart = chart2;
+            setTimeout(() => {
+              const ctx = canvas.getContext('2d');
+              const meta = chart.getDatasetMeta(0);
+              const data = chart.data.datasets[0].data;
+              
+              meta.data.forEach((bar, index) => {
+                const value = data[index];
+                if (value > 0) {
+                  ctx.fillStyle = '#7a7870';
+                  ctx.font = "11px 'DM Mono', monospace";
+                  ctx.textAlign = 'left';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText(value, bar.x + 6, bar.y);
+                }
+              });
+            }, 100);
           }
         }
 
@@ -1955,7 +1951,7 @@
               }
             }
           });
-          window.dashboardCharts.push(chart3);
+          dashboardChartsInstances.push(chart3);
         }
       }
 
@@ -2778,9 +2774,6 @@
       }
 
       function showErr(el, msg) { el.textContent=msg; el.classList.add("show"); }
-
-      // Registrar plugin de datalabels para Chart.js
-      const ChartDataLabels = window['chartjs-plugin-datalabels'];
 
       document.getElementById("password").addEventListener("keydown", e => { if (e.key==="Enter") login(); });
     </script>
