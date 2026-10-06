@@ -274,122 +274,124 @@
       .modal-close:hover { color:var(--text); background:var(--bg); }
       .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
 
-      /* ── Dashboard ── */
-      .dashboard-wrap { flex:1; padding:24px 32px; background:var(--bg); overflow-y:auto; }
-      
-      .dashboard-header {
-        display:flex; align-items:center; justify-content:space-between; 
-        margin-bottom:20px; flex-wrap:wrap; gap:12px;
-      }
-      
-      .dashboard-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-      
-      .dashboard-select {
-        font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px;
-        border:1px solid var(--border); border-radius:var(--radius);
-        background:var(--surface); color:var(--text); cursor:pointer;
-        outline:none; transition:border-color .15s; min-width:140px;
-        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%237a7870' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        -webkit-appearance:none;
-        -moz-appearance:none;
-        appearance:none;
-      }
-      
-      .dashboard-select:hover { border-color:var(--border-md); }
-      .dashboard-select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
-      
-      .dashboard-cards {
-        display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
-        gap:12px; margin-bottom:24px;
-      }
-      
-      .dashboard-card {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:18px 20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
-      .dashboard-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .dashboard-card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:6px; }
-      
-      .dashboard-card-value { font-size:28px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; color:var(--text); line-height:1.1; }
-      
-      .dashboard-card-sub { font-size:11px; color:var(--faint); margin-top:4px; }
-      
-      .dashboard-charts {
-        display:grid; grid-template-columns:1fr;
-        gap:16px; margin-bottom:16px;
-      }
-      
-      .dashboard-charts-2col {
-        display:grid; grid-template-columns:1fr 1fr;
-        gap:16px; margin-bottom:16px;
-      }
-      
-      .chart-card {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
-      .chart-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:14px; color:var(--text); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
-      
-      .chart-card-title .chart-meta { font-size:11px; color:var(--muted); font-weight:400; }
-      
-      .chart-card-body { position:relative; min-height:260px; }
-      
-      .chart-card-body canvas { width:100% !important; height:auto !important; max-height:300px; }
-      
-      .chart-card-body .chart-loading { display:flex; align-items:center; justify-content:center; height:260px; color:var(--faint); font-size:13px; }
-      
-      .dashboard-summary {
-        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
-        padding:20px; transition:border-color .15s,box-shadow .15s;
-      }
-      
-      .dashboard-summary:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-      
-      .dashboard-summary-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:14px; color:var(--text); }
-      
-      .dashboard-summary-grid {
-        display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
-        gap:12px;
-      }
-      
-      .summary-item {
-        padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius);
-        background:var(--bg);
-      }
-      
-      .summary-item-label { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:4px; }
-      
-      .summary-item-value { font-size:14px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text); }
-      
-      .dashboard-loading {
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        padding:40px; color:var(--muted); gap:12px;
-      }
-      
-      .spinner {
-        width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--text);
-        border-radius:50%; animation:spin 0.8s linear infinite;
-      }
-      
-      @keyframes spin { to { transform:rotate(360deg); } }
-      
-      .dashboard-error {
-        background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger);
-        padding:16px; border-radius:var(--radius); margin-bottom:16px;
-        text-align:center; font-size:14px;
-      }
+     /* ── Dashboard ── */
+.dashboard-wrap { flex:1; padding:24px 32px; background:var(--bg); overflow-y:auto; }
 
-      .dashboard-period-info {
-        font-size:12px; color:var(--muted); font-weight:400;
-      }
+.dashboard-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 
+.dashboard-select {
+  font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--surface); color:var(--text); cursor:pointer;
+  outline:none; transition:border-color .15s; min-width:160px;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%237a7870' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  -webkit-appearance:none; appearance:none;
+}
+.dashboard-select:hover { border-color:var(--border-md); }
+.dashboard-select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
+
+/* ── Secciones ── */
+.dash-section { margin-bottom:28px; }
+.dash-section-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; gap:12px; flex-wrap:wrap; }
+.dash-section-title { font-size:13px; font-weight:500; color:var(--text); letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+.dash-section-title::before { content:""; display:inline-block; width:3px; height:14px; background:var(--text); border-radius:2px; }
+.dash-section-sub { font-size:12px; color:var(--muted); font-weight:400; }
+
+/* ── Cards de métricas ── */
+.dashboard-cards {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+  gap:12px;
+}
+.dashboard-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:18px 20px; transition:border-color .15s,box-shadow .15s,transform .12s;
+  position:relative; overflow:hidden;
+}
+.dashboard-card::before {
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--border); transition:background .15s;
+}
+.dashboard-card:hover { border-color:var(--border-md); box-shadow:var(--shadow-md); transform:translateY(-1px); }
+.dashboard-card:hover::before { background:var(--text); }
+.dashboard-card.accent-pec::before { background:#1a1916; }
+.dashboard-card.accent-paf::before { background:#2d4baa; }
+.dashboard-card.accent-lar::before { background:#1a7a4a; }
+.dashboard-card.accent-nov::before { background:#b8860b; }
+.dashboard-card.accent-ped::before { background:#a0522d; }
+
+.dashboard-card-label {
+  font-size:10.5px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.07em; font-weight:500; margin-bottom:8px;
+}
+.dashboard-card-value {
+  font-size:30px; font-weight:500; letter-spacing:-.03em;
+  font-family:"DM Mono",monospace; color:var(--text); line-height:1;
+}
+.dashboard-card-sub { font-size:11px; color:var(--faint); margin-top:6px; }
+
+/* ── Bloques / tablas ── */
+.dashboard-summary {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:0; overflow:hidden;
+  transition:border-color .15s,box-shadow .15s;
+}
+.dashboard-summary:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+.dashboard-summary-title {
+  font-size:13px; font-weight:500; letter-spacing:-.01em;
+  color:var(--text); padding:14px 20px;
+  border-bottom:1px solid var(--border); background:var(--bg);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.dashboard-summary-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:1px; background:var(--border);
+}
+.summary-item {
+  padding:14px 18px; background:var(--surface);
+}
+.summary-item-label {
+  font-size:10.5px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.06em; font-weight:500; margin-bottom:6px;
+}
+.summary-item-value {
+  font-size:16px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text);
+}
+.summary-item-value small { color:var(--faint); font-weight:400; }
+
+/* ── Loading / Error ── */
+.dashboard-loading {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:60px 40px; color:var(--muted); gap:14px;
+}
+.spinner {
+  width:32px; height:32px; border:3px solid var(--border);
+  border-top-color:var(--text); border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.dashboard-error {
+  background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger);
+  padding:16px; border-radius:var(--radius); text-align:center; font-size:14px;
+}
+
+/* ── Tablas del dashboard ── */
+.tabla-scroll { overflow-x:auto; }
+.tabla-simple { width:100%; border-collapse:collapse; font-size:13px; }
+.tabla-simple th,.tabla-simple td {
+  padding:10px 20px; text-align:left; border-bottom:1px solid var(--border);
+}
+.tabla-simple th {
+  font-weight:500; font-size:10.5px; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.06em; background:var(--surface);
+}
+.tabla-simple td.num,.tabla-simple th.num { text-align:right; font-family:"DM Mono",monospace; }
+.tabla-simple tbody tr:nth-child(even) td { background:#fafaf8; }
+.tabla-simple tbody tr:hover td { background:var(--bg); }
+.tabla-simple tr:last-child td { border-bottom:none; }
+.tabla-simple tbody tr.total-row td {
+  font-weight:500; background:var(--bg); border-top:1px solid var(--border-md);
+}
       /* ── Responsive ── */
       @media (max-width:900px) {
         .dashboard-charts-2col { grid-template-columns:1fr; }
@@ -1430,9 +1432,8 @@ function descargarTabla(nombre, hoja, rows) {
   const content = document.getElementById("dashboardContent");
   const { start, end } = getDateRange(period);
   const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-  const hoyStr = (() => { const y = hoy.getFullYear(); const m = String(hoy.getMonth()+1).padStart(2,"0"); const d = String(hoy.getDate()).padStart(2,"0"); return `${y}-${m}-${d}`; })();
-  const mesStr = hoyStr.slice(0, 7), anioStr = hoyStr.slice(0, 4);
   const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const hoyStr = ymd(hoy), mesStr = hoyStr.slice(0, 7), anioStr = hoyStr.slice(0, 4);
   const startStr = ymd(start), endStr = ymd(end);
 
   const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -1452,16 +1453,41 @@ function descargarTabla(nombre, hoja, rows) {
   const prom = (total, dias) => dias > 0 ? (total / dias).toFixed(1) : "—";
   const labelMes = m => { const [y, mm] = m.split("-"); return `${MESES[Number(mm)-1]} ${y}`; };
 
-  const tablaHTML = (cols, filas) => {
-    if (!filas.length) return `<div style="color:var(--faint);font-size:13px;padding:8px 0">Sin datos</div>`;
+  const tablaHTML = (cols, filas, opts = {}) => {
+    if (!filas.length) {
+      return `<div style="color:var(--faint);font-size:13px;padding:24px;text-align:center">Sin datos en este período</div>`;
+    }
     return `<div class="tabla-scroll"><table class="tabla-simple">
       <thead><tr>${cols.map((c, i) => `<th${i ? ' class="num"' : ""}>${c}</th>`).join("")}</tr></thead>
-      <tbody>${filas.map(f => `<tr>${f.map((c, i) => `<td${i ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${filas.map((f, ri) => {
+        const isTotal = opts.totalRowIndex === ri;
+        return `<tr${isTotal ? ' class="total-row"' : ""}>${f.map((c, i) => `<td${i ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`;
+      }).join("")}</tbody>
     </table></div>`;
   };
-  const bloque = (titulo, html) => `<div class="dashboard-summary" style="margin-bottom:16px"><div class="dashboard-summary-title">${titulo}</div>${html}</div>`;
-  const item = (label, value) => `<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-item-value">${value}</div></div>`;
 
+  const seccion = (titulo, sub, html) => `
+    <div class="dash-section">
+      <div class="dash-section-head">
+        <div class="dash-section-title">${titulo}</div>
+        ${sub ? `<div class="dash-section-sub">${sub}</div>` : ""}
+      </div>
+      ${html}
+    </div>`;
+
+  const bloque = (titulo, html) => `
+    <div class="dashboard-summary" style="margin-bottom:12px">
+      <div class="dashboard-summary-title">${titulo}</div>
+      ${html}
+    </div>`;
+
+  const item = (label, value) => `
+    <div class="summary-item">
+      <div class="summary-item-label">${label}</div>
+      <div class="summary-item-value">${value}</div>
+    </div>`;
+
+  // ── Preparar datos ──
   const todos = window.dashboardData.expedientes;
   const exps = todos.filter(e => /^\d{4}-\d{2}-\d{2}/.test(e.fecha || "")).map(e => ({ f: e.fecha.slice(0, 10), tags: tagsDe(e) }));
   const sinFecha = todos.length - exps.length;
@@ -1485,38 +1511,82 @@ function descargarTabla(nombre, hoja, rows) {
   };
   const periodLabel = periodLabels[period] || "Este mes";
 
+  const cuenta = (t, fn) => exps.filter(e => e.tags.includes(t) && fn(e.f)).length;
+  const pecMes = cuenta("pec", f => f.slice(0,7) === mesStr);
+  const pafMes = cuenta("paf", f => f.slice(0,7) === mesStr);
+  const larMes = cuenta("lar", f => f.slice(0,7) === mesStr);
+  const pecAnio = cuenta("pec", f => f.slice(0,4) === anioStr);
+  const pafAnio = cuenta("paf", f => f.slice(0,4) === anioStr);
+  const larAnio = cuenta("lar", f => f.slice(0,4) === anioStr);
+
+  const novedadesTotal = exps.filter(e => e.tags.includes("novedades")).length;
+  const pedidosTotal = exps.filter(e => e.tags.includes("pedido")).length;
+
+  // ── Cards principales ──
   const cards = `
     <div class="dashboard-cards">
-      <div class="dashboard-card"><div class="dashboard-card-label">Total</div><div class="dashboard-card-value">${exps.length}</div><div class="dashboard-card-sub">Todos los registros con fecha</div></div>
-      <div class="dashboard-card"><div class="dashboard-card-label">Hoy</div><div class="dashboard-card-value">${porDia[hoyStr] || 0}</div><div class="dashboard-card-sub">${hoyStr}</div></div>
-      <div class="dashboard-card"><div class="dashboard-card-label">Este mes</div><div class="dashboard-card-value">${porMes[mesStr] || 0}</div><div class="dashboard-card-sub">${labelMes(mesStr)}</div></div>
-      <div class="dashboard-card"><div class="dashboard-card-label">Este año</div><div class="dashboard-card-value">${porAnio[anioStr] || 0}</div><div class="dashboard-card-sub">${anioStr}</div></div>
+      <div class="dashboard-card">
+        <div class="dashboard-card-label">Total histórico</div>
+        <div class="dashboard-card-value">${exps.length}</div>
+        <div class="dashboard-card-sub">Con fecha registrada</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-card-label">Hoy</div>
+        <div class="dashboard-card-value">${porDia[hoyStr] || 0}</div>
+        <div class="dashboard-card-sub">${hoyStr}</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-card-label">Este mes</div>
+        <div class="dashboard-card-value">${porMes[mesStr] || 0}</div>
+        <div class="dashboard-card-sub">${labelMes(mesStr)}</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="dashboard-card-label">Este año</div>
+        <div class="dashboard-card-value">${porAnio[anioStr] || 0}</div>
+        <div class="dashboard-card-sub">${anioStr}</div>
+      </div>
+      <div class="dashboard-card accent-nov">
+        <div class="dashboard-card-label">Novedades</div>
+        <div class="dashboard-card-value">${novedadesTotal}</div>
+        <div class="dashboard-card-sub">Histórico</div>
+      </div>
+      <div class="dashboard-card accent-ped">
+        <div class="dashboard-card-label">Pedidos</div>
+        <div class="dashboard-card-value">${pedidosTotal}</div>
+        <div class="dashboard-card-sub">Histórico</div>
+      </div>
     </div>`;
 
-  const promedios = bloque(`Promedios — ${periodLabel}`, `<div class="dashboard-summary-grid">
+  // ── Cards PEC / PAF / LAR ──
+  const cardsTags = `
+    <div class="dashboard-cards">
+      <div class="dashboard-card accent-pec">
+        <div class="dashboard-card-label">PEC · Este mes</div>
+        <div class="dashboard-card-value">${pecMes}</div>
+        <div class="dashboard-card-sub">${pecAnio} en ${anioStr}</div>
+      </div>
+      <div class="dashboard-card accent-paf">
+        <div class="dashboard-card-label">PAF · Este mes</div>
+        <div class="dashboard-card-value">${pafMes}</div>
+        <div class="dashboard-card-sub">${pafAnio} en ${anioStr}</div>
+      </div>
+      <div class="dashboard-card accent-lar">
+        <div class="dashboard-card-label">LAR · Este mes</div>
+        <div class="dashboard-card-value">${larMes}</div>
+        <div class="dashboard-card-sub">${larAnio} en ${anioStr}</div>
+      </div>
+    </div>`;
+
+  // ── Promedios ──
+  const promediosHTML = `<div class="dashboard-summary-grid">
     ${item("Expedientes en el período", totalPeriodo)}
     ${item("Días con actividad", diasPeriodo.length)}
     ${item("Promedio por día con actividad", prom(totalPeriodo, diasPeriodo.length))}
-    ${item("Promedio por día corrido", prom(totalPeriodo, calendario) + ` <small style="color:var(--faint)">(${calendario} d)</small>`)}
-    ${item("Promedio por día hábil (L–V)", prom(totalPeriodo, habiles) + ` <small style="color:var(--faint)">(${habiles} d)</small>`)}
-  </div>`);
+    ${item("Promedio por día corrido", prom(totalPeriodo, calendario) + ` <small>(${calendario} d)</small>`)}
+    ${item("Promedio por día hábil (L–V)", prom(totalPeriodo, habiles) + ` <small>(${habiles} d)</small>`)}
+  </div>`;
 
-  const filasAnio = Object.keys(porAnio).sort().reverse()
-    .map(a => [a, porAnio[a], diasAnio[a], prom(porAnio[a], diasAnio[a])]);
-  const tAnio = bloque("Expedientes por año", tablaHTML(["Año", "Total", "Días con actividad", "Prom./día activo"], filasAnio));
-
-  const filasMes = Object.keys(porMes).sort().reverse().map(m => {
-    const [y, mm] = m.split("-").map(Number);
-    let dias = new Date(y, mm, 0).getDate();
-    if (m === mesStr) dias = hoy.getDate();
-    return [labelMes(m), porMes[m], diasMes[m], prom(porMes[m], diasMes[m]), prom(porMes[m], dias)];
-  });
-  const tMes = bloque("Expedientes por mes", tablaHTML(["Mes", "Total", "Días con actividad", "Prom./día activo", "Prom./día corrido"], filasMes));
-
-  const filasDia = diasPeriodo.map(f => [`${DIAS_SEM[new Date(f + "T00:00:00").getDay()]} ${f}`, porDia[f]]);
-  const tDia = bloque(`Expedientes por día — ${periodLabel}`, tablaHTML(["Día", "Total"], filasDia));
-
-  const cuenta = (t, fn) => exps.filter(e => e.tags.includes(t) && fn(e.f)).length;
+  // ── Tablas ──
   const filasTag = TAGS_PERSONAL.map(t => [
     t.toUpperCase(),
     cuenta(t, () => true),
@@ -1524,8 +1594,13 @@ function descargarTabla(nombre, hoja, rows) {
     cuenta(t, f => f.slice(0, 7) === mesStr),
     cuenta(t, f => f >= startStr && f <= endStr),
   ]);
-  filasTag.push(["TOTAL", ...[1, 2, 3, 4].map(i => filasTag.reduce((s, r) => s + r[i], 0))]);
-  const tTags = bloque("Personal: PEC / PAF / LAR", tablaHTML(["Tag", "Histórico", "Este año", "Este mes", periodLabel], filasTag));
+  const totalRow = ["TOTAL", ...[1, 2, 3, 4].map(i => filasTag.reduce((s, r) => s + r[i], 0))];
+  filasTag.push(totalRow);
+  const tTags = bloque("PEC / PAF / LAR", tablaHTML(
+    ["Tag", "Histórico", "Este año", "Este mes", periodLabel],
+    filasTag,
+    { totalRowIndex: filasTag.length - 1 }
+  ));
 
   const mesesTag = {};
   exps.forEach(e => TAGS_PERSONAL.forEach(t => {
@@ -1536,11 +1611,45 @@ function descargarTabla(nombre, hoja, rows) {
   }));
   const filasTagMes = Object.keys(mesesTag).sort().reverse()
     .map(m => [labelMes(m), mesesTag[m].pec, mesesTag[m].paf, mesesTag[m].lar, mesesTag[m].pec + mesesTag[m].paf + mesesTag[m].lar]);
-  const tTagsMes = bloque("PEC / PAF / LAR por mes", tablaHTML(["Mes", "PEC", "PAF", "LAR", "Total"], filasTagMes));
+  const tTagsMes = bloque("PEC / PAF / LAR por mes", tablaHTML(
+    ["Mes", "PEC", "PAF", "LAR", "Total"], filasTagMes
+  ));
 
-  const nota = sinFecha ? `<div style="font-size:12px;color:var(--faint);margin-top:4px">${sinFecha} expediente(s) sin fecha no se cuentan en las tablas.</div>` : "";
+  const filasMes = Object.keys(porMes).sort().reverse().map(m => {
+    const [y, mm] = m.split("-").map(Number);
+    let dias = new Date(y, mm, 0).getDate();
+    if (m === mesStr) dias = hoy.getDate();
+    return [labelMes(m), porMes[m], diasMes[m], prom(porMes[m], diasMes[m]), prom(porMes[m], dias)];
+  });
+  const tMes = bloque("Expedientes por mes", tablaHTML(
+    ["Mes", "Total", "Días activos", "Prom./día activo", "Prom./día corrido"], filasMes
+  ));
 
-  content.innerHTML = cards + promedios + tTags + tTagsMes + tMes + tAnio + tDia + nota;
+  const filasAnio = Object.keys(porAnio).sort().reverse()
+    .map(a => [a, porAnio[a], diasAnio[a], prom(porAnio[a], diasAnio[a])]);
+  const tAnio = bloque("Expedientes por año", tablaHTML(
+    ["Año", "Total", "Días activos", "Prom./día activo"], filasAnio
+  ));
+
+  const filasDia = diasPeriodo.map(f => [
+    `${DIAS_SEM[new Date(f + "T00:00:00").getDay()]} ${f}`,
+    porDia[f]
+  ]);
+  const tDia = bloque(`Expedientes por día · ${periodLabel}`, tablaHTML(
+    ["Día", "Total"], filasDia
+  ));
+
+  const nota = sinFecha
+    ? `<div style="font-size:12px;color:var(--faint);margin-top:4px;text-align:right">${sinFecha} registro(s) sin fecha no se incluyen en las tablas.</div>`
+    : "";
+
+  content.innerHTML =
+    seccion("Resumen general", `${periodLabel} · ${new Date().toLocaleDateString("es-AR")}`, cards) +
+    seccion("Personal PEC / PAF / LAR", "Conteos del mes en curso", cardsTags) +
+    seccion(`Promedios · ${periodLabel}`, "", bloque("Indicadores del período", promediosHTML)) +
+    seccion("Distribución de personal", "", tTags + tTagsMes) +
+    seccion("Actividad por período", "", tMes + tAnio + tDia) +
+    nota;
 }
 
         // ── Cargar Dashboard (expone globalmente) ──
