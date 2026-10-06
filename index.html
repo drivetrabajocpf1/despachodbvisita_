@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    /* ── Tu CSS original, sin cambios ── */
     :root {
       --bg:#f5f4f1; --surface:#fff; --border:#e2e0da; --border-md:#cccac2;
       --text:#1a1916; --muted:#7a7870; --faint:#b0ada4;
@@ -90,6 +91,7 @@
     .btn-sm{padding:6px 12px;font-size:12px}
     .btn-excel{background:#1a7a4a;color:#fff;border-color:#1a7a4a;font-size:12.5px;padding:8px 14px}
     .btn-excel:hover{opacity:.88;background:#1a7a4a}
+    .btn-excel svg{flex-shrink:0}
 
     .filter-bar{padding:16px 32px;border-bottom:1px solid var(--border);background:var(--bg);display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
     .filter-bar .field{flex:1;min-width:120px}
@@ -161,7 +163,6 @@
     .modal-close:hover{color:var(--text);background:var(--bg)}
     .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
 
-    /* ── Dashboard ── */
     .dashboard-wrap{flex:1;padding:24px 32px;background:var(--bg);overflow-y:auto}
     .dashboard-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .dashboard-select{font-family:"DM Sans",sans-serif;font-size:13px;padding:8px 32px 8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;outline:none;transition:border-color .15s;min-width:140px;-webkit-appearance:none;appearance:none;
@@ -190,7 +191,6 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .dashboard-error{background:var(--danger-bg);border:1px solid #f5c6cb;color:var(--danger);padding:16px;border-radius:var(--radius);margin-bottom:16px;text-align:center;font-size:14px}
 
-    /* ── Tablas del dashboard ── */
     .tabla-scroll{overflow-x:auto;margin-top:4px}
     .tabla-simple{width:100%;border-collapse:collapse;font-size:13px}
     .tabla-simple th,.tabla-simple td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
