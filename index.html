@@ -191,10 +191,19 @@
       .chip-tag { background:var(--tag-bg); color:var(--tag-text); border-color:transparent; }
       .chip-green { background:var(--tag-bg2); color:var(--tag-text2); border-color:transparent; }
       .chip-fecha { color:var(--faint); border-color:transparent; background:transparent; font-size:11px; }
-      .card-actions { display:flex; gap:2px; flex-shrink:0; opacity:0; transition:opacity .15s; align-items:flex-start; }
+      .card-actions { 
+  display:flex; 
+  gap:2px; 
+  flex-shrink:0; 
+  opacity:0; 
+  transition:opacity .15s; 
+  align-items:flex-start; 
+}
 
-      .card:hover .card-actions,
-      .personal-card:hover .card-actions { opacity:1; }
+.card:hover .card-actions,
+.personal-card:hover .card-actions { 
+  opacity:1; 
+}
 
       /* ── Cards personal ── */
       .personal-card {
@@ -267,14 +276,14 @@
 
       /* ── Dashboard ── */
       .dashboard-wrap { flex:1; padding:24px 32px; background:var(--bg); overflow-y:auto; }
-
+      
       .dashboard-header {
         display:flex; align-items:center; justify-content:space-between; 
         margin-bottom:20px; flex-wrap:wrap; gap:12px;
       }
-
+      
       .dashboard-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-
+      
       .dashboard-select {
         font-family:"DM Sans",sans-serif; font-size:13px; padding:8px 32px 8px 12px;
         border:1px solid var(--border); border-radius:var(--radius);
@@ -287,63 +296,90 @@
         -moz-appearance:none;
         appearance:none;
       }
-
+      
       .dashboard-select:hover { border-color:var(--border-md); }
       .dashboard-select:focus { border-color:var(--text); box-shadow:0 0 0 3px rgba(26,25,22,.08); }
-
+      
       .dashboard-cards {
         display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
         gap:12px; margin-bottom:24px;
       }
-
+      
       .dashboard-card {
         background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
         padding:18px 20px; transition:border-color .15s,box-shadow .15s;
       }
-
+      
       .dashboard-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-
+      
       .dashboard-card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:6px; }
-
+      
       .dashboard-card-value { font-size:28px; font-weight:500; letter-spacing:-.02em; font-family:"DM Mono",monospace; color:var(--text); line-height:1.1; }
-
+      
       .dashboard-card-sub { font-size:11px; color:var(--faint); margin-top:4px; }
-
+      
+      .dashboard-charts {
+        display:grid; grid-template-columns:1fr;
+        gap:16px; margin-bottom:16px;
+      }
+      
+      .dashboard-charts-2col {
+        display:grid; grid-template-columns:1fr 1fr;
+        gap:16px; margin-bottom:16px;
+      }
+      
+      .chart-card {
+        background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+        padding:20px; transition:border-color .15s,box-shadow .15s;
+      }
+      
+      .chart-card:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
+      
+      .chart-card-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:14px; color:var(--text); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+      
+      .chart-card-title .chart-meta { font-size:11px; color:var(--muted); font-weight:400; }
+      
+      .chart-card-body { position:relative; min-height:260px; }
+      
+      .chart-card-body canvas { width:100% !important; height:auto !important; max-height:300px; }
+      
+      .chart-card-body .chart-loading { display:flex; align-items:center; justify-content:center; height:260px; color:var(--faint); font-size:13px; }
+      
       .dashboard-summary {
         background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
         padding:20px; transition:border-color .15s,box-shadow .15s;
       }
-
+      
       .dashboard-summary:hover { border-color:var(--border-md); box-shadow:var(--shadow); }
-
+      
       .dashboard-summary-title { font-size:14px; font-weight:500; letter-spacing:-.01em; margin-bottom:14px; color:var(--text); }
-
+      
       .dashboard-summary-grid {
         display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
         gap:12px;
       }
-
+      
       .summary-item {
         padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius);
         background:var(--bg);
       }
-
+      
       .summary-item-label { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; margin-bottom:4px; }
-
+      
       .summary-item-value { font-size:14px; font-weight:500; font-family:"DM Mono",monospace; color:var(--text); }
-
+      
       .dashboard-loading {
         display:flex; flex-direction:column; align-items:center; justify-content:center;
         padding:40px; color:var(--muted); gap:12px;
       }
-
+      
       .spinner {
         width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--text);
         border-radius:50%; animation:spin 0.8s linear infinite;
       }
-
+      
       @keyframes spin { to { transform:rotate(360deg); } }
-
+      
       .dashboard-error {
         background:var(--danger-bg); border:1px solid #f5c6cb; color:var(--danger);
         padding:16px; border-radius:var(--radius); margin-bottom:16px;
@@ -354,16 +390,11 @@
         font-size:12px; color:var(--muted); font-weight:400;
       }
 
-      /* ── Tablas del dashboard (reemplazan Chart.js) ── */
-      .tabla-scroll { overflow-x:auto; margin-top:4px; }
-      .tabla-simple { width:100%; border-collapse:collapse; font-size:13px; }
-      .tabla-simple th,.tabla-simple td { padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); }
-      .tabla-simple th { font-weight:500; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; background:var(--bg); }
-      .tabla-simple td.num,.tabla-simple th.num { text-align:right; font-family:"DM Mono",monospace; }
-      .tabla-simple tr:last-child td { border-bottom:none; }
-      .tabla-simple tbody tr:hover td { background:var(--bg); }
-
       /* ── Responsive ── */
+      @media (max-width:900px) {
+        .dashboard-charts-2col { grid-template-columns:1fr; }
+      }
+
       @media (max-width:720px) {
         .layout { grid-template-columns:1fr; }
         .sidebar { position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); }
@@ -372,6 +403,8 @@
         .form-section,.results-wrap,.filter-bar,.stats-bar,.topbar,.dashboard-wrap { padding-left:16px; padding-right:16px; }
         .login-wrap { padding:20px; }
         .dashboard-cards { grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); }
+        .dashboard-charts-2col { grid-template-columns:1fr; }
+        .chart-card-body { min-height:200px; }
       }
     </style>
   </head>
@@ -470,4 +503,1843 @@
             </svg>
             Ver novedades
           </button>
-          <button
+          <button class="nav-item" id="navNuevaNovedad" onclick="setPanel('nuevaNovedad',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            Cargar novedad
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">Pedidos</div>
+          <button class="nav-item" id="navPedidos" onclick="setPanel('pedidos',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            Ver pedidos
+          </button>
+          <button class="nav-item" id="navNuevoPedido" onclick="setPanel('nuevoPedido',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            Cargar pedido
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">Personal</div>
+          <button class="nav-item" id="navPersonal" onclick="setPanel('personal',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Ver personal
+          </button>
+          <button class="nav-item" id="navNuevoPersonal" onclick="setPanel('nuevoPersonal',this)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+            Cargar personal
+          </button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="user-pill">
+            <div class="avatar" id="avatar">--</div>
+            <div class="user-info">
+              <div class="user-email" id="userEmail">—</div>
+              <div class="user-status">Conectado</div>
+            </div>
+            <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+
+        <!-- ══ Panel Dashboard ══ -->
+        <div class="panel active" id="panelDashboard">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Dashboard</div>
+              <div class="page-sub">Resumen general de actividad</div>
+            </div>
+            <div class="dashboard-filters">
+              <select id="dashboardPeriodo" class="dashboard-select" onchange="cargarDashboard()">
+                <option value="este_mes">Este mes</option>
+                <option value="mes_anterior">Mes anterior</option>
+                <option value="ultimos_3">Últimos 3 meses</option>
+                <option value="ultimos_6">Últimos 6 meses</option>
+                <option value="este_ano">Este año</option>
+                <option value="ano_anterior">Año anterior</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="dashboard-wrap">
+            <div id="dashboardContent">
+              <div class="dashboard-loading">
+                <div class="spinner"></div>
+                <span style="font-size:13px;">Cargando estadísticas...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Lista Expedientes ══ -->
+        <div class="panel" id="panelLista">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Expedientes</div>
+              <div class="page-sub">Registros de la base de datos</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="statTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="statMes">—</div>
+              <div class="stat-label">Este mes</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="statFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Expediente</label>
+              <input id="f_numero" placeholder="Buscar por número…" oninput="buscar()"/>
+            </div>
+            <div class="field">
+              <label>Tag</label>
+              <input id="f_tag" placeholder="Filtrar por tag…" oninput="buscar()"/>
+            </div>
+            <div class="field">
+              <label>Interno</label>
+              <input id="f_interno" placeholder="Filtrar por interno…" oninput="buscar()"/>
+            </div>
+            <div class="field">
+              <label>LPU</label>
+              <input id="f_lpu" placeholder="Filtrar por LPU…" oninput="buscar()"/>
+            </div>
+            <div class="field" style="max-width:150px">
+              <label>Fecha</label>
+              <input id="f_fecha" type="date" onchange="buscar()"/>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltros()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div class="results-count" id="resultsCount"></div>
+              <button class="btn btn-excel btn-sm" onclick="exportarExcel()" title="Descargar expedientes filtrados como Excel">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="resultados"></div>
+            <div class="pagination" id="paginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Expediente ══ -->
+        <div class="panel" id="panelNuevo">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo expediente</div>
+              <div class="page-sub">Completá y guardá el registro</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:720px">
+              <div class="field col-2">
+                <label for="numero">N° expediente *</label>
+                <input id="numero" placeholder="EX-2026-..."/>
+              </div>
+              <div class="field">
+                <label for="fecha">Fecha</label>
+                <input id="fecha" type="date"/>
+              </div>
+              <div class="field">
+                <label for="tag">Tag</label>
+                <input id="tag" maxlength="20" placeholder="pedido,ur6, fiesta..."/>
+              </div>
+              <div class="field col-4">
+                <label for="detalle">Detalle *</label>
+                <textarea id="detalle" placeholder="masomenos de que es"></textarea>
+              </div>
+              <div class="field col-2">
+                <label for="interno">Interno</label>
+                <input id="interno" placeholder="Nombre del interno"/>
+              </div>
+              <div class="field col-2">
+                <label for="lpu">LPU</label>
+                <input id="lpu" placeholder="LPU"/>
+              </div>
+            </div>
+            <div class="error-msg" id="formError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardar()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormulario()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Novedades ══ -->
+        <div class="panel" id="panelNovedades">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Novedades</div>
+              <div class="page-sub">Expedientes con tag "novedades"</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="nStatTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="nStatMes">—</div>
+              <div class="stat-label">Este mes</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="nStatFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Expediente</label>
+              <input id="nf_numero" placeholder="Buscar por número…" oninput="buscarNovedades()"/>
+            </div>
+            <div class="field">
+              <label>Interno</label>
+              <input id="nf_interno" placeholder="Filtrar por interno…" oninput="buscarNovedades()"/>
+            </div>
+            <div class="field">
+              <label>LPU</label>
+              <input id="nf_lpu" placeholder="Filtrar por LPU…" oninput="buscarNovedades()"/>
+            </div>
+            <div class="field" style="max-width:150px">
+              <label>Fecha</label>
+              <input id="nf_fecha" type="date" onchange="buscarNovedades()"/>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosNovedades()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div class="results-count" id="nResultsCount"></div>
+              <button class="btn btn-excel btn-sm" onclick="exportarNovedadesExcel()" title="Descargar novedades filtradas como Excel">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="nResultados"></div>
+            <div class="pagination" id="nPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nueva Novedad ══ -->
+        <div class="panel" id="panelNuevaNovedad">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nueva novedad</div>
+              <div class="page-sub">Se guarda como expediente con tag "novedades"</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:720px">
+              <div class="field col-2">
+                <label for="n_numero">N° expediente *</label>
+                <input id="n_numero" placeholder="EX-2026-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="n_fecha">Fecha</label>
+                <input id="n_fecha" type="date"/>
+              </div>
+              <div class="field col-4">
+                <label for="n_detalle">Detalle *</label>
+                <textarea id="n_detalle" placeholder="masomenos de que es"></textarea>
+              </div>
+              <div class="field col-2">
+                <label for="n_interno">Interno</label>
+                <input id="n_interno" placeholder="Nombre del interno"/>
+              </div>
+              <div class="field col-2">
+                <label for="n_lpu">LPU</label>
+                <input id="n_lpu" placeholder="LPU"/>
+              </div>
+            </div>
+            <div class="error-msg" id="nFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarNovedad()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioNovedad()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Pedidos ══ -->
+        <div class="panel" id="panelPedidos">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Pedidos</div>
+              <div class="page-sub">Expedientes con tag "pedido"</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatMes">—</div>
+              <div class="stat-label">Este mes</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pdStatFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Expediente</label>
+              <input id="pdf_numero" placeholder="Buscar por número…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field">
+              <label>Interno</label>
+              <input id="pdf_interno" placeholder="Filtrar por interno…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field">
+              <label>LPU</label>
+              <input id="pdf_lpu" placeholder="Filtrar por LPU…" oninput="buscarPedidos()"/>
+            </div>
+            <div class="field" style="max-width:150px">
+              <label>Fecha</label>
+              <input id="pdf_fecha" type="date" onchange="buscarPedidos()"/>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPedidos()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div class="results-count" id="pdResultsCount"></div>
+              <button class="btn btn-excel btn-sm" onclick="exportarPedidosExcel()" title="Descargar pedidos filtrados como Excel">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="pdResultados"></div>
+            <div class="pagination" id="pdPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Pedido ══ -->
+        <div class="panel" id="panelNuevoPedido">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo pedido</div>
+              <div class="page-sub">Se guarda como expediente con tag "pedido"</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:720px">
+              <div class="field col-2">
+                <label for="pd_numero">N° expediente *</label>
+                <input id="pd_numero" placeholder="EX-2026-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_fecha">Fecha</label>
+                <input id="pd_fecha" type="date"/>
+              </div>
+              <div class="field col-4">
+                <label for="pd_detalle">Detalle *</label>
+                <textarea id="pd_detalle" placeholder="masomenos de que es"></textarea>
+              </div>
+              <div class="field col-2">
+                <label for="pd_interno">Interno</label>
+                <input id="pd_interno" placeholder="Nombre del interno"/>
+              </div>
+              <div class="field col-2">
+                <label for="pd_lpu">LPU</label>
+                <input id="pd_lpu" placeholder="LPU"/>
+              </div>
+            </div>
+            <div class="error-msg" id="pdFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarPedido()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioPedido()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Personal ══ -->
+        <div class="panel" id="panelPersonal">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Personal</div>
+              <div class="page-sub">Directorio del personal</div>
+            </div>
+          </div>
+
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-num" id="pStatTotal">—</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pStatSectores">—</div>
+              <div class="stat-label">Sectores</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num" id="pStatFiltrados">—</div>
+              <div class="stat-label">Filtrados</div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field">
+              <label>Nombre / Apellido</label>
+              <input id="pf_nombre" placeholder="Buscar…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Grado</label>
+              <input id="pf_grado" placeholder="Filtrar por grado…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Credencial</label>
+              <input id="pf_credencial" placeholder="Filtrar por credencial…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Sector</label>
+              <input id="pf_sector" placeholder="Filtrar por sector…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field">
+              <label>Curso / Título</label>
+              <input id="pf_curso" placeholder="Filtrar por curso…" oninput="buscarPersonal()"/>
+            </div>
+            <div class="field" style="max-width:140px">
+              <label>Turno</label>
+              <select id="pf_turno" onchange="buscarPersonal()">
+                <option value="">Todos</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="Rotativo">Rotativo</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPersonal()">Limpiar</button>
+          </div>
+
+          <div class="results-wrap">
+            <div class="results-header">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div class="results-count" id="pResultsCount"></div>
+                <div class="sort-tabs">
+                  <span style="font-size:11px;color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;">Ordenar:</span>
+                  <button class="sort-btn active" id="sortBtn_apellido" onclick="setSortPersonal('apellido',this)">Apellido</button>
+                  <button class="sort-btn" id="sortBtn_grado" onclick="setSortPersonal('grado',this)">Grado</button>
+                  <button class="sort-btn" id="sortBtn_credencial" onclick="setSortPersonal('credencial',this)">
+                    Credencial <span class="sort-arrow" id="sortArrow_credencial"></span>
+                  </button>
+                  <button class="sort-btn" id="sortBtn_sector" onclick="setSortPersonal('sector',this)">Sector</button>
+                  <button class="sort-btn" id="sortBtn_curso_titulo" onclick="setSortPersonal('curso_titulo',this)">Curso</button>
+                </div>
+              </div>
+              <button class="btn btn-excel btn-sm" onclick="exportarPersonalExcel()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exportar Excel
+              </button>
+            </div>
+            <div id="pResultados"></div>
+            <div class="pagination" id="pPaginacion" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- ══ Panel Nuevo Personal ══ -->
+        <div class="panel" id="panelNuevoPersonal">
+          <div class="topbar">
+            <div>
+              <div class="page-title">Nuevo personal</div>
+              <div class="page-sub">Completá y guardá el registro</div>
+            </div>
+          </div>
+          <div class="form-section" style="flex:1">
+            <div class="form-grid form-grid-4" style="max-width:860px">
+
+              <!-- Fila 1 -->
+              <div class="field">
+                <label for="p_grado">Grado</label>
+                <input id="p_grado" placeholder="Ej: Inspector"/>
+              </div>
+              <div class="field">
+                <label for="p_nombre">Nombre *</label>
+                <input id="p_nombre" placeholder="Nombre"/>
+              </div>
+              <div class="field">
+                <label for="p_apellido">Apellido *</label>
+                <input id="p_apellido" placeholder="Apellido"/>
+              </div>
+              <div class="field">
+                <label for="p_credencial">Credencial</label>
+                <input id="p_credencial" placeholder="Nro. credencial"/>
+              </div>
+
+              <!-- Fila 2 -->
+              <div class="field">
+                <label for="p_dni">DNI</label>
+                <input id="p_dni" placeholder="00.000.000"/>
+              </div>
+              <div class="field">
+                <label for="p_cuil">CUIL</label>
+                <input id="p_cuil" placeholder="20-00000000-0"/>
+              </div>
+              <div class="field">
+                <label for="p_telefono">Teléfono</label>
+                <input id="p_telefono" placeholder="+54 11 ..."/>
+              </div>
+              <div class="field">
+                <label for="p_mail">Mail</label>
+                <input id="p_mail" type="email" placeholder="correo@..."/>
+              </div>
+
+              <!-- Fila 3 -->
+              <div class="field">
+                <label for="p_usuario_gde">Usuario GDE</label>
+                <input id="p_usuario_gde" placeholder="Usuario GDE"/>
+              </div>
+              <div class="field col-2">
+                <label for="p_direccion">Dirección</label>
+                <input id="p_direccion" placeholder="Calle, nro, ciudad"/>
+              </div>
+              <div class="field">
+                <label for="p_sector">Sector</label>
+                <input id="p_sector" placeholder="Sector / área"/>
+              </div>
+              <div class="field">
+                <label for="p_turno">Turno</label>
+                <select id="p_turno">
+                  <option value="">Sin especificar</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="Rotativo">Rotativo</option>
+                </select>
+              </div>
+
+              <!-- Fila 4 -->
+              <div class="field col-2">
+                <label for="p_expediente_oi">Expediente OI</label>
+                <input id="p_expediente_oi" placeholder="EX-OI-..."/>
+              </div>
+              <div class="field col-2">
+                <label for="p_numero_oi">Número OI</label>
+                <input id="p_numero_oi" placeholder="Nro. OI"/>
+              </div>
+
+              <!-- Fila 5 -->
+              <div class="field col-4">
+                <label for="p_curso_titulo">Curso / Título</label>
+                <input id="p_curso_titulo" placeholder="Ej: Tecnicatura en Seguridad, Curso de..."/>
+              </div>
+
+              <!-- Fila 6 -->
+              <div class="field col-4">
+                <label for="p_detalle">Detalle / Observaciones</label>
+                <textarea id="p_detalle" placeholder="Cualquier información adicional..."></textarea>
+              </div>
+            </div>
+
+            <div class="error-msg" id="pFormError"></div>
+            <div class="form-actions" style="margin-top:20px">
+              <button class="btn btn-primary" onclick="guardarPersonal()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Guardar
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormularioPersonal()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ── Modal edición expediente ── -->
+    <div class="overlay" id="editOverlay" onclick="overlayClick(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Editar expediente</div>
+          <button class="modal-close" onclick="cerrarModal('editOverlay')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="editId"/>
+        <div class="form-grid form-grid-2" style="gap:12px">
+          <div class="field"><label>N° expediente</label><input id="editNumero"/></div>
+          <div class="field"><label>Fecha</label><input id="editFecha" type="date"/></div>
+          <div class="field col-2"><label>Detalle</label><textarea id="editDetalle"></textarea></div>
+          <div class="field"><label>Interno</label><input id="editInterno"/></div>
+          <div class="field"><label>LPU</label><input id="editLpu"/></div>
+          <div class="field col-2"><label>Tag</label><input id="editTag" maxlength="20"/></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="cerrarModal('editOverlay')">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modal edición personal ── -->
+    <div class="overlay" id="editPersonalOverlay" onclick="overlayClickPersonal(event)">
+      <div class="modal" style="max-width:640px">
+        <div class="modal-header">
+          <div class="modal-title">Editar personal</div>
+          <button class="modal-close" onclick="cerrarModal('editPersonalOverlay')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="ep_id"/>
+        <div class="form-grid form-grid-2" style="gap:12px">
+          <div class="field"><label>Grado</label><input id="ep_grado"/></div>
+          <div class="field"><label>Nombre *</label><input id="ep_nombre"/></div>
+          <div class="field"><label>Apellido *</label><input id="ep_apellido"/></div>
+          <div class="field"><label>Credencial</label><input id="ep_credencial"/></div>
+          <div class="field"><label>DNI</label><input id="ep_dni"/></div>
+          <div class="field"><label>CUIL</label><input id="ep_cuil"/></div>
+          <div class="field"><label>Teléfono</label><input id="ep_telefono"/></div>
+          <div class="field"><label>Mail</label><input id="ep_mail" type="email"/></div>
+          <div class="field"><label>Usuario GDE</label><input id="ep_usuario_gde"/></div>
+          <div class="field"><label>Sector</label><input id="ep_sector"/></div>
+          <div class="field"><label>Turno</label>
+            <select id="ep_turno">
+              <option value="">Sin especificar</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="Rotativo">Rotativo</option>
+            </select>
+          </div>
+          <div class="field col-2"><label>Dirección</label><input id="ep_direccion"/></div>
+          <div class="field"><label>Expediente OI</label><input id="ep_expediente_oi"/></div>
+          <div class="field"><label>Número OI</label><input id="ep_numero_oi"/></div>
+          <div class="field col-2"><label>Curso / Título</label><input id="ep_curso_titulo"/></div>
+          <div class="field col-2"><label>Detalle</label><textarea id="ep_detalle"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="cerrarModal('editPersonalOverlay')">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarEdicionPersonal()">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      // ============================================================
+      //  Variables GLOBALES (visibles desde window y desde el módulo)
+      // ============================================================
+      window.dashboardData = {
+        expedientes: [],
+        personal: []
+      };
+      window.user = null;
+
+      const PAGE_SIZE = 10;
+      const NOVEDADES_TAG = "novedades";
+      const PEDIDOS_TAG = "pedido";
+
+      // Expedientes
+      let allData = [];
+      let currentPage = 1;
+
+      // Novedades
+      let allNovedades = [];
+      let currentPageN = 1;
+
+      // Pedidos
+      let allPedidos = [];
+      let currentPagePd = 1;
+
+      // Personal
+      let allPersonal = [];
+      let currentPageP = 1;
+      let sortFieldP = "apellido";
+      let sortAscP = true;
+      const personalMap = {};
+
+      // ============================================================
+//  Descarga: XLSX si la librería cargó, si no CSV (fallback)
+// ============================================================
+function descargarTabla(nombre, hoja, rows) {
+  if (!rows || !rows.length) { alert("No hay datos para exportar."); return; }
+  const fecha = new Date().toISOString().slice(0, 10);
+
+  // Si XLSX está disponible, usar .xlsx
+  try {
+    if (typeof XLSX !== "undefined" && XLSX && XLSX.utils) {
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws["!cols"] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || "").length), 12) }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, hoja);
+      XLSX.writeFile(wb, `${nombre}_${fecha}.xlsx`);
+      return;
+    }
+  } catch (e) { console.warn("XLSX falló, uso CSV:", e); }
+
+  // Fallback: CSV con BOM (Excel lo abre directo con acentos OK)
+  const cols = Object.keys(rows[0]);
+  const q = s => `"${String(s ?? "").replace(/"/g, '""').replace(/\r?\n/g, " ")}"`;
+  const csv = "\uFEFF" + [
+    cols.map(q).join(";"),
+    ...rows.map(r => cols.map(c => q(r[c])).join(";"))
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${nombre}_${fecha}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+      // ============================================================
+      //  Firebase (se carga en un módulo para usar import)
+      // ============================================================
+      (async function initFirebase() {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+        const { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } = await import(
+          "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+        );
+        const { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } = await import(
+          "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+        );
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyB1o6zNVuTGVbSW9Srp6ihKm600okjO1lo",
+          authDomain: "despachovisitacpf1.firebaseapp.com",
+          projectId: "despachovisitacpf1",
+          storageBucket: "despachovisitacpf1.firebasestorage.app",
+          messagingSenderId: "237378635866",
+          appId: "1:237378635866:web:704780e83e187bd3e67063"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Exponer auth y db globalmente para las funciones
+        window.auth = auth;
+        window.db = db;
+
+        // ── Funciones de autenticación ──
+        window.login = async function () {
+          const emailVal = document.getElementById("email").value.trim();
+          const passVal = document.getElementById("password").value;
+          const errEl = document.getElementById("loginError");
+          errEl.classList.remove("show");
+          if (!emailVal || !passVal) { showErr(errEl, "Completá email y contraseña."); return; }
+          try {
+            await signInWithEmailAndPassword(auth, emailVal, passVal);
+          } catch (error) {
+            showErr(errEl, traducirErrorAuth(error.code));
+          }
+        };
+
+        window.logout = async function () {
+          await signOut(auth);
+          document.getElementById("resultados").innerHTML = "";
+        };
+
+        function traducirErrorAuth(code) {
+          const map = {
+            "auth/invalid-email": "Email inválido.",
+            "auth/user-not-found": "Usuario no encontrado.",
+            "auth/wrong-password": "Contraseña incorrecta.",
+            "auth/invalid-credential": "Email o contraseña incorrectos.",
+            "auth/too-many-requests": "Demasiados intentos. Probá más tarde.",
+          };
+          return map[code] || "Error al iniciar sesión.";
+        }
+
+        // ── Estado de autenticación ──
+        onAuthStateChanged(auth, (u) => {
+          if (u) {
+            window.user = u;
+            showApp();
+            cargarDashboard();
+            buscar();
+          } else {
+            window.user = null;
+            document.getElementById("loginWrap").style.display = "flex";
+            document.getElementById("appWrap").style.display = "none";
+          }
+        });
+
+        function showApp() {
+          document.getElementById("loginWrap").style.display = "none";
+          document.getElementById("appWrap").style.display = "grid";
+          const email = window.user.email;
+          document.getElementById("userEmail").textContent = email;
+          document.getElementById("avatar").textContent = email.slice(0, 2).toUpperCase();
+        }
+
+        // ── Funciones de utilidad (compartidas) ──
+        function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
+        function esc(str) {
+          if (!str) return "";
+          return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+        function showErr(el, msg) { el.textContent = msg; el.classList.add("show"); }
+        function isValidDate(dateString) {
+          if (!dateString) return false;
+          const date = new Date(dateString);
+          return !isNaN(date.getTime());
+        }
+
+        function normalizeTag(tag) {
+          if (!tag) return "";
+          return tag.trim().toLowerCase().replace(/\s+/g, " ");
+        }
+
+        function normalizeUR(tag) {
+          if (!tag) return null;
+          const normalized = normalizeTag(tag);
+          const urMatch = normalized.match(/^ur\s*(\d+)$/);
+          if (urMatch) {
+            return `UR ${parseInt(urMatch[1])}`;
+          }
+          return null;
+        }
+
+        function getDateRange(period) {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth();
+          let start, end;
+          switch (period) {
+            case "este_mes":
+              start = new Date(year, month, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "mes_anterior":
+              start = new Date(year, month - 1, 1);
+              end = new Date(year, month, 0);
+              break;
+            case "ultimos_3":
+              start = new Date(year, month - 2, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "ultimos_6":
+              start = new Date(year, month - 5, 1);
+              end = new Date(year, month + 1, 0);
+              break;
+            case "este_ano":
+              start = new Date(year, 0, 1);
+              end = new Date(year, 11, 31);
+              break;
+            case "ano_anterior":
+              start = new Date(year - 1, 0, 1);
+              end = new Date(year - 1, 11, 31);
+              break;
+            default:
+              start = new Date(year, month, 1);
+              end = new Date(year, month + 1, 0);
+          }
+          return { start, end };
+        }
+
+
+      
+
+        // ── Render del Dashboard ──
+       function renderDashboard(period = "este_mes") {
+  const content = document.getElementById("dashboardContent");
+  const { start, end } = getDateRange(period);
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const hoyStr = (() => { const y = hoy.getFullYear(); const m = String(hoy.getMonth()+1).padStart(2,"0"); const d = String(hoy.getDate()).padStart(2,"0"); return `${y}-${m}-${d}`; })();
+  const mesStr = hoyStr.slice(0, 7), anioStr = hoyStr.slice(0, 4);
+  const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const startStr = ymd(start), endStr = ymd(end);
+
+  const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  const DIAS_SEM = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const TAGS_PERSONAL = ["pec", "paf", "lar"];
+
+  const tagsDe = e => (e.tag || "").toLowerCase().split(/[\s,;]+/).filter(Boolean);
+  const diasEntre = (a, b) => Math.round((b - a) / 86400000) + 1;
+  const diasHabiles = (a, b) => {
+    let n = 0;
+    for (let d = new Date(a); d <= b; d.setDate(d.getDate() + 1)) {
+      const w = d.getDay();
+      if (w !== 0 && w !== 6) n++;
+    }
+    return n;
+  };
+  const prom = (total, dias) => dias > 0 ? (total / dias).toFixed(1) : "—";
+  const labelMes = m => { const [y, mm] = m.split("-"); return `${MESES[Number(mm)-1]} ${y}`; };
+
+  const tablaHTML = (cols, filas) => {
+    if (!filas.length) return `<div style="color:var(--faint);font-size:13px;padding:8px 0">Sin datos</div>`;
+    return `<div class="tabla-scroll"><table class="tabla-simple">
+      <thead><tr>${cols.map((c, i) => `<th${i ? ' class="num"' : ""}>${c}</th>`).join("")}</tr></thead>
+      <tbody>${filas.map(f => `<tr>${f.map((c, i) => `<td${i ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>`;
+  };
+  const bloque = (titulo, html) => `<div class="dashboard-summary" style="margin-bottom:16px"><div class="dashboard-summary-title">${titulo}</div>${html}</div>`;
+  const item = (label, value) => `<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-item-value">${value}</div></div>`;
+
+  const todos = window.dashboardData.expedientes;
+  const exps = todos.filter(e => /^\d{4}-\d{2}-\d{2}/.test(e.fecha || "")).map(e => ({ f: e.fecha.slice(0, 10), tags: tagsDe(e) }));
+  const sinFecha = todos.length - exps.length;
+
+  const porDia = {}, porMes = {}, porAnio = {}, diasMes = {}, diasAnio = {};
+  exps.forEach(e => { porDia[e.f] = (porDia[e.f] || 0) + 1; });
+  Object.entries(porDia).forEach(([f, n]) => {
+    const m = f.slice(0, 7), a = f.slice(0, 4);
+    porMes[m] = (porMes[m] || 0) + n; porAnio[a] = (porAnio[a] || 0) + n;
+    diasMes[m] = (diasMes[m] || 0) + 1; diasAnio[a] = (diasAnio[a] || 0) + 1;
+  });
+
+  const diasPeriodo = Object.keys(porDia).filter(f => f >= startStr && f <= endStr).sort().reverse();
+  const totalPeriodo = diasPeriodo.reduce((s, f) => s + porDia[f], 0);
+  const finEf = end > hoy ? hoy : end;
+  const calendario = start > finEf ? 0 : diasEntre(start, finEf);
+  const habiles = start > finEf ? 0 : diasHabiles(start, finEf);
+  const periodLabels = {
+    este_mes: "Este mes", mes_anterior: "Mes anterior", ultimos_3: "Últimos 3 meses",
+    ultimos_6: "Últimos 6 meses", este_ano: "Este año", ano_anterior: "Año anterior"
+  };
+  const periodLabel = periodLabels[period] || "Este mes";
+
+  const cards = `
+    <div class="dashboard-cards">
+      <div class="dashboard-card"><div class="dashboard-card-label">Total</div><div class="dashboard-card-value">${exps.length}</div><div class="dashboard-card-sub">Todos los registros con fecha</div></div>
+      <div class="dashboard-card"><div class="dashboard-card-label">Hoy</div><div class="dashboard-card-value">${porDia[hoyStr] || 0}</div><div class="dashboard-card-sub">${hoyStr}</div></div>
+      <div class="dashboard-card"><div class="dashboard-card-label">Este mes</div><div class="dashboard-card-value">${porMes[mesStr] || 0}</div><div class="dashboard-card-sub">${labelMes(mesStr)}</div></div>
+      <div class="dashboard-card"><div class="dashboard-card-label">Este año</div><div class="dashboard-card-value">${porAnio[anioStr] || 0}</div><div class="dashboard-card-sub">${anioStr}</div></div>
+    </div>`;
+
+  const promedios = bloque(`Promedios — ${periodLabel}`, `<div class="dashboard-summary-grid">
+    ${item("Expedientes en el período", totalPeriodo)}
+    ${item("Días con actividad", diasPeriodo.length)}
+    ${item("Promedio por día con actividad", prom(totalPeriodo, diasPeriodo.length))}
+    ${item("Promedio por día corrido", prom(totalPeriodo, calendario) + ` <small style="color:var(--faint)">(${calendario} d)</small>`)}
+    ${item("Promedio por día hábil (L–V)", prom(totalPeriodo, habiles) + ` <small style="color:var(--faint)">(${habiles} d)</small>`)}
+  </div>`);
+
+  const filasAnio = Object.keys(porAnio).sort().reverse()
+    .map(a => [a, porAnio[a], diasAnio[a], prom(porAnio[a], diasAnio[a])]);
+  const tAnio = bloque("Expedientes por año", tablaHTML(["Año", "Total", "Días con actividad", "Prom./día activo"], filasAnio));
+
+  const filasMes = Object.keys(porMes).sort().reverse().map(m => {
+    const [y, mm] = m.split("-").map(Number);
+    let dias = new Date(y, mm, 0).getDate();
+    if (m === mesStr) dias = hoy.getDate();
+    return [labelMes(m), porMes[m], diasMes[m], prom(porMes[m], diasMes[m]), prom(porMes[m], dias)];
+  });
+  const tMes = bloque("Expedientes por mes", tablaHTML(["Mes", "Total", "Días con actividad", "Prom./día activo", "Prom./día corrido"], filasMes));
+
+  const filasDia = diasPeriodo.map(f => [`${DIAS_SEM[new Date(f + "T00:00:00").getDay()]} ${f}`, porDia[f]]);
+  const tDia = bloque(`Expedientes por día — ${periodLabel}`, tablaHTML(["Día", "Total"], filasDia));
+
+  const cuenta = (t, fn) => exps.filter(e => e.tags.includes(t) && fn(e.f)).length;
+  const filasTag = TAGS_PERSONAL.map(t => [
+    t.toUpperCase(),
+    cuenta(t, () => true),
+    cuenta(t, f => f.slice(0, 4) === anioStr),
+    cuenta(t, f => f.slice(0, 7) === mesStr),
+    cuenta(t, f => f >= startStr && f <= endStr),
+  ]);
+  filasTag.push(["TOTAL", ...[1, 2, 3, 4].map(i => filasTag.reduce((s, r) => s + r[i], 0))]);
+  const tTags = bloque("Personal: PEC / PAF / LAR", tablaHTML(["Tag", "Histórico", "Este año", "Este mes", periodLabel], filasTag));
+
+  const mesesTag = {};
+  exps.forEach(e => TAGS_PERSONAL.forEach(t => {
+    if (e.tags.includes(t)) {
+      const m = e.f.slice(0, 7);
+      (mesesTag[m] = mesesTag[m] || { pec: 0, paf: 0, lar: 0 })[t]++;
+    }
+  }));
+  const filasTagMes = Object.keys(mesesTag).sort().reverse()
+    .map(m => [labelMes(m), mesesTag[m].pec, mesesTag[m].paf, mesesTag[m].lar, mesesTag[m].pec + mesesTag[m].paf + mesesTag[m].lar]);
+  const tTagsMes = bloque("PEC / PAF / LAR por mes", tablaHTML(["Mes", "PEC", "PAF", "LAR", "Total"], filasTagMes));
+
+  const nota = sinFecha ? `<div style="font-size:12px;color:var(--faint);margin-top:4px">${sinFecha} expediente(s) sin fecha no se cuentan en las tablas.</div>` : "";
+
+  content.innerHTML = cards + promedios + tTags + tTagsMes + tMes + tAnio + tDia + nota;
+}
+
+        // ── Cargar Dashboard (expone globalmente) ──
+        window.cargarDashboard = async function () {
+          if (!window.user) return;
+          const content = document.getElementById("dashboardContent");
+          const period = document.getElementById("dashboardPeriodo").value;
+
+          content.innerHTML = `
+            <div class="dashboard-loading">
+              <div class="spinner"></div>
+              <span style="font-size:13px;">Cargando estadísticas...</span>
+            </div>
+          `;
+
+          try {
+            const expSnap = await getDocs(collection(db, "expedientes"));
+            window.dashboardData.expedientes = [];
+            expSnap.forEach(d => window.dashboardData.expedientes.push({ id: d.id, ...d.data() }));
+
+            const personalSnap = await getDocs(collection(db, "personal"));
+            window.dashboardData.personal = [];
+            personalSnap.forEach(d => window.dashboardData.personal.push({ id: d.id, ...d.data() }));
+
+            renderDashboard(period);
+          } catch (error) {
+            console.error("Error al cargar dashboard:", error);
+            content.innerHTML = `
+              <div class="dashboard-error">
+                Error al cargar los datos del dashboard. Por favor, intentá nuevamente.
+                <br><small style="font-size:12px; margin-top:8px; display:block;">${error.message || "Error desconocido"}</small>
+              </div>
+            `;
+          }
+        };
+
+        // ── EXPEDIENTES CRUD ──
+        window.guardar = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("formError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("numero"),
+            detalle: v("detalle"),
+            interno: v("interno"),
+            lpu: v("lpu"),
+            tag: v("tag"),
+            fecha: v("fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormulario();
+            setPanel("lista", document.getElementById("navLista"));
+            buscar();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscar = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+          const fn = v("f_numero"),
+            ft = v("f_tag"),
+            ff = v("f_fecha"),
+            fi = v("f_interno"),
+            fl = v("f_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ft) data = data.filter(e => (e.tag || "").toLowerCase().includes(ft.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+
+          allData = data;
+          currentPage = 1;
+          actualizarStats(allData);
+          renderPagina();
+        };
+
+        function actualizarStats(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("statTotal").textContent = data.length;
+          document.getElementById("statMes").textContent = esteMes;
+          document.getElementById("statFiltrados").textContent = data.length;
+          const filtrado = v("f_numero") || v("f_tag") || v("f_fecha") || v("f_interno") || v("f_lpu");
+          document.getElementById("resultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} expediente${data.length !== 1 ? "s" : ""}`;
+        }
+
+        function renderPagina() {
+          const total = allData.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPage > totalPages) currentPage = totalPages;
+          const start = (currentPage - 1) * PAGE_SIZE;
+          renderResultados(allData.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "paginacion", "expedientes");
+        }
+
+        function renderResultados(data, offset = 0) {
+          const el = document.getElementById("resultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <p>No hay expedientes</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    ${e.tag ? `<span class="chip chip-tag">${esc(e.tag)}</span>` : ""}
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        window.eliminar = async function (id) {
+          if (!confirm("¿Eliminar este expediente? Esta acción no se puede deshacer.")) return;
+          try {
+            await deleteDoc(doc(db, "expedientes", id));
+            buscar();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.abrirEdicion = function (id) {
+          const e = allData.find(x => x.id === id) || allNovedades.find(x => x.id === id) || allPedidos.find(x => x.id === id);
+          if (!e) return alert("No se encontró el registro.");
+          document.getElementById("editId").value = e.id;
+          document.getElementById("editNumero").value = e.numero_expediente || "";
+          document.getElementById("editDetalle").value = e.detalle || "";
+          document.getElementById("editInterno").value = e.interno || "";
+          document.getElementById("editLpu").value = e.lpu || "";
+          document.getElementById("editTag").value = e.tag || "";
+          document.getElementById("editFecha").value = e.fecha || "";
+          document.getElementById("editOverlay").classList.add("open");
+        };
+
+        window.guardarEdicion = async function () {
+          const payload = {
+            numero_expediente: document.getElementById("editNumero").value,
+            detalle: document.getElementById("editDetalle").value,
+            interno: document.getElementById("editInterno").value,
+            lpu: document.getElementById("editLpu").value,
+            tag: document.getElementById("editTag").value,
+            fecha: document.getElementById("editFecha").value || null,
+          };
+          const id = document.getElementById("editId").value;
+          try {
+            await updateDoc(doc(db, "expedientes", id), payload);
+            cerrarModal("editOverlay");
+            buscar();
+            buscarNovedades();
+            buscarPedidos();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+window.exportarExcel = function () {
+  if (!allData.length) { alert("No hay expedientes para exportar."); return; }
+  descargarTabla("expedientes", "Expedientes", allData.map(e => ({
+    "N° Expediente": e.numero_expediente || "",
+    "Fecha": e.fecha || "",
+    "Detalle": e.detalle || "",
+    "Interno": e.interno || "",
+    "LPU": e.lpu || "",
+    "Tag": e.tag || "",
+  })));
+};
+
+        // ── NOVEDADES ──
+        window.guardarNovedad = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("nFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("n_numero"),
+            detalle: v("n_detalle"),
+            interno: v("n_interno"),
+            lpu: v("n_lpu"),
+            tag: NOVEDADES_TAG,
+            fecha: v("n_fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormularioNovedad();
+            setPanel("novedades", document.getElementById("navNovedades"));
+            buscarNovedades();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarNovedades = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+          data = data.filter(e => (e.tag || "").toLowerCase() === NOVEDADES_TAG);
+
+          const fn = v("nf_numero"),
+            ff = v("nf_fecha"),
+            fi = v("nf_interno"),
+            fl = v("nf_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+          allNovedades = data;
+          currentPageN = 1;
+          actualizarStatsNovedades(allNovedades);
+          renderPaginaNovedades();
+        };
+
+        function actualizarStatsNovedades(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("nStatTotal").textContent = data.length;
+          document.getElementById("nStatMes").textContent = esteMes;
+          document.getElementById("nStatFiltrados").textContent = data.length;
+          const filtrado = v("nf_numero") || v("nf_fecha") || v("nf_interno") || v("nf_lpu");
+          document.getElementById("nResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} novedad${data.length !== 1 ? "es" : ""}`;
+        }
+
+        function renderPaginaNovedades() {
+          const total = allNovedades.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPageN > totalPages) currentPageN = totalPages;
+          const start = (currentPageN - 1) * PAGE_SIZE;
+          renderResultadosNovedades(allNovedades.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "nPaginacion", "novedades");
+        }
+
+        function renderResultadosNovedades(data, offset = 0) {
+          const el = document.getElementById("nResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <p>No hay novedades</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    <span class="chip chip-tag">novedades</span>
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+window.exportarNovedadesExcel = function () {
+  if (!allNovedades.length) { alert("No hay novedades para exportar."); return; }
+  descargarTabla("novedades", "Novedades", allNovedades.map(e => ({
+    "N° Expediente": e.numero_expediente || "",
+    "Fecha": e.fecha || "",
+    "Detalle": e.detalle || "",
+    "Interno": e.interno || "",
+    "LPU": e.lpu || "",
+  })));
+};
+
+        window.limpiarFiltrosNovedades = function () {
+          ["nf_numero", "nf_fecha", "nf_interno", "nf_lpu"].forEach(id => document.getElementById(id).value = "");
+          buscarNovedades();
+        };
+        window.limpiarFormularioNovedad = function () {
+          ["n_numero", "n_detalle", "n_interno", "n_lpu", "n_fecha"].forEach(id => document.getElementById(id).value = "");
+        };
+
+        // ── PEDIDOS ──
+        window.guardarPedido = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("pdFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            numero_expediente: v("pd_numero"),
+            detalle: v("pd_detalle"),
+            interno: v("pd_interno"),
+            lpu: v("pd_lpu"),
+            tag: PEDIDOS_TAG,
+            fecha: v("pd_fecha") || null,
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.numero_expediente || !payload.detalle) {
+            showErr(errEl, "N° expediente y detalle son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "expedientes"), payload);
+            limpiarFormularioPedido();
+            setPanel("pedidos", document.getElementById("navPedidos"));
+            buscarPedidos();
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarPedidos = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "expedientes"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+          data = data.filter(e => (e.tag || "").toLowerCase() === PEDIDOS_TAG);
+
+          const fn = v("pdf_numero"),
+            ff = v("pdf_fecha"),
+            fi = v("pdf_interno"),
+            fl = v("pdf_lpu");
+
+          if (fn) data = data.filter(e => (e.numero_expediente || "").toLowerCase().includes(fn.toLowerCase()));
+          if (ff) data = data.filter(e => e.fecha === ff);
+          if (fi) data = data.filter(e => (e.interno || "").toLowerCase().includes(fi.toLowerCase()));
+          if (fl) data = data.filter(e => (e.lpu || "").toLowerCase().includes(fl.toLowerCase()));
+
+          data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+          allPedidos = data;
+          currentPagePd = 1;
+          actualizarStatsPedidos(allPedidos);
+          renderPaginaPedidos();
+        };
+
+        function actualizarStatsPedidos(data) {
+          const now = new Date();
+          const esteMes = data.filter(e => {
+            if (!e.fecha) return false;
+            const d = new Date(e.fecha + "T00:00:00");
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          document.getElementById("pdStatTotal").textContent = data.length;
+          document.getElementById("pdStatMes").textContent = esteMes;
+          document.getElementById("pdStatFiltrados").textContent = data.length;
+          const filtrado = v("pdf_numero") || v("pdf_fecha") || v("pdf_interno") || v("pdf_lpu");
+          document.getElementById("pdResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} pedido${data.length !== 1 ? "s" : ""}`;
+        }
+
+        function renderPaginaPedidos() {
+          const total = allPedidos.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPagePd > totalPages) currentPagePd = totalPages;
+          const start = (currentPagePd - 1) * PAGE_SIZE;
+          renderResultadosPedidos(allPedidos.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "pdPaginacion", "pedidos");
+        }
+
+        function renderResultadosPedidos(data, offset = 0) {
+          const el = document.getElementById("pdResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <p>No hay pedidos</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((e, i) => `
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-index">${String(offset + i + 1).padStart(2, "0")}</div>
+                <div class="card-body">
+                  <div class="card-head">
+                    <span class="card-num">${esc(e.numero_expediente)}</span>
+                  </div>
+                  <div class="card-detalle">${esc(e.detalle)}</div>
+                  <div class="card-chips">
+                    ${e.interno ? `<span class="chip">Int: ${esc(e.interno)}</span>` : ""}
+                    ${e.lpu ? `<span class="chip">LPU: ${esc(e.lpu)}</span>` : ""}
+                    <span class="chip chip-tag">pedido</span>
+                    ${e.fecha ? `<span class="chip chip-fecha">${e.fecha}</span>` : ""}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicion('${e.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminar('${e.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+window.exportarPedidosExcel = function () {
+  if (!allPedidos.length) { alert("No hay pedidos para exportar."); return; }
+  descargarTabla("pedidos", "Pedidos", allPedidos.map(e => ({
+    "N° Expediente": e.numero_expediente || "",
+    "Fecha": e.fecha || "",
+    "Detalle": e.detalle || "",
+    "Interno": e.interno || "",
+    "LPU": e.lpu || "",
+  })));
+};
+
+        window.limpiarFiltrosPedidos = function () {
+          ["pdf_numero", "pdf_fecha", "pdf_interno", "pdf_lpu"].forEach(id => document.getElementById(id).value = "");
+          buscarPedidos();
+        };
+        window.limpiarFormularioPedido = function () {
+          ["pd_numero", "pd_detalle", "pd_interno", "pd_lpu", "pd_fecha"].forEach(id => document.getElementById(id).value = "");
+        };
+
+        // ── PERSONAL ──
+        window.guardarPersonal = async function () {
+          if (!window.user) return;
+          const errEl = document.getElementById("pFormError");
+          errEl.classList.remove("show");
+          const payload = {
+            user_id: window.user.uid,
+            grado: v("p_grado"),
+            nombre: v("p_nombre"),
+            apellido: v("p_apellido"),
+            credencial: v("p_credencial"),
+            dni: v("p_dni"),
+            cuil: v("p_cuil"),
+            telefono: v("p_telefono"),
+            mail: v("p_mail"),
+            usuario_gde: v("p_usuario_gde"),
+            direccion: v("p_direccion"),
+            expediente_oi: v("p_expediente_oi"),
+            numero_oi: v("p_numero_oi"),
+            curso_titulo: v("p_curso_titulo"),
+            sector: v("p_sector"),
+            turno: v("p_turno"),
+            detalle: v("p_detalle"),
+            created_at: new Date().toISOString(),
+          };
+          if (!payload.nombre || !payload.apellido) {
+            showErr(errEl, "Nombre y apellido son obligatorios.");
+            return;
+          }
+          try {
+            await addDoc(collection(db, "personal"), payload);
+            limpiarFormularioPersonal();
+            setPanel("personal", document.getElementById("navPersonal"));
+          } catch (error) {
+            showErr(errEl, error.message);
+          }
+        };
+
+        window.buscarPersonal = async function () {
+          if (!window.user) return;
+          const snap = await getDocs(collection(db, "personal"));
+          let data = [];
+          snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+          const fn = v("pf_nombre"),
+            fg = v("pf_grado"),
+            fc = v("pf_credencial"),
+            fs = v("pf_sector"),
+            fcu = v("pf_curso"),
+            ft = v("pf_turno");
+
+          if (fn) data = data.filter(p =>
+            (p.nombre || "").toLowerCase().includes(fn.toLowerCase()) ||
+            (p.apellido || "").toLowerCase().includes(fn.toLowerCase())
+          );
+          if (fg) data = data.filter(p => (p.grado || "").toLowerCase().includes(fg.toLowerCase()));
+          if (fc) data = data.filter(p => (p.credencial || "").toLowerCase().includes(fc.toLowerCase()));
+          if (fs) data = data.filter(p => (p.sector || "").toLowerCase().includes(fs.toLowerCase()));
+          if (fcu) data = data.filter(p => (p.curso_titulo || "").toLowerCase().includes(fcu.toLowerCase()));
+          if (ft) data = data.filter(p => (p.turno || "").toLowerCase() === ft.toLowerCase());
+
+          allPersonal = data;
+          allPersonal.forEach(p => { personalMap[p.id] = p; });
+          currentPageP = 1;
+          actualizarStatsPersonal(allPersonal);
+          renderPaginaPersonal();
+        };
+
+        function actualizarStatsPersonal(data) {
+          const sectores = new Set(data.map(p => p.sector).filter(Boolean)).size;
+          document.getElementById("pStatTotal").textContent = data.length;
+          document.getElementById("pStatSectores").textContent = sectores;
+          document.getElementById("pStatFiltrados").textContent = data.length;
+          const filtrado = v("pf_nombre") || v("pf_grado") || v("pf_credencial") || v("pf_sector") || v("pf_curso");
+          document.getElementById("pResultsCount").textContent = filtrado ?
+            `${data.length} resultado${data.length !== 1 ? "s" : ""} filtrado${data.length !== 1 ? "s" : ""}` :
+            `${data.length} persona${data.length !== 1 ? "s" : ""}`;
+        }
+
+        window.setSortPersonal = function (field, btn) {
+          if (sortFieldP === field) {
+            sortAscP = !sortAscP;
+          } else {
+            sortFieldP = field;
+            sortAscP = true;
+          }
+          document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const arrowEl = document.getElementById("sortArrow_" + field);
+          document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
+          if (arrowEl) arrowEl.textContent = sortAscP ? "↑" : "↓";
+          renderPaginaPersonal();
+        };
+
+        function renderPaginaPersonal() {
+          const sorted = [...allPersonal].sort((a, b) => {
+            const va = (a[sortFieldP] || "").toLowerCase();
+            const vb = (b[sortFieldP] || "").toLowerCase();
+            const cmp = va.localeCompare(vb, "es");
+            return sortAscP ? cmp : -cmp;
+          });
+          const total = sorted.length;
+          const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+          if (currentPageP > totalPages) currentPageP = totalPages;
+          const start = (currentPageP - 1) * PAGE_SIZE;
+          renderResultadosPersonal(sorted.slice(start, start + PAGE_SIZE), start);
+          renderPaginacion(total, totalPages, "pPaginacion", "personal");
+        }
+
+        function renderResultadosPersonal(data, offset = 0) {
+          const el = document.getElementById("pResultados");
+          if (!data.length) {
+            el.innerHTML = `<div class="empty-state">
+              <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              <p>No hay personal registrado</p>
+            </div>`;
+            return;
+          }
+          el.innerHTML = data.map((p) => {
+            const initials = ((p.nombre || "").charAt(0) + (p.apellido || "").charAt(0)).toUpperCase();
+            return `
+            <div class="personal-card">
+              <div class="personal-card-inner">
+                <div class="personal-avatar">${initials}</div>
+                <div class="personal-body">
+                  <div class="personal-name">${esc(p.apellido)}, ${esc(p.nombre)}</div>
+                  <div class="personal-sub">${p.grado ? esc(p.grado) + " · " : ""}${p.sector ? esc(p.sector) : "Sin sector"}</div>
+                  <div class="personal-grid">
+                    ${p.credencial ? `<div class="personal-field"><span class="personal-field-label">Credencial</span><span class="personal-field-value">${esc(p.credencial)}</span></div>` : ""}
+                    ${p.dni ? `<div class="personal-field"><span class="personal-field-label">DNI</span><span class="personal-field-value">${esc(p.dni)}</span></div>` : ""}
+                    ${p.cuil ? `<div class="personal-field"><span class="personal-field-label">CUIL</span><span class="personal-field-value">${esc(p.cuil)}</span></div>` : ""}
+                    ${p.telefono ? `<div class="personal-field"><span class="personal-field-label">Tel.</span><span class="personal-field-value">${esc(p.telefono)}</span></div>` : ""}
+                    ${p.mail ? `<div class="personal-field"><span class="personal-field-label">Mail</span><span class="personal-field-value">${esc(p.mail)}</span></div>` : ""}
+                    ${p.usuario_gde ? `<div class="personal-field"><span class="personal-field-label">GDE</span><span class="personal-field-value">${esc(p.usuario_gde)}</span></div>` : ""}
+                    ${p.numero_oi ? `<div class="personal-field"><span class="personal-field-label">Nro. OI</span><span class="personal-field-value">${esc(p.numero_oi)}</span></div>` : ""}
+                  </div>
+                  <div class="card-chips">
+                    ${p.curso_titulo ? `<span class="chip chip-tag">${esc(p.curso_titulo)}</span>` : ""}
+                    ${p.turno ? `<span class="chip chip-green">${esc(p.turno)}</span>` : ""}
+                    ${p.expediente_oi ? `<span class="chip">OI: ${esc(p.expediente_oi)}</span>` : ""}
+                    ${p.direccion ? `<span class="chip chip-fecha">${esc(p.direccion)}</span>` : ""}
+                  </div>
+                  ${p.detalle ? `<div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5">${esc(p.detalle)}</div>` : ""}
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-edit-soft" onclick="abrirEdicionPersonal('${p.id}')">Editar</button>
+                  <button class="btn btn-danger-soft" onclick="eliminarPersonal('${p.id}')">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `}).join("");
+        }
+
+        window.eliminarPersonal = async function (id) {
+          if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
+          try {
+            await deleteDoc(doc(db, "personal", id));
+            buscarPersonal();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+        window.abrirEdicionPersonal = function (id) {
+          const p = personalMap[id];
+          if (!p) return alert("No se encontró el registro.");
+          const fields = ["id", "grado", "nombre", "apellido", "credencial", "dni", "cuil", "telefono",
+            "mail", "usuario_gde", "direccion", "expediente_oi", "numero_oi",
+            "curso_titulo", "sector", "turno", "detalle"
+          ];
+          fields.forEach(f => {
+            const el = document.getElementById("ep_" + f);
+            if (el) el.value = p[f] || "";
+          });
+          document.getElementById("editPersonalOverlay").classList.add("open");
+        };
+
+        window.guardarEdicionPersonal = async function () {
+          const id = document.getElementById("ep_id").value;
+          const payload = {
+            grado: document.getElementById("ep_grado").value,
+            nombre: document.getElementById("ep_nombre").value,
+            apellido: document.getElementById("ep_apellido").value,
+            credencial: document.getElementById("ep_credencial").value,
+            dni: document.getElementById("ep_dni").value,
+            cuil: document.getElementById("ep_cuil").value,
+            telefono: document.getElementById("ep_telefono").value,
+            mail: document.getElementById("ep_mail").value,
+            usuario_gde: document.getElementById("ep_usuario_gde").value,
+            direccion: document.getElementById("ep_direccion").value,
+            expediente_oi: document.getElementById("ep_expediente_oi").value,
+            numero_oi: document.getElementById("ep_numero_oi").value,
+            curso_titulo: document.getElementById("ep_curso_titulo").value,
+            sector: document.getElementById("ep_sector").value,
+            turno: document.getElementById("ep_turno").value,
+            detalle: document.getElementById("ep_detalle").value,
+          };
+          try {
+            await updateDoc(doc(db, "personal", id), payload);
+            cerrarModal("editPersonalOverlay");
+            buscarPersonal();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+
+window.exportarPersonalExcel = function () {
+  if (!allPersonal.length) { alert("No hay personal para exportar."); return; }
+  descargarTabla("personal", "Personal", allPersonal.map(p => ({
+    "Grado": p.grado || "",
+    "Apellido": p.apellido || "",
+    "Nombre": p.nombre || "",
+    "Credencial": p.credencial || "",
+    "DNI": p.dni || "",
+    "CUIL": p.cuil || "",
+    "Teléfono": p.telefono || "",
+    "Mail": p.mail || "",
+    "Usuario GDE": p.usuario_gde || "",
+    "Dirección": p.direccion || "",
+    "Expediente OI": p.expediente_oi || "",
+    "Número OI": p.numero_oi || "",
+    "Curso / Título": p.curso_titulo || "",
+    "Sector": p.sector || "",
+    "Turno": p.turno || "",
+    "Detalle": p.detalle || "",
+  })));
+};
+
+        // ── PAGINACIÓN ──
+        window.cambiarPagina = function (containerType, p) {
+          if (containerType === "expedientes") { currentPage = p;
+            renderPagina(); } else if (containerType === "novedades") { currentPageN = p;
+            renderPaginaNovedades(); } else if (containerType === "pedidos") { currentPagePd = p;
+            renderPaginaPedidos(); } else { currentPageP = p;
+            renderPaginaPersonal(); }
+        };
+
+        function renderPaginacion(total, totalPages, containerId, containerType) {
+          const pag = document.getElementById(containerId);
+          const cp = containerType === "expedientes" ? currentPage :
+            containerType === "novedades" ? currentPageN :
+            containerType === "pedidos" ? currentPagePd :
+            currentPageP;
+          if (total <= PAGE_SIZE) { pag.style.display = "none"; return; }
+          pag.style.display = "flex";
+
+          let pages = [];
+          if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+          } else {
+            pages = [1];
+            const left = Math.max(2, cp - 1);
+            const right = Math.min(totalPages - 1, cp + 1);
+            if (left > 2) pages.push("…");
+            for (let i = left; i <= right; i++) pages.push(i);
+            if (right < totalPages - 1) pages.push("…");
+            pages.push(totalPages);
+          }
+
+          const startItem = (cp - 1) * PAGE_SIZE + 1;
+          const endItem = Math.min(cp * PAGE_SIZE, total);
+
+          pag.innerHTML = `
+            <div class="pagination-info">${startItem}–${endItem} de ${total}</div>
+            <div class="pagination-controls">
+              <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp - 1})" ${cp === 1 ? "disabled" : ""}>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              ${pages.map(p => p === "…" ?
+                `<span class="page-btn" style="cursor:default;opacity:.4">…</span>` :
+                `<button class="page-btn ${p === cp ? "active" : ""}" onclick="cambiarPagina('${containerType}', ${p})">${p}</button>`
+              ).join("")}
+              <button class="page-btn" onclick="cambiarPagina('${containerType}', ${cp + 1})" ${cp === totalPages ? "disabled" : ""}>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          `;
+        }
+
+        // ── MODALES ──
+        window.cerrarModal = function (id) { document.getElementById(id).classList.remove("open"); };
+        window.overlayClick = function (e) { if (e.target === e.currentTarget) cerrarModal("editOverlay"); };
+        window.overlayClickPersonal = function (e) { if (e.target === e.currentTarget) cerrarModal("editPersonalOverlay"); };
+
+        // ── LIMPIAR FILTROS / FORMULARIOS ──
+        window.limpiarFiltros = function () {
+          ["f_numero", "f_tag", "f_fecha", "f_interno", "f_lpu"].forEach(id => document.getElementById(id).value = "");
+          buscar();
+        };
+        window.limpiarFormulario = function () {
+          ["numero", "detalle", "interno", "lpu", "tag", "fecha"].forEach(id => document.getElementById(id).value = "");
+        };
+        window.limpiarFiltrosPersonal = function () {
+          ["pf_nombre", "pf_grado", "pf_credencial", "pf_sector", "pf_curso", "pf_turno"].forEach(id => document.getElementById(id).value = "");
+          buscarPersonal();
+        };
+        window.limpiarFormularioPersonal = function () {
+          ["p_grado", "p_nombre", "p_apellido", "p_credencial", "p_dni", "p_cuil", "p_telefono",
+            "p_mail", "p_usuario_gde", "p_direccion", "p_expediente_oi", "p_numero_oi",
+            "p_curso_titulo", "p_sector", "p_turno", "p_detalle"
+          ].forEach(id => document.getElementById(id).value = "");
+        };
+
+        window.setPanel = function (name, btn) {
+          document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+          document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+          const key = name.charAt(0).toUpperCase() + name.slice(1);
+          document.getElementById("panel" + key).classList.add("active");
+          btn.classList.add("active");
+          if (name === "personal") buscarPersonal();
+          if (name === "novedades") buscarNovedades();
+          if (name === "pedidos") buscarPedidos();
+          if (name === "dashboard") cargarDashboard();
+          if (name === "lista") buscar();
+        };
+
+        document.getElementById("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+      })();
+    </script>
+  </body>
+</html>
